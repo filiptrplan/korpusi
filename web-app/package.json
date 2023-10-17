@@ -1,0 +1,37 @@
+{
+  "name": "material-ui-remix-ts",
+  "version": "5.0.0",
+  "private": true,
+  "scripts": {
+    "build": "remix build",
+    "dev": "remix dev --manual",
+    "start": "remix-serve ./build/index.js",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@emotion/cache": "latest",
+    "@emotion/react": "latest",
+    "@emotion/server": "latest",
+    "@emotion/styled": "latest",
+    "@mui/icons-material": "^5.14.14",
+    "@mui/material": "latest",
+    "@remix-run/css-bundle": "latest",
+    "@remix-run/node": "latest",
+    "@remix-run/react": "latest",
+    "@remix-run/serve": "latest",
+    "@remix-run/server-runtime": "latest",
+    "opensheetmusicdisplay": "^1.8.4",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "typescript": "latest"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "sideEffects": false
+}
