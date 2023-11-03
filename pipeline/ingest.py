@@ -7,7 +7,7 @@ from typing_extensions import Annotated
 import typer
 import music21
 import sys
-from processors import basic_processors
+from processors import basic_processors, contour_processor
 
 music_xml_processors = [
     # Add musicXML processors here
@@ -15,7 +15,8 @@ music_xml_processors = [
     basic_processors.TimeSignatureProcessor,
     basic_processors.TempoProcessor,
     basic_processors.AmbitusProcessor,
-    basic_processors.MetadataProcessor
+    basic_processors.MetadataProcessor,
+    contour_processor.ContourProcessor,
 ]
 
 def main(in_file: str, out_file: Annotated[str, typer.Argument()] = None, pretty: bool = False, include_original: bool = True):
