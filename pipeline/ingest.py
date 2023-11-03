@@ -6,22 +6,33 @@ import os
 from typing_extensions import Annotated
 import typer
 import music21
-from processors import test_processor
+import sys
+from processors import basic_processors
 
 music_xml_processors = [
     # Add musicXML processors here
-    test_processor.KeySignatureProcessor,
+    basic_processors.KeySignatureProcessor,
+    basic_processors.TimeSignatureProcessor,
+    basic_processors.TempoProcessor,
+    basic_processors.AmbitusProcessor,
+    basic_processors.MetadataProcessor
 ]
 
-def main(in_file: str, out_file: Annotated[str, typer.Argument()] = None, pretty: bool = False):
+def main(in_file: str, out_file: Annotated[str, typer.Argument()] = None, pretty: bool = False, include_original: bool = True):
     """Ingester main function. It processes the files and spits out the results in JSON."""
     # Check if in_file exists and is a file
     if not os.path.isfile(in_file):
         raise typer.BadParameter(f"File does not exist: {in_file}")
 
     results = process_musicxml(in_file, music_xml_processors)
+    if include_original:
+        results['filename'] = os.path.basename(in_file)
+        with open(in_file, 'r', encoding='utf-8') as f:
+            results['original_file'] = f.read()
     if pretty:
-        results = json.dumps(json.loads(results), indent=4)
+        results = json.dumps(results, indent=4)
+    else:
+        results = json.dumps(results)
     if out_file is None:
         print(results)
     else:
@@ -30,18 +41,14 @@ def main(in_file: str, out_file: Annotated[str, typer.Argument()] = None, pretty
         print(f"Results written to {out_file}")
 
 def process_musicxml(path: str, processors: list):
-    """Processes a single MusicXML file and spits out the results in JSON."""
+    """Processes a single MusicXML file and spits out the results in dictionary form."""
     music21_song = music21.converter.parse(path)
     results = {}
     for processor in processors:
         processor_instance = processor(music21_song)
         results[processor_instance.get_name()] = processor_instance.process()
 
-    results['filename'] = os.path.basename(path)
-    with open(path, 'r', encoding='utf-8') as f:
-        results['original_file'] = f.read()
-
-    return json.dumps(results)
+    return results
 
 
 if __name__ == '__main__':
