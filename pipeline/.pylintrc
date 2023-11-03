@@ -1,5 +1,6 @@
 [MASTER]
 disable=
-    C0114
+    C0114,
+    C0303
 
 max-line-length=150
