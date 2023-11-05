@@ -12,6 +12,9 @@ panda = "*"
 regex = "*"
 typer = "*"
 music21 = "*"
+elasticsearch = "*"
+pip = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
