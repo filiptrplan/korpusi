@@ -6,6 +6,9 @@ class KeySignatureProcessor(MusicXMLProcessor):
     song: stream.Stream
     def __init__(self, song: stream.Stream, name='key_signature'):
         super().__init__(song, name)
+        self.mapping = {
+            'type': 'keyword'
+        }
 
     def process(self) -> str:
         first_measure: stream.Measure = self.song.parts[0].getElementsByClass(stream.Measure)[0]
@@ -17,6 +20,12 @@ class TimeSignatureProcessor(MusicXMLProcessor):
     song: stream.Stream
     def __init__(self, song: stream.Stream, name='time_signature'):
         super().__init__(song, name)
+        self.mapping = {
+            'type': 'keyword',
+            'fields': {
+                'text': { 'type': 'text'}
+            }
+        }
 
     def process(self) -> str:
         first_measure: stream.Measure = self.song.parts[0].getElementsByClass(stream.Measure)[0]
@@ -28,6 +37,9 @@ class TempoProcessor(MusicXMLProcessor):
     song: stream.Stream
     def __init__(self, song: stream.Stream, name='tempo'):
         super().__init__(song, name)
+        self.mapping = {
+            'type': 'long'
+        }
 
     def process(self) -> str:
         tempo_marks = []
@@ -47,6 +59,23 @@ class AmbitusProcessor(MusicXMLProcessor):
     song: stream.Stream
     def __init__(self, song: stream.Stream, name='ambitus'):
         super().__init__(song, name)
+        self.mapping = {
+            'properties': {
+                'min_note': { 
+                    'type': 'keyword',           
+                    'fields': {
+                        'text': { 'type': 'text'}
+                    } 
+                },
+                'max_note': { 
+                    'type': 'keyword',           
+                    'fields': {
+                        'text': { 'type': 'text'}
+                    } 
+                },
+                'ambitus_semitones': { 'type': 'long' }
+            }
+        }
 
     def process(self):
         notes = self.song.flatten().getElementsByClass(note.Note)
@@ -73,6 +102,9 @@ class MetadataProcessor(MusicXMLProcessor):
     song: stream.Stream
     def __init__(self, song: stream.Stream, name='metadata'):
         super().__init__(song, name)
+        self.mapping = {
+            'type': 'object',
+        }
 
     def process(self):
         my_metadata = self.song.getElementsByClass(metadata.Metadata)[0]

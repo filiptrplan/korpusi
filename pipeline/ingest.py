@@ -6,7 +6,6 @@ import os
 from typing_extensions import Annotated
 import typer
 import music21
-import sys
 from processors import basic_processors, contour_processor
 
 music_xml_processors = [
@@ -21,12 +20,13 @@ music_xml_processors = [
 
 def main(in_file: Annotated[str, typer.Option(help='Path to the file to process')] = None,
          out_file: str = None, 
+         mapping_file: str = None,
          in_dir: Annotated[str, typer.Option(help='Path to the directory to process')] = None,
          out_dir: str = None,
          pretty: bool = False, 
          include_original: Annotated[bool, typer.Option(help='Whether to include the original musicXML file in the JSON output')] = True,
          print_output: bool = False,
-         single_output: Annotated[bool, typer.Option(help='If all the files should be outputed as one newline delimited JSON')] = False):
+         single_output: Annotated[bool, typer.Option(help='If all the files should be outputed as one newline delimited JSON')] = False,):
     """Ingester main function. It processes the files and spits out the results in JSON."""
     if in_file is not None and in_dir is not None:
         raise typer.BadParameter("Cannot specify both in_file and in_dir")
@@ -67,6 +67,25 @@ def main(in_file: Annotated[str, typer.Option(help='Path to the file to process'
                         with open(out_file, 'w', encoding='utf-8') as f:
                             f.write(results)
                     print(f"Processed {in_file}")
+
+    if mapping_file is None:
+        if out_dir is None:
+            if out_file is None:
+                mapping_file = os.path.join(os.path.dirname(in_file),'mapping.json')
+            else:
+                mapping_file = os.path.join(os.path.dirname(out_file), 'mapping.json')
+        else:
+            mapping_file = os.path.join(os.path.dirname(out_dir), 'mapping.json')
+        with open(mapping_file, 'w', encoding='utf-8') as f:
+            mapping = { 'properties': {
+                'filename': { 'enabled': False },
+                'original_file': { 'enabled': False }
+            } }
+            for processor in music_xml_processors:
+                processor_instance = processor(None)
+                mapping['properties'][processor_instance.get_name()] = processor_instance.get_mapping()
+            f.write(json.dumps(mapping, indent=4))
+            
 
 def process_file(in_file: str, pretty: bool, include_original: bool):
     """Processes a single file and writes the results in JSON."""

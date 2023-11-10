@@ -8,6 +8,19 @@ class ContourProcessor(MusicXMLProcessor):
     song: music21.stream.Stream
     def __init__(self, song: music21.stream.Stream, name='contour'):
         super().__init__(song, name)
+        self.mapping = {
+            'properties': {
+                'melodic_contour_semi': {
+                    'type': 'long'
+                },
+                'melodic_contour_string': {
+                    'type': 'text'
+                },
+                'measure_starts': {
+                    'type': 'long'
+                }
+            }
+        }
 
     def process(self):
         pitch_values = []
