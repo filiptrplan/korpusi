@@ -122,7 +122,7 @@ export default function Search() {
           {sklanjaj(data.length, [
             "rezultat",
             "rezultata",
-            "rezultate",
+            "rezultati",
             "rezultatov",
           ])}
         </Typography>
