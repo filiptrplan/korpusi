@@ -34,7 +34,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const params = Object.fromEntries(url.searchParams);
   if (!("title" in params) || params.title === "") {
-    return { data: [], params, pagination: { total: 0, current: 1 } };
+    return {
+      data: [],
+      params,
+      pagination: { total: 0, current: 1, totalHits: 0, pageSize: 10 },
+    };
   }
   let pageSize = 10;
   let page = 1;
@@ -61,13 +65,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       },
     },
   });
+  const totalPages =
+    Math.ceil((data.hits.total as SearchTotalHits)?.value / pageSize) ?? 0;
   return {
     data: data.hits.hits.map((hit) => hit._source),
     params,
     pagination: {
-      total:
-        Math.ceil((data.hits.total as SearchTotalHits)?.value / pageSize) ?? 0,
-      current: page,
+      total: totalPages,
+      pageSize: pageSize,
+      totalHits: (data.hits.total as SearchTotalHits)?.value ?? 0,
+      current: Math.min(page, totalPages),
     },
   };
 };
@@ -92,9 +99,20 @@ export default function Search() {
     navigation.location &&
     new URLSearchParams(navigation.location.search).has("title");
 
+  const submit = useSubmit();
+
   return (
     <div>
-      <Form>
+      <Form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+          if (pagination.pageSize !== 10) {
+            formData.set("pageSize", pagination.pageSize.toString());
+          }
+          submit(formData);
+        }}
+      >
         <TextField
           name="title"
           label="Išči"
@@ -118,8 +136,8 @@ export default function Search() {
             whiteSpace: "nowrap",
           }}
         >
-          {data.length}{" "}
-          {sklanjaj(data.length, [
+          {pagination.totalHits}{" "}
+          {sklanjaj(pagination.totalHits, [
             "rezultat",
             "rezultata",
             "rezultati",
@@ -176,9 +194,17 @@ export default function Search() {
             }}
             size="small"
             label="Št. na stran"
+            value={pagination.pageSize}
             onChange={(e) => {
               const link = new URLSearchParams(params);
+              const pageSize = parseInt(e.target.value as string);
               link.set("pageSize", e.target.value.toString());
+              if (pageSize * (pagination.current - 1) > pagination.totalHits) {
+                link.set(
+                  "page",
+                  Math.ceil(pagination.totalHits / pageSize).toString()
+                );
+              }
               navigate(`?${link.toString()}`);
             }}
           >
@@ -192,7 +218,7 @@ export default function Search() {
           page={pagination.current}
           onChange={(e, page) => {
             const link = new URLSearchParams(params);
-            link.append("page", page ? page.toString() : "1");
+            link.set("page", page ? page.toString() : "1");
             navigate(`?${link.toString()}`);
           }}
         />
