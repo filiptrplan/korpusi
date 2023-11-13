@@ -17,6 +17,13 @@ const theme = createTheme({
   shape: {
     borderRadius: 8,
   },
+  components: {
+    MuiCard: {
+      defaultProps: {
+        variant: "outlined",
+      },
+    },
+  },
 });
 
 export default theme;

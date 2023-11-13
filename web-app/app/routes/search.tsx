@@ -1,14 +1,12 @@
 import {
   Box,
+  Button,
   CircularProgress,
   Divider,
   FormControl,
-  Input,
   InputLabel,
-  Link,
   MenuItem,
   Pagination,
-  PaginationItem,
   Select,
   Stack,
   TextField,
@@ -26,7 +24,7 @@ import { useEffect, useState } from "react";
 import { elastic } from "~/services/Elastic";
 import { SongResult } from "~/src/DataTypes";
 import { useDebounceSubmit } from "~/src/useDebounceSubmit";
-import { ResultRow } from "./ResultRow";
+import { ResultRow } from "./search/ResultRow";
 import { sklanjaj } from "~/src/helpers";
 import { SearchTotalHits } from "@elastic/elasticsearch/lib/api/types";
 
@@ -68,7 +66,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const totalPages =
     Math.ceil((data.hits.total as SearchTotalHits)?.value / pageSize) ?? 0;
   return {
-    data: data.hits.hits.map((hit) => hit._source),
+    data: data.hits.hits,
     params,
     pagination: {
       total: totalPages,
@@ -85,7 +83,7 @@ export default function Search() {
   const navigate = useNavigate();
 
   const resultComponents = data.map((song) => {
-    return <ResultRow song={song} />;
+    return <ResultRow songHit={song} key={song._id} />;
   });
 
   useEffect(() => {
@@ -145,6 +143,9 @@ export default function Search() {
           ])}
         </Typography>
         <Divider sx={{ mx: 1, flexGrow: 1 }} />
+        <Button variant="text" size="small">
+          Izberi dela
+        </Button>
       </Stack>
       <Box
         sx={{

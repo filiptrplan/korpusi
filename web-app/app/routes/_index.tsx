@@ -1,11 +1,17 @@
-import {
-  Card,
-  CardContent,
-  InputLabel,
-  Slider,
-  Stack,
-  TextField,
-} from "@mui/material";
+// import {
+//   Card,
+//   CardContent,
+//   InputLabel,
+//   Slider,
+//   Stack,
+//   TextField,
+// } from "@mui/material";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import InputLabel from "@mui/material/InputLabel";
+import Slider from "@mui/material/Slider";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
 import { OSMD } from "~/components/OSMD";
 import { FormControl } from "@mui/base";
