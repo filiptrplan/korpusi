@@ -16,6 +16,7 @@ music_xml_processors = [
     basic_processors.AmbitusProcessor,
     basic_processors.MetadataProcessor,
     contour_processor.ContourProcessor,
+    contour_processor.RhythmProcessor
 ]
 
 def main(in_file: Annotated[str, typer.Option(help='Path to the file to process')] = None,

@@ -18,6 +18,9 @@ class ContourProcessor(MusicXMLProcessor):
                 },
                 'measure_starts': {
                     'type': 'long'
+                },
+                'melodic_contour_string_absolute': {
+                    'type': 'text'
                 }
             }
         }
@@ -67,3 +70,33 @@ class ContourProcessor(MusicXMLProcessor):
             'measure_starts': measure_starts
         }
     
+class RhythmProcessor(MusicXMLProcessor):
+    """Gets the rhythm of the song. It describes the duration of the notes."""
+
+    song: music21.stream.Stream
+    def __init__(self, song: music21.stream.Stream, name='rhythm'):
+        super().__init__(song, name)
+        self.mapping = {
+            'properties': {
+                'rhythm_numeric': {
+                    'type': 'text'
+                },
+                'rhythm_string': {
+                    'type': 'text'
+                },
+            }
+        }
+
+    def process(self):
+        rhythm_numeric = []
+        for x in self.song.parts[0].flatten():
+            if isinstance(x, music21.note.Note):
+                rhythm_numeric.append(x.duration.quarterLength)
+            elif isinstance(x, music21.chord.Chord):
+                note = x.sortAscending()[len(x) - 1]
+                rhythm_numeric.append(note.duration.quarterLength)
+        rhythm_string = ' '.join([str(x) for x in rhythm_numeric])
+        return {
+            'rhythm_numeric': rhythm_numeric,
+            'rhythm_string': rhythm_string
+        }
