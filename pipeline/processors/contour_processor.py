@@ -45,7 +45,9 @@ class ContourProcessor(MusicXMLProcessor):
             pitch_interval = music21.interval.Interval(pitch_values[i], pitch_values[i+1])
             semi = pitch_interval.semitones
             melodic_contour.append(semi)
-
+            
+        melodic_contour_string_absolute = ' '.join([x.nameWithOctave for x in pitch_values])
+            
         melodic_contour_string = ""
         for x in melodic_contour:
             if x > 0: 
@@ -54,12 +56,14 @@ class ContourProcessor(MusicXMLProcessor):
                 melodic_contour_string += "D"
             else: 
                 melodic_contour_string += "S"
+            melodic_contour_string += " " # this is here so we can better search for the contour
 
         measure_starts = [i for i in range(len(pitch_values)) if measure_numbers[i] != measure_numbers[i-1]]
 
         return {
             'melodic_contour_semi': melodic_contour,
-            'melodic_contour_string': melodic_contour_string,
+            'melodic_contour_string_relative': melodic_contour_string,
+            'melodic_contour_string_absolute': melodic_contour_string_absolute,
             'measure_starts': measure_starts
         }
     
