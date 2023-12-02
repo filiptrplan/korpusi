@@ -27,25 +27,28 @@ import { useDebounceSubmit } from "~/src/useDebounceSubmit";
 import { ResultRow } from "./search/ResultRow";
 import { sklanjaj } from "~/src/helpers";
 import { SearchTotalHits } from "@elastic/elasticsearch/lib/api/types";
+import { useTranslation } from "react-i18next";
+
+export let handle = {
+  i18n: "search",
+};
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const params = Object.fromEntries(url.searchParams);
-  if (!("title" in params) || params.title === "") {
-    return {
-      data: [],
-      params,
-      pagination: { total: 0, current: 1, totalHits: 0, pageSize: 10 },
-    };
-  }
   let pageSize = 10;
   let page = 1;
+  let metadataFields: string[] = [];
   if ("pageSize" in params) {
     pageSize = parseInt(params.pageSize);
   }
   if ("page" in params) {
     page = parseInt(params.page);
   }
+  if ("metadataFields" in params) {
+    metadataFields = params.metadataFields.split(",");
+  }
+
   const data = await elastic.search<SongResult>({
     index: "songs",
     from: (page - 1) * pageSize,
@@ -58,8 +61,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       //   lenient: true,
       // },
       query_string: {
-        query: `*${params.title}*`,
-        fields: ["metadata.*"],
+        query: `*${params.metadataQuery}*`,
+        fields:
+          metadataFields.length > 0
+            ? metadataFields.map((x) => `metadata.${x}`)
+            : ["metadata.*"],
       },
     },
   });
@@ -81,22 +87,13 @@ export default function Search() {
   const { data, params, pagination } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const navigate = useNavigate();
+  const { t } = useTranslation("search");
 
   const resultComponents = data.map((song) => {
     return <ResultRow songHit={song} key={song._id} />;
   });
 
-  useEffect(() => {
-    const titleField = document.getElementById("title");
-    if (titleField instanceof HTMLInputElement) {
-      titleField.value = params.title || "";
-    }
-  }, [params.title]);
-
-  const searching =
-    navigation.location &&
-    new URLSearchParams(navigation.location.search).has("title");
-
+  const searching = navigation.state !== "idle";
   const submit = useSubmit();
 
   return (
@@ -111,13 +108,42 @@ export default function Search() {
           submit(formData);
         }}
       >
-        <TextField
-          name="title"
-          label="Išči"
-          variant="outlined"
-          defaultValue={params.title || ""}
-          id="title"
-        />
+        <Stack spacing={1} direction="column" alignItems={"flex-start"}>
+          <Stack spacing={1} direction="row">
+            <TextField
+              name="metadataQuery"
+              label={t("searchByMetadata")}
+              variant="outlined"
+              defaultValue={params.metadataQuery || ""}
+              id="metadataQuery"
+            />
+            <FormControl
+              sx={{
+                width: "15rem",
+              }}
+            >
+              <InputLabel id="metadata-field-label">
+                {t("chooseMetadataFields")}
+              </InputLabel>
+              <Select
+                label={t("chooseMetadataFields")}
+                labelId="metadata-field-label"
+                name="metadataFields"
+                multiple
+                defaultValue={
+                  params.metadataFields ? params.metadataFields.split(",") : []
+                }
+              >
+                <MenuItem value="title">{t("metadataTitle")}</MenuItem>
+                <MenuItem value="composer">{t("metadataComposer")}</MenuItem>
+                <MenuItem value="lyricist">{t("metadataLyricist")}</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
+          <Button type="submit" variant="contained">
+            {t("search")}
+          </Button>
+        </Stack>
       </Form>
       <Stack
         direction={"row"}
@@ -134,13 +160,7 @@ export default function Search() {
             whiteSpace: "nowrap",
           }}
         >
-          {pagination.totalHits}{" "}
-          {sklanjaj(pagination.totalHits, [
-            "rezultat",
-            "rezultata",
-            "rezultati",
-            "rezultatov",
-          ])}
+          {t("results", { count: pagination.totalHits })}
         </Typography>
         <Divider sx={{ mx: 1, flexGrow: 1 }} />
         <Button variant="text" size="small">

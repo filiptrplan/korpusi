@@ -3,5 +3,10 @@
     "results_one": "{{count}} rezultat",
     "results_two": "{{count}} rezultata",
     "results_few": "{{count}} rezultati",
-    "results_other": "{{count}} rezultatov"
+    "results_other": "{{count}} rezultatov",
+    "chooseMetadataFields": "Izberi polja",
+    "metadataTitle": "Naslov",
+    "metadataComposer": "Skladatelj",
+    "metadataLyricist": "Pesnik",
+    "search": "Išči"
 }
