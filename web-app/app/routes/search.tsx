@@ -169,7 +169,7 @@ export default function Search() {
   return (
     <div>
       <Form onSubmit={onSubmit}>
-        <Stack spacing={1} direction="column" alignItems={"flex-start"}>
+        <Stack spacing={1.6} direction="column" alignItems={"flex-start"}>
           <MetadataSelect
             metadataFields={params.metadataFields}
             metadataQuery={params.metadataQuery}

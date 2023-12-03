@@ -35,16 +35,42 @@ export const KeySelect: React.FC<KeySelectProps> = ({
           label={t("key")}
           name="key"
           sx={{
-            width: "6rem",
+            width: "8rem",
           }}
           value={keyState}
           onChange={(e) => {
             setKeyState(e.target.value as string);
           }}
         >
-          <MenuItem value="none">{t("none")}</MenuItem>
-          <MenuItem value="C">{t("C")}</MenuItem>
-          <MenuItem value="D">{t("D")}</MenuItem>
+          <MenuItem value="none">{t("keys.none")}</MenuItem>
+          <MenuItem value="G">{t("keys.G")}</MenuItem>
+          <MenuItem value="D">{t("keys.D")}</MenuItem>
+          <MenuItem value="A">{t("keys.A")}</MenuItem>
+          <MenuItem value="E">{t("keys.E")}</MenuItem>
+          <MenuItem value="B">{t("keys.B")}</MenuItem>
+          <MenuItem value="F#">{t("keys.F#")}</MenuItem>
+          <MenuItem value="C#">{t("keys.C#")}</MenuItem>
+          <MenuItem value="F">{t("keys.F")}</MenuItem>
+          <MenuItem value="B-">{t("keys.B-")}</MenuItem>
+          <MenuItem value="E-">{t("keys.E-")}</MenuItem>
+          <MenuItem value="A-">{t("keys.A-")}</MenuItem>
+          <MenuItem value="D-">{t("keys.D-")}</MenuItem>
+          <MenuItem value="G-">{t("keys.G-")}</MenuItem>
+          <MenuItem value="C-">{t("keys.C-")}</MenuItem>
+          <MenuItem value="a">{t("keys.a")}</MenuItem>
+          <MenuItem value="e">{t("keys.e")}</MenuItem>
+          <MenuItem value="b">{t("keys.b")}</MenuItem>
+          <MenuItem value="f#">{t("keys.f#")}</MenuItem>
+          <MenuItem value="c#">{t("keys.c#")}</MenuItem>
+          <MenuItem value="g#">{t("keys.g#")}</MenuItem>
+          <MenuItem value="d#">{t("keys.d#")}</MenuItem>
+          <MenuItem value="d">{t("keys.d")}</MenuItem>
+          <MenuItem value="g">{t("keys.g")}</MenuItem>
+          <MenuItem value="c">{t("keys.c")}</MenuItem>
+          <MenuItem value="f">{t("keys.f")}</MenuItem>
+          <MenuItem value="b-">{t("keys.b-")}</MenuItem>
+          <MenuItem value="e-">{t("keys.e-")}</MenuItem>
+          <MenuItem value="a-">{t("keys.a-")}</MenuItem>
         </Select>
       </FormControl>
       <FormControlLabel
