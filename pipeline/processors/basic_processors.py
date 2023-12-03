@@ -7,12 +7,28 @@ class KeyProcessor(MusicXMLProcessor):
     def __init__(self, song: stream.Stream, name='key'):
         super().__init__(song, name)
         self.mapping = {
-            'type': 'keyword'
+            'properties': {
+                'most_certain_key': {
+                    'type': 'keyword',
+                    'fields': {
+                        'text': { 'type': 'text'}
+                    }
+                },
+                'alternate_keys': {
+                    'type': 'keyword',
+                    'fields': {
+                        'text': { 'type': 'text'}
+                    }
+                }
+            }
         }
 
     def process(self) -> str:
         song_key: key.Key = self.song.analyze('key')
-        return song_key.tonicPitchNameWithCase
+        return {
+            'most_certain_key': song_key.tonicPitchNameWithCase,
+            'alternate_keys': [x.tonicPitchNameWithCase for x in song_key.alternateInterpretations[0:4]] # get the first 4 alternate keys
+        }
 
 class TimeSignatureProcessor(MusicXMLProcessor):
     """Get the time signature of the song."""

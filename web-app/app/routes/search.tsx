@@ -15,51 +15,42 @@ import {
 import {
   Form,
   useLoaderData,
+  useLocation,
   useNavigate,
   useNavigation,
   useSubmit,
 } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { elastic } from "~/services/Elastic";
 import { SongResult } from "~/src/DataTypes";
 import { useDebounceSubmit } from "~/src/useDebounceSubmit";
 import { ResultRow } from "./search/ResultRow";
 import { sklanjaj } from "~/src/helpers";
-import { SearchTotalHits } from "@elastic/elasticsearch/lib/api/types";
+import {
+  QueryDslQueryContainer,
+  SearchTotalHits,
+} from "@elastic/elasticsearch/lib/api/types";
 import { useTranslation } from "react-i18next";
+import { MetadataSelect } from "./search/MetadataSelect";
+import { KeySelect } from "./search/KeySelect";
 
 export let handle = {
   i18n: "search",
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const params = Object.fromEntries(url.searchParams);
-  let pageSize = 10;
-  let page = 1;
-  let metadataFields: string[] = [];
-  if ("pageSize" in params) {
-    pageSize = parseInt(params.pageSize);
-  }
-  if ("page" in params) {
-    page = parseInt(params.page);
-  }
-  if ("metadataFields" in params) {
-    metadataFields = params.metadataFields.split(",");
-  }
+const constructQuery = (
+  params: Record<string, string>
+): QueryDslQueryContainer => {
+  let queries: QueryDslQueryContainer[] = [];
 
-  const data = await elastic.search<SongResult>({
-    index: "songs",
-    from: (page - 1) * pageSize,
-    size: pageSize,
-    query: {
-      // multi_match: {
-      //   query: `*${params.title}*`,
-      //   fields: ["metadata.*"],
-      //   type: "phrase_prefix",
-      //   lenient: true,
-      // },
+  // METADATA QUERY
+  if ("metadataQuery" in params) {
+    let metadataFields: string[] = [];
+    if ("metadataFields" in params) {
+      metadataFields = params.metadataFields.split(",");
+    }
+    queries.push({
       query_string: {
         query: `*${params.metadataQuery}*`,
         fields:
@@ -67,7 +58,60 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             ? metadataFields.map((x) => `metadata.${x}`)
             : ["metadata.*"],
       },
+    });
+  }
+
+  // KEY QUERY
+  if ("key" in params && params.key !== "none") {
+    if ("alternativeKeys" in params && params.alternativeKeys === "on") {
+      queries.push({
+        bool: {
+          should: [
+            {
+              term: {
+                "key.most_certain_key": params.key,
+              },
+            },
+            {
+              match: {
+                "key.alternate_keys": params.key,
+              },
+            },
+          ],
+        },
+      });
+    } else {
+      queries.push({
+        term: {
+          "key.most_certain_key": params.key,
+        },
+      });
+    }
+  }
+  return {
+    bool: {
+      must: queries,
     },
+  };
+};
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+  const params = Object.fromEntries(url.searchParams);
+  let pageSize = 10;
+  let page = 1;
+  if ("pageSize" in params) {
+    pageSize = parseInt(params.pageSize);
+  }
+  if ("page" in params) {
+    page = parseInt(params.page);
+  }
+
+  const data = await elastic.search<SongResult>({
+    index: "songs",
+    from: (page - 1) * pageSize,
+    size: pageSize,
+    query: constructQuery(params),
   });
   const totalPages =
     Math.ceil((data.hits.total as SearchTotalHits)?.value / pageSize) ?? 0;
@@ -88,7 +132,6 @@ export default function Search() {
   const navigation = useNavigation();
   const navigate = useNavigate();
   const { t } = useTranslation("search");
-
   const resultComponents = data.map((song) => {
     return <ResultRow songHit={song} key={song._id} />;
   });
@@ -96,53 +139,69 @@ export default function Search() {
   const searching = navigation.state !== "idle";
   const submit = useSubmit();
 
+  const resetFields = () => {
+    navigate("/search");
+  };
+
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    if (pagination.pageSize !== 10) {
+      formData.set("pageSize", pagination.pageSize.toString());
+    }
+    if (formData.get("key") === "none") {
+      formData.delete("key");
+    }
+    for (let key of formData.keys()) {
+      // delete empty keys
+      if (
+        formData.get(key) === "" ||
+        formData.get(key) === null ||
+        formData.get(key) === undefined ||
+        formData.getAll(key).length === 0
+      ) {
+        formData.delete(key);
+      }
+    }
+    submit(formData);
+  };
+
   return (
     <div>
-      <Form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
-          if (pagination.pageSize !== 10) {
-            formData.set("pageSize", pagination.pageSize.toString());
-          }
-          submit(formData);
-        }}
-      >
+      <Form onSubmit={onSubmit}>
         <Stack spacing={1} direction="column" alignItems={"flex-start"}>
+          <MetadataSelect
+            metadataFields={params.metadataFields}
+            metadataQuery={params.metadataQuery}
+          />
+          <KeySelect
+            keyValue={params.key}
+            alternativeKeys={params.alternativeKeys}
+          />
           <Stack spacing={1} direction="row">
-            <TextField
-              name="metadataQuery"
-              label={t("searchByMetadata")}
-              variant="outlined"
-              defaultValue={params.metadataQuery || ""}
-              id="metadataQuery"
-            />
-            <FormControl
+            <Button
+              type="submit"
+              variant="contained"
               sx={{
-                width: "15rem",
+                py: 1,
+                px: 3,
+                boxShadow: "none",
               }}
             >
-              <InputLabel id="metadata-field-label">
-                {t("chooseMetadataFields")}
-              </InputLabel>
-              <Select
-                label={t("chooseMetadataFields")}
-                labelId="metadata-field-label"
-                name="metadataFields"
-                multiple
-                defaultValue={
-                  params.metadataFields ? params.metadataFields.split(",") : []
-                }
-              >
-                <MenuItem value="title">{t("metadataTitle")}</MenuItem>
-                <MenuItem value="composer">{t("metadataComposer")}</MenuItem>
-                <MenuItem value="lyricist">{t("metadataLyricist")}</MenuItem>
-              </Select>
-            </FormControl>
+              {t("search")}
+            </Button>
+            <Button
+              sx={{
+                py: 1,
+                px: 3,
+                boxShadow: "none",
+              }}
+              variant="outlined"
+              onClick={resetFields}
+            >
+              {t("reset")}
+            </Button>
           </Stack>
-          <Button type="submit" variant="contained">
-            {t("search")}
-          </Button>
         </Stack>
       </Form>
       <Stack

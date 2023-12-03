@@ -8,5 +8,8 @@
     "metadataTitle": "Naslov",
     "metadataComposer": "Skladatelj",
     "metadataLyricist": "Pesnik",
-    "search": "Išči"
+    "search": "Išči",
+    "key": "Ključ",
+    "reset": "Ponastavi",
+    "alternativeKeys": "Upoštevaj alternativne ključe"
 }
