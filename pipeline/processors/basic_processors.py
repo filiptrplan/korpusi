@@ -1,19 +1,18 @@
-from music21 import stream, tempo, note, interval, metadata
+from music21 import stream, tempo, note, interval, metadata, key
 from processors.musicxml_processor import MusicXMLProcessor
 
-class KeySignatureProcessor(MusicXMLProcessor):
+class KeyProcessor(MusicXMLProcessor):
     """Get the key signature of the song."""
     song: stream.Stream
-    def __init__(self, song: stream.Stream, name='key_signature'):
+    def __init__(self, song: stream.Stream, name='key'):
         super().__init__(song, name)
         self.mapping = {
             'type': 'keyword'
         }
 
     def process(self) -> str:
-        first_measure: stream.Measure = self.song.parts[0].getElementsByClass(stream.Measure)[0]
-        key_signature = str(first_measure.keySignature.asKey().tonicPitchNameWithCase) # lowercase = minor, uppercase = major
-        return key_signature
+        song_key: key.Key = self.song.analyze('key')
+        return song_key.tonicPitchNameWithCase
 
 class TimeSignatureProcessor(MusicXMLProcessor):
     """Get the time signature of the song."""

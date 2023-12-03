@@ -10,7 +10,7 @@ from processors import basic_processors, contour_processor
 
 music_xml_processors = [
     # Add musicXML processors here
-    basic_processors.KeySignatureProcessor,
+    basic_processors.KeyProcessor,
     basic_processors.TimeSignatureProcessor,
     basic_processors.TempoProcessor,
     basic_processors.AmbitusProcessor,
