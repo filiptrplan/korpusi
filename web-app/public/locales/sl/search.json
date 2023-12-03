@@ -13,6 +13,10 @@
     "reset": "Ponastavi",
     "alternativeKeys": "Upoštevaj alternativne ključe",
     "timeSignature": "Metrum",
+    "from": "Od",
+    "to": "Do",
+    "tempoBPM": "Tempo (dobe/min)",
+    "useTempo": "Upoštevaj tempo",
     "keys": {
         "none": "Brez",
         "G": "G-dur",

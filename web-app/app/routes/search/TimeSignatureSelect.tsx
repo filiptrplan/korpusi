@@ -46,7 +46,9 @@ export const TimeSignatureSelect: React.FC<TimeSignatureProps> = ({
             return a.split("/")[1].localeCompare(b.split("/")[1]);
           })
           .map((timeSig) => (
-            <MenuItem value={timeSig}>{timeSig}</MenuItem>
+            <MenuItem key={timeSig} value={timeSig}>
+              {timeSig}
+            </MenuItem>
           ))}
       </Select>
     </FormControl>

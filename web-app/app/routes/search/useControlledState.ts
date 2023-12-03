@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
  * synchronizing the state with the URL.
  * @param value The default value
  */
-export const useControlledState = <T>(value?: T) => {
-  const [state, setState] = useState<T | undefined>(value);
+export const useControlledState = <T>(value: T) => {
+  const [state, setState] = useState<T>(value);
 
   useEffect(() => {
     setState(value);

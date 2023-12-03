@@ -36,6 +36,7 @@ import { useTranslation } from "react-i18next";
 import { MetadataSelect } from "./search/MetadataSelect";
 import { KeySelect } from "./search/KeySelect";
 import { TimeSignatureSelect } from "./search/TimeSignatureSelect";
+import { TempoSlider } from "./search/TempoSlider";
 
 export let handle = {
   i18n: "search",
@@ -98,6 +99,22 @@ const constructQuery = (
         time_signature: params.timeSignature,
       },
     });
+  }
+
+  // TEMPO QUERY
+  if ("useTempo" in params && params.useTempo === "on") {
+    if ("tempoFrom" in params && "tempoTo" in params) {
+      const tempoFrom = parseInt(params.tempoFrom);
+      const tempoTo = parseInt(params.tempoTo);
+      queries.push({
+        range: {
+          tempo: {
+            gte: tempoFrom,
+            lte: tempoTo,
+          },
+        },
+      });
+    }
   }
 
   return {
@@ -183,19 +200,20 @@ export default function Search() {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const originalFormData = new FormData(e.currentTarget);
     if (pagination.pageSize !== 10) {
       formData.set("pageSize", pagination.pageSize.toString());
     }
-    for (let key of formData.keys()) {
+    for (let value of originalFormData.keys()) {
       // delete empty keys
       if (
-        formData.get(key) === "" ||
-        formData.get(key) === null ||
-        formData.get(key) === undefined ||
-        formData.getAll(key).length === 0 ||
-        formData.get(key) === "none"
+        formData.get(value) === "" ||
+        formData.get(value) === null ||
+        formData.get(value) === undefined ||
+        formData.getAll(value).length === 0 ||
+        formData.get(value) === "none"
       ) {
-        formData.delete(key);
+        formData.delete(value);
       }
     }
     submit(formData);
@@ -204,12 +222,18 @@ export default function Search() {
   return (
     <div>
       <Form onSubmit={onSubmit}>
-        <Stack spacing={1.6} direction="column" alignItems={"flex-start"}>
+        <Stack spacing={1.6} alignItems={"flex-start"} direction={"column"}>
           <MetadataSelect
             metadataFields={params.metadataFields}
             metadataQuery={params.metadataQuery}
           />
-          <Stack spacing={1.5} direction="row">
+          <Stack
+            spacing={1.5}
+            direction={{
+              md: "column",
+              lg: "row",
+            }}
+          >
             <KeySelect
               keyValue={params.key}
               alternativeKeys={params.alternativeKeys}
@@ -217,6 +241,11 @@ export default function Search() {
             <TimeSignatureSelect
               availableTimeSignatures={availableTimeSignatures}
               timeSignature={params.timeSignature}
+            />
+            <TempoSlider
+              tempoFrom={params.tempoFrom}
+              tempoTo={params.tempoTo}
+              useTempo={params.useTempo}
             />
           </Stack>
           <Stack spacing={1} direction="row">
