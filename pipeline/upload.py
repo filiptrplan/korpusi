@@ -30,7 +30,8 @@ def index_document(json_str: str, index: str):
 def main(index: str, 
         json_file: Annotated[str, typer.Option(help='Path to the JSON file to upload. It should feature one JSON file for each line.')] = None,
         json_dir: Annotated[str, typer.Option(help='Path to the directory containing the JSON files to upload. Each file is its separate document')] = None,
-        mapping_file: Annotated[str, typer.Option(help='Path to the mapping file. If not specified, it will be inferred from the path of the input file.')] = None):
+        mapping_file: Annotated[str, typer.Option(help='Path to the mapping file. If not specified, it will be inferred from the path of the input file.')] = None,
+        delete_index: Annotated[bool, typer.Option(help='Whether to delete the index before uploading.')] = False):
     """Uploads JSON files to the ElasticSearch database."""
     if json_file is not None and json_dir is not None:
         raise typer.BadParameter("Cannot specify both json_file and json_dir")
@@ -47,6 +48,8 @@ def main(index: str,
                 raise typer.BadParameter(f"Mapping file {mapping_file} does not exist")
         
     mapping = json.load(open(mapping_file, 'r', encoding='utf-8'))
+    if delete_index is True:
+        client.indices.delete(index=index)
     client.options(ignore_status=400).indices.create(index=index)
     client.indices.put_mapping(index=index, properties=mapping['properties']) # this is so we don't ignore 400 errors on mapping syntax
     
