@@ -108,6 +108,5 @@ class RhythmProcessor(MusicXMLProcessor):
                 
         rhythm_string = ' '.join([str(x) for x in rhythm_numeric])
         return {
-            'rhythm_numeric': rhythm_numeric,
             'rhythm_string': rhythm_string
         }
