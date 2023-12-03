@@ -12,7 +12,7 @@ class KeySignatureProcessor(MusicXMLProcessor):
 
     def process(self) -> str:
         first_measure: stream.Measure = self.song.parts[0].getElementsByClass(stream.Measure)[0]
-        key_signature = str(first_measure.keySignature.asKey())
+        key_signature = str(first_measure.keySignature.asKey().tonicPitchNameWithCase) # lowercase = minor, uppercase = major
         return key_signature
 
 class TimeSignatureProcessor(MusicXMLProcessor):
