@@ -89,12 +89,23 @@ class RhythmProcessor(MusicXMLProcessor):
 
     def process(self):
         rhythm_numeric = []
+        measure_numbers = [] # this is done because you can't set a measure number to a note and a note in a chord doesn't have one
+        beats = []
         for x in self.song.parts[0].flatten():
-            if isinstance(x, music21.note.Note):
-                rhythm_numeric.append(x.duration.quarterLength)
-            elif isinstance(x, music21.chord.Chord):
+            if len(measure_numbers) != 0:
+                if measure_numbers[len(measure_numbers) - 1] == x.measureNumber and beats[len(beats) - 1] == x.beat:
+                    continue # prevents adding two notes that are played at the same time
+            
+            note = x
+            if not (isinstance(x, music21.note.Note) or isinstance(x, music21.chord.Chord) or isinstance(x, music21.note.Rest)):
+                continue
+            if isinstance(x, music21.chord.Chord):
                 note = x.sortAscending()[len(x) - 1]
-                rhythm_numeric.append(note.duration.quarterLength)
+            beats.append(note.beat)
+            measure_numbers.append(note.measureNumber)
+            fraction = (note.duration.quarterLength).as_integer_ratio()
+            rhythm_numeric.append(f'{fraction[0]}/{fraction[1]}')
+                
         rhythm_string = ' '.join([str(x) for x in rhythm_numeric])
         return {
             'rhythm_numeric': rhythm_numeric,
