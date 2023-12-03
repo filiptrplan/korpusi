@@ -78,8 +78,8 @@ class RhythmProcessor(MusicXMLProcessor):
         super().__init__(song, name)
         self.mapping = {
             'properties': {
-                'rhythm_numeric': {
-                    'type': 'text'
+                'measure_starts': {
+                    'type': 'long'
                 },
                 'rhythm_string': {
                     'type': 'text'
@@ -108,5 +108,6 @@ class RhythmProcessor(MusicXMLProcessor):
                 
         rhythm_string = ' '.join([str(x) for x in rhythm_numeric])
         return {
-            'rhythm_string': rhythm_string
+            'rhythm_string': rhythm_string,
+            'measure_starts': [i for i in range(len(rhythm_numeric)) if measure_numbers[i] != measure_numbers[i-1]]
         }
