@@ -52,7 +52,8 @@ def main(in_file: Annotated[str, typer.Option(help='Path to the file to process'
             out_dir = in_dir
         if single_output is True and os.path.isfile(os.path.join(out_dir, 'results.json')):
             os.remove(os.path.join(out_dir, 'results.json'))
-        for file in os.listdir(in_dir):
+        files = sorted(os.listdir(in_dir))
+        for file in files:
             if file.endswith(".xml") or file.endswith(".musicxml"):
                 in_file = os.path.join(in_dir, file) 
                 results = process_file(in_file, pretty, include_original)
