@@ -21,7 +21,7 @@ export const KeySelect: React.FC<KeySelectProps> = ({
   keyValue,
   alternativeKeys,
 }) => {
-  const [keyState, setKeyState] = useControlledState(keyValue || "none");
+  const [keyState, setKeyState] = useControlledState(keyValue || "");
   const [alternativeKeysState, setAlternativeKeysState] = useControlledState(
     alternativeKeys == "on" || false
   );

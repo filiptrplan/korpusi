@@ -12,6 +12,7 @@
     "key": "Ključ",
     "reset": "Ponastavi",
     "alternativeKeys": "Upoštevaj alternativne ključe",
+    "timeSignature": "Metrum",
     "keys": {
         "none": "Brez",
         "G": "G-dur",

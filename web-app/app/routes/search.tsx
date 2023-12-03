@@ -28,12 +28,14 @@ import { useDebounceSubmit } from "~/src/useDebounceSubmit";
 import { ResultRow } from "./search/ResultRow";
 import { sklanjaj } from "~/src/helpers";
 import {
+  AggregationsStringTermsAggregate,
   QueryDslQueryContainer,
   SearchTotalHits,
 } from "@elastic/elasticsearch/lib/api/types";
 import { useTranslation } from "react-i18next";
 import { MetadataSelect } from "./search/MetadataSelect";
 import { KeySelect } from "./search/KeySelect";
+import { TimeSignatureSelect } from "./search/TimeSignatureSelect";
 
 export let handle = {
   i18n: "search",
@@ -88,11 +90,44 @@ const constructQuery = (
       });
     }
   }
+
+  // TIME SIGNATURE QUERY
+  if ("timeSignature" in params && params.timeSignature !== "none") {
+    queries.push({
+      term: {
+        time_signature: params.timeSignature,
+      },
+    });
+  }
+
   return {
     bool: {
       must: queries,
     },
   };
+};
+
+const getAvailableTimeSignatures = async () => {
+  const data = await elastic.search({
+    index: "songs",
+    aggs: {
+      time_signatures: {
+        terms: {
+          field: "time_signature",
+        },
+      },
+    },
+  });
+  if (!data.aggregations) {
+    return [];
+  }
+  const timeSignatures = data.aggregations
+    .time_signatures as AggregationsStringTermsAggregate;
+  if (Array.isArray(timeSignatures.buckets)) {
+    return timeSignatures.buckets.map((x) => x.key);
+  } else {
+    return [];
+  }
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -118,6 +153,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return {
     data: data.hits.hits,
     params,
+    availableTimeSignatures: await getAvailableTimeSignatures(),
     pagination: {
       total: totalPages,
       pageSize: pageSize,
@@ -128,7 +164,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function Search() {
-  const { data, params, pagination } = useLoaderData<typeof loader>();
+  const { data, params, pagination, availableTimeSignatures } =
+    useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const navigate = useNavigate();
   const { t } = useTranslation("search");
@@ -149,16 +186,14 @@ export default function Search() {
     if (pagination.pageSize !== 10) {
       formData.set("pageSize", pagination.pageSize.toString());
     }
-    if (formData.get("key") === "none") {
-      formData.delete("key");
-    }
     for (let key of formData.keys()) {
       // delete empty keys
       if (
         formData.get(key) === "" ||
         formData.get(key) === null ||
         formData.get(key) === undefined ||
-        formData.getAll(key).length === 0
+        formData.getAll(key).length === 0 ||
+        formData.get(key) === "none"
       ) {
         formData.delete(key);
       }
@@ -174,10 +209,16 @@ export default function Search() {
             metadataFields={params.metadataFields}
             metadataQuery={params.metadataQuery}
           />
-          <KeySelect
-            keyValue={params.key}
-            alternativeKeys={params.alternativeKeys}
-          />
+          <Stack spacing={1.5} direction="row">
+            <KeySelect
+              keyValue={params.key}
+              alternativeKeys={params.alternativeKeys}
+            />
+            <TimeSignatureSelect
+              availableTimeSignatures={availableTimeSignatures}
+              timeSignature={params.timeSignature}
+            />
+          </Stack>
           <Stack spacing={1} direction="row">
             <Button
               type="submit"
