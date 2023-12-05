@@ -77,16 +77,10 @@ class AmbitusProcessor(MusicXMLProcessor):
         self.mapping = {
             'properties': {
                 'min_note': { 
-                    'type': 'keyword',           
-                    'fields': {
-                        'text': { 'type': 'text'}
-                    } 
+                    'type': 'long',           
                 },
                 'max_note': { 
-                    'type': 'keyword',           
-                    'fields': {
-                        'text': { 'type': 'text'}
-                    } 
+                    'type': 'long',           
                 },
                 'ambitus_semitones': { 'type': 'long' }
             }
@@ -105,8 +99,8 @@ class AmbitusProcessor(MusicXMLProcessor):
         my_interval = interval.Interval(noteStart=min_note, noteEnd=max_note)
 
         result = {
-            'min_note': str(min_note.nameWithOctave),
-            'max_note': str(max_note.nameWithOctave),
+            'min_note': min_note.pitch.midi,
+            'max_note': max_note.pitch.midi,
             'ambitus_semitones': my_interval.semitones
         }
 
