@@ -10,8 +10,8 @@ class ContourProcessor(MusicXMLProcessor):
         super().__init__(song, name)
         self.mapping = {
             'properties': {
-                'melodic_contour_semi': {
-                    'type': 'long'
+                'melodic_contour_string_relative': {
+                    'type': 'text'
                 },
                 'melodic_contour_string': {
                     'type': 'text'
@@ -49,7 +49,7 @@ class ContourProcessor(MusicXMLProcessor):
             semi = pitch_interval.semitones
             melodic_contour.append(semi)
             
-        melodic_contour_string_absolute = ' '.join([x.nameWithOctave for x in pitch_values])
+        melodic_contour_string_absolute = ' '.join([str(x.pitch.midi) for x in pitch_values])
             
         melodic_contour_string = ""
         for x in melodic_contour:
@@ -64,8 +64,8 @@ class ContourProcessor(MusicXMLProcessor):
         measure_starts = [i for i in range(len(pitch_values)) if measure_numbers[i] != measure_numbers[i-1]]
 
         return {
-            'melodic_contour_semi': melodic_contour,
-            'melodic_contour_string_relative': melodic_contour_string,
+            'melodic_contour_string_relative': ' '.join([str(x) for x in melodic_contour]),
+            'melodic_contour_string': melodic_contour_string,
             'melodic_contour_string_absolute': melodic_contour_string_absolute,
             'measure_starts': measure_starts
         }
