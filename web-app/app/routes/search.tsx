@@ -308,6 +308,28 @@ export default function Search() {
   const navigation = useNavigation();
   const navigate = useNavigate();
   const { t } = useTranslation("search");
+
+  // load the last search params from local storage
+  useEffect(() => {
+    if (
+      localStorage.getItem("searchParams") &&
+      window.location.href.indexOf("?") === -1 &&
+      window.location.href.indexOf("search") > -1
+    ) {
+      // this will execute only if there are no params
+      const params = JSON.parse(localStorage.getItem("searchParams")!);
+      const link = new URLSearchParams(params);
+      navigate(`?${link.toString()}`, {
+        replace: true,
+      });
+    }
+  }, [navigate]);
+
+  // save the search params to local storage
+  useEffect(() => {
+    localStorage.setItem("searchParams", JSON.stringify(params));
+  }, [params]);
+
   const resultComponents = data.map((song) => {
     return (
       <ResultRow
@@ -322,6 +344,7 @@ export default function Search() {
   const submit = useSubmit();
 
   const resetFields = () => {
+    localStorage.removeItem("searchParams");
     navigate("/search");
   };
 
