@@ -37,6 +37,11 @@ import { MetadataSelect } from "./search/MetadataSelect";
 import { KeySelect } from "./search/KeySelect";
 import { TimeSignatureSelect } from "./search/TimeSignatureSelect";
 import { TempoSlider } from "./search/TempoSlider";
+import { NoteRangeSlider } from "./search/NoteRangeSlider";
+import { AmbitusSlider } from "./search/AmbitusSlider";
+import { RhythmNgramSearch } from "./search/RhythmNgramSearch";
+import { MelodicNgramSearch } from "./search/MelodicNgramSearch";
+import notes from "./search/notes.json";
 
 export let handle = {
   i18n: "search",
@@ -112,6 +117,95 @@ const constructQuery = (
             gte: tempoFrom,
             lte: tempoTo,
           },
+        },
+      });
+    }
+  }
+
+  // HIGHEST NOTE QUERY
+  if ("noteHighestFrom" in params && "noteHighestTo" in params) {
+    const noteHighestFrom = parseInt(params.noteHighestFrom);
+    const noteHighestTo = parseInt(params.noteHighestTo);
+    queries.push({
+      range: {
+        "ambitus.max_note": {
+          gte: noteHighestFrom,
+          lte: noteHighestTo,
+        },
+      },
+    });
+  }
+
+  // LOWEST NOTE QUERY
+  if ("noteLowestFrom" in params && "noteLowestTo" in params) {
+    const noteLowestFrom = parseInt(params.noteLowestFrom);
+    const noteLowestTo = parseInt(params.noteLowestTo);
+    queries.push({
+      range: {
+        "ambitus.min_note": {
+          gte: noteLowestFrom,
+          lte: noteLowestTo,
+        },
+      },
+    });
+  }
+
+  // AMBITUS QUERY
+  if ("ambitusFrom" in params && "ambitusTo" in params) {
+    const ambitusFrom = parseInt(params.ambitusFrom);
+    const ambitusTo = parseInt(params.ambitusTo);
+    queries.push({
+      range: {
+        "ambitus.ambitus_semitones": {
+          gte: ambitusFrom,
+          lte: ambitusTo,
+        },
+      },
+    });
+  }
+
+  // RHYTHM NGRAM QUERY
+  if ("rhythmNgram" in params) {
+    queries.push({
+      match_phrase: {
+        "rhythm.rhythm_string": params.rhythmNgram,
+      },
+    });
+  }
+
+  // MELODIC NGRAM QUERY
+  if ("melodicNgram" in params) {
+    // convert text to midi numbers
+    const stringArr = params.melodicNgram.split(" ");
+    const expandedNotes: any = { ...notes };
+    Object.keys(notes).forEach((key) => {
+      // here we expand the notes object to include flat keys with the regular letter b
+      if (key.includes("♭")) {
+        expandedNotes[key.replace("♭", "b")] = notes[key as keyof typeof notes];
+      }
+    });
+    const midiNumbers = stringArr.map((x) => {
+      const note = x.replace("♭", "b");
+      return expandedNotes[note as keyof typeof expandedNotes];
+    });
+    const midiNumbersRelative = [];
+    for (let i = 1; i < midiNumbers.length; i++) {
+      midiNumbersRelative.push(midiNumbers[i] - midiNumbers[i - 1]); // we leave out the first note as we have no idea what the starting note is
+    }
+    if (
+      "melodicNgramRelative" in params &&
+      params.melodicNgramRelative === "on"
+    ) {
+      queries.push({
+        match_phrase: {
+          "contour.melodic_contour_string_relative":
+            midiNumbersRelative.join(" "),
+        },
+      });
+    } else {
+      queries.push({
+        match_phrase: {
+          "contour.melodic_contour_string_absolute": midiNumbers.join(" "),
         },
       });
     }
@@ -246,6 +340,31 @@ export default function Search() {
               tempoFrom={params.tempoFrom}
               tempoTo={params.tempoTo}
               useTempo={params.useTempo}
+            />
+          </Stack>
+          <NoteRangeSlider
+            noteFrom={params.noteHighestFrom}
+            noteTo={params.noteHighestTo}
+            label={t("highestNote")}
+            nameFrom="noteHighestFrom"
+            nameTo="noteHighestTo"
+          />
+          <NoteRangeSlider
+            noteFrom={params.noteLowestFrom}
+            noteTo={params.noteLowestTo}
+            label={t("lowestNote")}
+            nameFrom="noteLowestFrom"
+            nameTo="noteLowestTo"
+          />
+          <AmbitusSlider
+            ambitusFrom={params.ambitusFrom}
+            ambitusTo={params.ambitusTo}
+          />
+          <Stack direction="row" spacing={1}>
+            <RhythmNgramSearch rhythmNgram={params.rhythmNgram} />
+            <MelodicNgramSearch
+              melodicNgram={params.melodicNgram}
+              melodicNgramRelative={params.melodicNgramRelative}
             />
           </Stack>
           <Stack spacing={1} direction="row">
