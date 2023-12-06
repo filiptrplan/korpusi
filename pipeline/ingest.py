@@ -77,7 +77,7 @@ def main(in_file: Annotated[str, typer.Option(help='Path to the file to process'
             else:
                 mapping_file = os.path.join(os.path.dirname(out_file), 'mapping.json')
         else:
-            mapping_file = os.path.join(os.path.dirname(out_dir), 'mapping.json')
+            mapping_file = os.path.join(out_dir, 'mapping.json')
         with open(mapping_file, 'w', encoding='utf-8') as f:
             mapping = { 'properties': {
                 'filename': { 'enabled': False },
