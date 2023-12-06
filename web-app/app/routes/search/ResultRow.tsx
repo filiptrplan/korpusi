@@ -15,6 +15,9 @@ import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { useNavigate } from "@remix-run/react";
 import Difference from "@mui/icons-material/Difference";
 import FileDownload from "@mui/icons-material/FileDownload";
+import { InfoCard } from "./InfoCard";
+import { useTranslation } from "react-i18next";
+import notes from "./notes.json";
 
 export interface ResultRowProps {
   songHit: SearchHit<SongResult>;
@@ -23,6 +26,12 @@ export interface ResultRowProps {
 export const ResultRow: React.FC<ResultRowProps> = ({ songHit }) => {
   const song = songHit._source!;
   const navigate = useNavigate();
+  const { t } = useTranslation("search");
+  const findNoteByValue = (note: number) => {
+    return Object.keys(notes).find((key) => {
+      return notes[key as keyof typeof notes] == note;
+    });
+  };
   return (
     <Card
       variant="outlined"
@@ -35,23 +44,50 @@ export const ResultRow: React.FC<ResultRowProps> = ({ songHit }) => {
           navigate(`/song/${songHit._id}`);
         }}
       >
-        <CardContent>
+        <CardContent
+          sx={{
+            py: 2,
+          }}
+        >
           <Stack direction={"row"} gap={0} alignContent={"space-between"}>
-            <Box>
-              <Typography variant="h6" fontSize={"1.15rem"}>
-                {" "}
-                {song.metadata.title ?? "Naslov ni znan"}
-              </Typography>
-              <Typography
-                variant="body2"
-                fontSize={"0.8rem"}
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Box
                 sx={{
-                  color: "text.secondary",
+                  paddingRight: 3,
                 }}
               >
-                {song.metadata.composer ?? "Skladatelj ni znan"}
-              </Typography>
-            </Box>
+                <Typography variant="h6" fontSize={"1.15rem"}>
+                  {" "}
+                  {song.metadata.title ?? "Naslov ni znan"}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  fontSize={"0.8rem"}
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
+                  {song.metadata.composer ?? "Skladatelj ni znan"}
+                </Typography>
+              </Box>
+              <InfoCard
+                title={t("key")}
+                value={t(`keys.${song.key.most_certain_key}`)}
+              />
+              <InfoCard
+                title={t("timeSignature")}
+                value={song.time_signature}
+              />
+              <InfoCard title={t("tempoBPM")} value={song.tempo} />
+              <InfoCard
+                title={t("highestNote")}
+                value={findNoteByValue(song.ambitus.max_note)}
+              />
+              <InfoCard
+                title={t("lowestNote")}
+                value={findNoteByValue(song.ambitus.min_note)}
+              />
+            </Stack>
           </Stack>
         </CardContent>
       </CardActionArea>
