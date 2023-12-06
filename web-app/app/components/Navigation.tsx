@@ -13,7 +13,7 @@ import { Link } from "@remix-run/react";
 export default function Navigation() {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar elevation={0} position="static" variant="outlined">
         <Toolbar>
           <Stack direction={"row"} gap={1}>
             <Typography
