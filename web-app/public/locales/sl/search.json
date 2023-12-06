@@ -23,6 +23,7 @@
     "rhythmNgram": "Išči po ritmičnih vzorcih",
     "melodicNgram": "Išči po melodičnih vzorcih",
     "melodicNgramRelative": "Upoštevaj relativne višine",
+    "corpus": "Korpus",
     "keys": {
         "none": "Brez",
         "C": "C-dur",

@@ -42,6 +42,7 @@ import { AmbitusSlider } from "./search/AmbitusSlider";
 import { RhythmNgramSearch } from "./search/RhythmNgramSearch";
 import { MelodicNgramSearch } from "./search/MelodicNgramSearch";
 import notes from "./search/notes.json";
+import { CorpusSelect } from "./search/CorpusSelect";
 
 export let handle = {
   i18n: "search",
@@ -52,6 +53,14 @@ const constructQuery = (
 ): QueryDslQueryContainer => {
   let queries: QueryDslQueryContainer[] = [];
 
+  // CORPUS QUERY
+  if ("corpus" in params) {
+    queries.push({
+      terms: {
+        corpus_id: params.corpus.split(","),
+      },
+    });
+  }
   // METADATA QUERY
   if ("metadataQuery" in params) {
     let metadataFields: string[] = [];
@@ -241,6 +250,19 @@ const getAvailableTimeSignatures = async () => {
   }
 };
 
+const getAvailableCorpuses = async () => {
+  const data = await elastic.search<{ corpus_name: string }>({
+    index: "corpuses",
+  });
+
+  return data.hits.hits.map((x) => {
+    return {
+      value: x._id,
+      label: x._source!.corpus_name,
+    };
+  });
+};
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const params = Object.fromEntries(url.searchParams);
@@ -265,6 +287,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     data: data.hits.hits,
     params,
     availableTimeSignatures: await getAvailableTimeSignatures(),
+    availableCorpuses: await getAvailableCorpuses(),
     pagination: {
       total: totalPages,
       pageSize: pageSize,
@@ -275,8 +298,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function Search() {
-  const { data, params, pagination, availableTimeSignatures } =
-    useLoaderData<typeof loader>();
+  const {
+    data,
+    params,
+    pagination,
+    availableTimeSignatures,
+    availableCorpuses,
+  } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const navigate = useNavigate();
   const { t } = useTranslation("search");
@@ -317,10 +345,16 @@ export default function Search() {
     <div>
       <Form onSubmit={onSubmit}>
         <Stack spacing={1.6} alignItems={"flex-start"} direction={"column"}>
-          <MetadataSelect
-            metadataFields={params.metadataFields}
-            metadataQuery={params.metadataQuery}
-          />
+          <Stack direction="row" spacing={1}>
+            <MetadataSelect
+              metadataFields={params.metadataFields}
+              metadataQuery={params.metadataQuery}
+            />
+            <CorpusSelect
+              corpus={params.corpus}
+              corpusOptions={availableCorpuses}
+            />
+          </Stack>
           <Stack
             spacing={1.5}
             direction={{
