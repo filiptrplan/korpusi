@@ -309,7 +309,13 @@ export default function Search() {
   const navigate = useNavigate();
   const { t } = useTranslation("search");
   const resultComponents = data.map((song) => {
-    return <ResultRow songHit={song} key={song._id} />;
+    return (
+      <ResultRow
+        songHit={song}
+        key={song._id}
+        corpusOptions={availableCorpuses}
+      />
+    );
   });
 
   const searching = navigation.state !== "idle";

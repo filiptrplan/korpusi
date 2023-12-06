@@ -21,9 +21,13 @@ import notes from "./notes.json";
 
 export interface ResultRowProps {
   songHit: SearchHit<SongResult>;
+  corpusOptions?: { value: string; label: string }[];
 }
 
-export const ResultRow: React.FC<ResultRowProps> = ({ songHit }) => {
+export const ResultRow: React.FC<ResultRowProps> = ({
+  songHit,
+  corpusOptions,
+}) => {
   const song = songHit._source!;
   const navigate = useNavigate();
   const { t } = useTranslation("search");
@@ -70,6 +74,12 @@ export const ResultRow: React.FC<ResultRowProps> = ({ songHit }) => {
                   {song.metadata.composer ?? "Skladatelj ni znan"}
                 </Typography>
               </Box>
+              <InfoCard
+                title={t("corpus")}
+                value={
+                  corpusOptions?.find((x) => x.value === song.corpus_id)?.label
+                }
+              />
               <InfoCard
                 title={t("key")}
                 value={t(`keys.${song.key.most_certain_key}`)}
