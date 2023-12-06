@@ -64,10 +64,11 @@ const Document = withEmotionCache(
     // detected by the loader, this way, when we do something to change the
     // language, this locale will change and i18next will load the correct
     // translation files
-    useChangeLanguage(load.locale);
+    const locale = load ? load.locale : "en";
+    useChangeLanguage(locale);
 
     return (
-      <html lang={load.locale}>
+      <html lang={locale}>
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width,initial-scale=1" />
