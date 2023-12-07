@@ -58,6 +58,10 @@ export const AmbitusSlider: React.FC<AmbitusSliderProps> = ({
         <Slider
           sx={{
             width: "15rem",
+            display: {
+              xs: "none",
+              md: "block",
+            },
           }}
           value={[ambitusFromState, ambitusToState]}
           onChange={(e, value) => {

@@ -27,7 +27,13 @@ export const KeySelect: React.FC<KeySelectProps> = ({
   );
   const { t } = useTranslation("search");
   return (
-    <Stack spacing={1} direction="row">
+    <Stack
+      spacing={1}
+      direction={{
+        xs: "column",
+        sm: "row",
+      }}
+    >
       <FormControl>
         <InputLabel id="key-label">{t("key")}</InputLabel>
         <Select

@@ -4,6 +4,7 @@ import {
   CircularProgress,
   Divider,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
   Pagination,
@@ -396,7 +397,12 @@ export default function Search() {
               title={t("metadataFilters")}
               defaultCollapsed={false}
             >
-              <Stack direction="row" spacing={1}>
+              <Stack
+                direction={{
+                  sm: "column",
+                  md: "row",
+                }}
+              >
                 <MetadataSelect
                   metadataFields={params.metadataFields}
                   metadataQuery={params.metadataQuery}
@@ -408,27 +414,34 @@ export default function Search() {
               </Stack>
             </FilterGroupCollapse>
             <FilterGroupCollapse title={t("basicFilters")}>
-              <Stack
-                spacing={1.5}
-                direction={{
-                  md: "column",
-                  lg: "row",
-                }}
+              <Grid
+                container
+                // direction={{
+                //   md: "column",
+                //   lg: "row",
+                // }}
+                spacing={1}
               >
-                <KeySelect
-                  keyValue={params.key}
-                  alternativeKeys={params.alternativeKeys}
-                />
-                <TimeSignatureSelect
-                  availableTimeSignatures={availableTimeSignatures}
-                  timeSignature={params.timeSignature}
-                />
-                <TempoSlider
-                  tempoFrom={params.tempoFrom}
-                  tempoTo={params.tempoTo}
-                  useTempo={params.useTempo}
-                />
-              </Stack>
+                <Grid item xs="auto">
+                  <KeySelect
+                    keyValue={params.key}
+                    alternativeKeys={params.alternativeKeys}
+                  />
+                </Grid>
+                <Grid item xs={12} sm="auto">
+                  <TimeSignatureSelect
+                    availableTimeSignatures={availableTimeSignatures}
+                    timeSignature={params.timeSignature}
+                  />
+                </Grid>
+                <Grid item xs="auto" md={12}>
+                  <TempoSlider
+                    tempoFrom={params.tempoFrom}
+                    tempoTo={params.tempoTo}
+                    useTempo={params.useTempo}
+                  />
+                </Grid>
+              </Grid>
             </FilterGroupCollapse>
             <FilterGroupCollapse title={t("ambitusFilters")}>
               <Stack direction="column" spacing={1}>
@@ -453,7 +466,13 @@ export default function Search() {
               </Stack>
             </FilterGroupCollapse>
             <FilterGroupCollapse title={t("patternFilters")}>
-              <Stack direction="row" spacing={1}>
+              <Stack
+                direction={{
+                  xs: "column",
+                  md: "row",
+                }}
+                spacing={1}
+              >
                 <RhythmNgramSearch rhythmNgram={params.rhythmNgram} />
                 <MelodicNgramSearch
                   melodicNgram={params.melodicNgram}

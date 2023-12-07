@@ -64,6 +64,10 @@ export const NoteRangeSlider: React.FC<NoteRangeSliderProps> = ({
         <Slider
           sx={{
             width: "15rem",
+            display: {
+              xs: "none",
+              md: "block",
+            },
           }}
           value={[noteFromState, noteToState]}
           onChange={(e, value) => {

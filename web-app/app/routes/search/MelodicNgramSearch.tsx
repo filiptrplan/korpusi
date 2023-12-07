@@ -21,7 +21,13 @@ export const MelodicNgramSearch: React.FC<MelodicNgramSearchProps> = ({
     );
   return (
     <>
-      <Stack direction={"row"} spacing={1}>
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "row",
+        }}
+        spacing={1}
+      >
         <TextField
           name="melodicNgram"
           label={t("melodicNgram")}

@@ -23,6 +23,11 @@ const theme = createTheme({
         variant: "outlined",
       },
     },
+    MuiStack: {
+      defaultProps: {
+        spacing: 1,
+      },
+    },
   },
 });
 

@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FilterGroupCollapseProps {
   title: string;
@@ -22,12 +22,34 @@ export const FilterGroupCollapse: React.FC<FilterGroupCollapseProps> = ({
   children,
   defaultCollapsed = true,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+  const [isCollapsed, setIsCollapsed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (isCollapsed === null) {
+      return;
+    }
+    const collapsedList = JSON.parse(
+      localStorage.getItem("collapsedList") || "{}"
+    );
+    collapsedList[title] = isCollapsed;
+    localStorage.setItem("collapsedList", JSON.stringify(collapsedList));
+  }, [isCollapsed]);
+
+  useEffect(() => {
+    const collapsedList = JSON.parse(
+      localStorage.getItem("collapsedList") || "{}"
+    );
+    setIsCollapsed(
+      typeof collapsedList[title] === "boolean"
+        ? collapsedList[title]
+        : defaultCollapsed
+    );
+  }, []);
 
   return (
     <Box sx={{ width: "100%" }}>
       <CardActionArea
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={() => setIsCollapsed(isCollapsed ? false : true)}
         sx={{
           borderRadius: 1,
         }}
@@ -56,7 +78,7 @@ export const FilterGroupCollapse: React.FC<FilterGroupCollapseProps> = ({
           {isCollapsed ? <ArrowDropDown /> : <ArrowDropUp />}
         </Stack>
       </CardActionArea>
-      <Collapse in={!isCollapsed}>
+      <Collapse in={isCollapsed === null ? !defaultCollapsed : !isCollapsed}>
         <Box sx={{ pt: 1 }}>{children}</Box>
       </Collapse>
     </Box>

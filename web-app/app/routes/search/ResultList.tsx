@@ -105,7 +105,10 @@ export const ResultList: React.FC<ResultListProps> = ({
         </Stack>
       </Box>
       <Stack
-        direction={"row"}
+        direction={{
+          xs: "column",
+          md: "row",
+        }}
         alignItems={"center"}
         justifyContent={"center"}
         gap={2}

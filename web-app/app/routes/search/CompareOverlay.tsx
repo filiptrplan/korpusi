@@ -26,11 +26,8 @@ export const CompareOverlay: React.FC = ({}) => {
           m: 2.5,
           px: 3,
           py: 1.5,
-          // bgcolor: "text.disabled",
-          // color: "background.paper",
-          // borderRadius: 0,
+          zIndex: 10,
         }}
-        // variant="outlined"
         elevation={3}
       >
         <Stack

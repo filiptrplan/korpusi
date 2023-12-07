@@ -95,25 +95,64 @@ export const ResultRow: React.FC<ResultRowProps> = ({
                 </Typography>
               </Box>
               <InfoCard
+                sx={{
+                  display: {
+                    xs: "none",
+                    sm: "block",
+                  },
+                }}
                 title={t("corpus")}
                 value={
                   corpusOptions?.find((x) => x.value === song.corpus_id)?.label
                 }
               />
               <InfoCard
+                sx={{
+                  display: {
+                    xs: "none",
+                    sm: "block",
+                  },
+                }}
                 title={t("key")}
                 value={t(`keys.${song.key.most_certain_key}`)}
               />
               <InfoCard
+                sx={{
+                  display: {
+                    xs: "none",
+                    sm: "block",
+                  },
+                }}
                 title={t("timeSignature")}
                 value={song.time_signature}
               />
-              <InfoCard title={t("tempoBPM")} value={song.tempo} />
               <InfoCard
+                title={t("tempoBPM")}
+                value={song.tempo}
+                sx={{
+                  display: {
+                    xs: "none",
+                    lg: "block",
+                  },
+                }}
+              />
+              <InfoCard
+                sx={{
+                  display: {
+                    xs: "none",
+                    md: "block",
+                  },
+                }}
                 title={t("highestNote")}
                 value={findNoteByValue(song.ambitus.max_note)}
               />
               <InfoCard
+                sx={{
+                  display: {
+                    xs: "none",
+                    md: "block",
+                  },
+                }}
                 title={t("lowestNote")}
                 value={findNoteByValue(song.ambitus.min_note)}
               />

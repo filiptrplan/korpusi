@@ -27,43 +27,50 @@ export const MetadataSelect: React.FC<MetadataSelectProps> = ({
     metadataFields?.split(",") ?? ["title", "composer", "lyricist"]
   );
   return (
-    <>
-      <Stack spacing={1} direction="row">
-        <TextField
-          name="metadataQuery"
-          label={t("searchByMetadata")}
-          variant="outlined"
-          id="metadata-query"
-          value={metadataQueryState}
+    <Stack
+      spacing={1}
+      direction={{
+        xs: "column",
+        sm: "row",
+      }}
+    >
+      <TextField
+        name="metadataQuery"
+        label={t("searchByMetadata")}
+        variant="outlined"
+        id="metadata-query"
+        value={metadataQueryState}
+        sx={{
+          width: "15rem",
+        }}
+        onChange={(e) => {
+          setMetadataQueryState(e.target.value);
+        }}
+      />
+      <FormControl
+        sx={{
+          width: "15rem",
+        }}
+      >
+        <InputLabel id="metadata-field-label">
+          {t("chooseMetadataFields")}
+        </InputLabel>
+        <Select
+          label={t("chooseMetadataFields")}
+          labelId="metadata-field-label"
+          id="metadata-fields"
+          name="metadataFields"
+          value={metadataFieldsState}
           onChange={(e) => {
-            setMetadataQueryState(e.target.value);
+            setMetadataFieldsState(e.target.value as string[]);
           }}
-        />
-        <FormControl
-          sx={{
-            width: "15rem",
-          }}
+          multiple
         >
-          <InputLabel id="metadata-field-label">
-            {t("chooseMetadataFields")}
-          </InputLabel>
-          <Select
-            label={t("chooseMetadataFields")}
-            labelId="metadata-field-label"
-            id="metadata-fields"
-            name="metadataFields"
-            value={metadataFieldsState}
-            onChange={(e) => {
-              setMetadataFieldsState(e.target.value as string[]);
-            }}
-            multiple
-          >
-            <MenuItem value="title">{t("metadataTitle")}</MenuItem>
-            <MenuItem value="composer">{t("metadataComposer")}</MenuItem>
-            <MenuItem value="lyricist">{t("metadataLyricist")}</MenuItem>
-          </Select>
-        </FormControl>
-      </Stack>
-    </>
+          <MenuItem value="title">{t("metadataTitle")}</MenuItem>
+          <MenuItem value="composer">{t("metadataComposer")}</MenuItem>
+          <MenuItem value="lyricist">{t("metadataLyricist")}</MenuItem>
+        </Select>
+      </FormControl>
+    </Stack>
   );
 };

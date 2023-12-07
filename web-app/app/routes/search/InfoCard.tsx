@@ -1,9 +1,10 @@
-import { Paper, Typography } from "@mui/material";
+import { Paper, SxProps, Theme, Typography } from "@mui/material";
 interface InfoCardProps {
   title: string;
   value: number | string | undefined | null;
+  sx?: SxProps<Theme>;
 }
-export const InfoCard: React.FC<InfoCardProps> = ({ title, value }) => {
+export const InfoCard: React.FC<InfoCardProps> = ({ title, value, sx }) => {
   return (
     <>
       <Paper
@@ -11,6 +12,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({ title, value }) => {
         sx={{
           px: 1.7,
           py: 1,
+          ...sx,
         }}
       >
         <Typography variant="caption">{title}</Typography>
