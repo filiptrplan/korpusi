@@ -24,6 +24,10 @@
     "melodicNgram": "Išči po melodičnih vzorcih",
     "melodicNgramRelative": "Upoštevaj relativne višine",
     "corpus": "Korpus",
+    "metadataFilters": "Metapodatki",
+    "basicFilters": "Osnovni filtri",
+    "ambitusFilters": "Ambitus",
+    "patternFilters": "Vzorci in n-grami",
     "keys": {
         "none": "Brez",
         "C": "C-dur",

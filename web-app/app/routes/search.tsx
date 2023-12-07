@@ -43,6 +43,7 @@ import { RhythmNgramSearch } from "./search/RhythmNgramSearch";
 import { MelodicNgramSearch } from "./search/MelodicNgramSearch";
 import notes from "./search/notes.json";
 import { CorpusSelect } from "./search/CorpusSelect";
+import { FilterGroupCollapse } from "./search/FilterGroupCollapse";
 
 export let handle = {
   i18n: "search",
@@ -373,63 +374,76 @@ export default function Search() {
   return (
     <div>
       <Form onSubmit={onSubmit}>
-        <Stack spacing={1.6} alignItems={"flex-start"} direction={"column"}>
-          <Stack direction="row" spacing={1}>
-            <MetadataSelect
-              metadataFields={params.metadataFields}
-              metadataQuery={params.metadataQuery}
-            />
-            <CorpusSelect
-              corpus={params.corpus}
-              corpusOptions={availableCorpuses}
-            />
-          </Stack>
-          <Stack
-            spacing={1.5}
-            direction={{
-              md: "column",
-              lg: "row",
-            }}
+        <Stack spacing={1} alignItems={"flex-start"} direction={"column"}>
+          <FilterGroupCollapse
+            title={t("metadataFilters")}
+            defaultCollapsed={false}
           >
-            <KeySelect
-              keyValue={params.key}
-              alternativeKeys={params.alternativeKeys}
-            />
-            <TimeSignatureSelect
-              availableTimeSignatures={availableTimeSignatures}
-              timeSignature={params.timeSignature}
-            />
-            <TempoSlider
-              tempoFrom={params.tempoFrom}
-              tempoTo={params.tempoTo}
-              useTempo={params.useTempo}
-            />
-          </Stack>
-          <NoteRangeSlider
-            noteFrom={params.noteHighestFrom}
-            noteTo={params.noteHighestTo}
-            label={t("highestNote")}
-            nameFrom="noteHighestFrom"
-            nameTo="noteHighestTo"
-          />
-          <NoteRangeSlider
-            noteFrom={params.noteLowestFrom}
-            noteTo={params.noteLowestTo}
-            label={t("lowestNote")}
-            nameFrom="noteLowestFrom"
-            nameTo="noteLowestTo"
-          />
-          <AmbitusSlider
-            ambitusFrom={params.ambitusFrom}
-            ambitusTo={params.ambitusTo}
-          />
-          <Stack direction="row" spacing={1}>
-            <RhythmNgramSearch rhythmNgram={params.rhythmNgram} />
-            <MelodicNgramSearch
-              melodicNgram={params.melodicNgram}
-              melodicNgramRelative={params.melodicNgramRelative}
-            />
-          </Stack>
+            <Stack direction="row" spacing={1}>
+              <MetadataSelect
+                metadataFields={params.metadataFields}
+                metadataQuery={params.metadataQuery}
+              />
+              <CorpusSelect
+                corpus={params.corpus}
+                corpusOptions={availableCorpuses}
+              />
+            </Stack>
+          </FilterGroupCollapse>
+          <FilterGroupCollapse title={t("basicFilters")}>
+            <Stack
+              spacing={1.5}
+              direction={{
+                md: "column",
+                lg: "row",
+              }}
+            >
+              <KeySelect
+                keyValue={params.key}
+                alternativeKeys={params.alternativeKeys}
+              />
+              <TimeSignatureSelect
+                availableTimeSignatures={availableTimeSignatures}
+                timeSignature={params.timeSignature}
+              />
+              <TempoSlider
+                tempoFrom={params.tempoFrom}
+                tempoTo={params.tempoTo}
+                useTempo={params.useTempo}
+              />
+            </Stack>
+          </FilterGroupCollapse>
+          <FilterGroupCollapse title={t("ambitusFilters")}>
+            <Stack direction="column" spacing={1}>
+              <NoteRangeSlider
+                noteFrom={params.noteHighestFrom}
+                noteTo={params.noteHighestTo}
+                label={t("highestNote")}
+                nameFrom="noteHighestFrom"
+                nameTo="noteHighestTo"
+              />
+              <NoteRangeSlider
+                noteFrom={params.noteLowestFrom}
+                noteTo={params.noteLowestTo}
+                label={t("lowestNote")}
+                nameFrom="noteLowestFrom"
+                nameTo="noteLowestTo"
+              />
+              <AmbitusSlider
+                ambitusFrom={params.ambitusFrom}
+                ambitusTo={params.ambitusTo}
+              />
+            </Stack>
+          </FilterGroupCollapse>
+          <FilterGroupCollapse title={t("patternFilters")}>
+            <Stack direction="row" spacing={1}>
+              <RhythmNgramSearch rhythmNgram={params.rhythmNgram} />
+              <MelodicNgramSearch
+                melodicNgram={params.melodicNgram}
+                melodicNgramRelative={params.melodicNgramRelative}
+              />
+            </Stack>
+          </FilterGroupCollapse>
           <Stack spacing={1} direction="row">
             <Button
               type="submit"
