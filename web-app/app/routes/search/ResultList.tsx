@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { SongResult } from "~/src/DataTypes";
 import { ResultRow } from "./ResultRow";
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
+import { Dispatch } from "react";
 
 interface ResultListProps {
   pagination: {

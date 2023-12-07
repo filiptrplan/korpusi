@@ -12,12 +12,14 @@ import {
 } from "@mui/material";
 import { SongResult } from "~/src/DataTypes";
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 import Difference from "@mui/icons-material/Difference";
 import FileDownload from "@mui/icons-material/FileDownload";
 import { InfoCard } from "./InfoCard";
 import { useTranslation } from "react-i18next";
 import notes from "./notes.json";
+import { Dispatch, SetStateAction, useContext } from "react";
+import { CompareContext } from "../search";
 
 export interface ResultRowProps {
   songHit: SearchHit<SongResult>;
@@ -32,6 +34,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
   const navigate = useNavigate();
 
   const { t } = useTranslation("search");
+  const { compareIds, setCompareIds } = useContext(CompareContext);
 
   const findNoteByValue = (note: number) => {
     return Object.keys(notes).find((key) => {
@@ -45,6 +48,12 @@ export const ResultRow: React.FC<ResultRowProps> = ({
     });
     const url = URL.createObjectURL(blob);
     return url;
+  };
+
+  const onAddToComparison = () => {
+    if (!compareIds.includes(song._id)) {
+      setCompareIds([...compareIds, songHit._id]);
+    }
   };
 
   return (
@@ -118,6 +127,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
             sx={{
               zIndex: 10,
             }}
+            onClick={onAddToComparison}
           >
             <Difference
               sx={{

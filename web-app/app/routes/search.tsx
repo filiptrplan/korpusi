@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import {
   Form,
+  ShouldRevalidateFunction,
   useLoaderData,
   useLocation,
   useNavigate,
@@ -21,7 +22,7 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, createContext, useEffect, useState } from "react";
 import { elastic } from "~/services/Elastic";
 import { SongResult } from "~/src/DataTypes";
 import { useDebounceSubmit } from "~/src/useDebounceSubmit";
@@ -45,6 +46,7 @@ import notes from "./search/notes.json";
 import { CorpusSelect } from "./search/CorpusSelect";
 import { FilterGroupCollapse } from "./search/FilterGroupCollapse";
 import { ResultList } from "./search/ResultList";
+import { CompareOverlay } from "./search/CompareOverlay";
 
 export let handle = {
   i18n: "search",
@@ -299,6 +301,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   };
 };
 
+export const CompareContext = createContext<{
+  compareIds: string[];
+  setCompareIds: (ids: string[]) => void;
+}>({
+  compareIds: [],
+  setCompareIds: () => {},
+});
+
 export default function Search() {
   const {
     data,
@@ -307,7 +317,6 @@ export default function Search() {
     availableTimeSignatures,
     availableCorpuses,
   } = useLoaderData<typeof loader>();
-  const navigation = useNavigation();
   const navigate = useNavigate();
   const { t } = useTranslation("search");
 
@@ -361,110 +370,129 @@ export default function Search() {
     submit(formData);
   };
 
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (localStorage.getItem("compareIds")) {
+      setCompareIds(JSON.parse(localStorage.getItem("compareIds")!));
+    }
+  }, []);
+  const setCompareIdsContext = (ids: string[]) => {
+    localStorage.setItem("compareIds", JSON.stringify(ids));
+    setCompareIds(ids);
+  };
+
   return (
-    <div>
-      <Form onSubmit={onSubmit}>
-        <Stack spacing={1} alignItems={"flex-start"} direction={"column"}>
-          <FilterGroupCollapse
-            title={t("metadataFilters")}
-            defaultCollapsed={false}
-          >
-            <Stack direction="row" spacing={1}>
-              <MetadataSelect
-                metadataFields={params.metadataFields}
-                metadataQuery={params.metadataQuery}
-              />
-              <CorpusSelect
-                corpus={params.corpus}
-                corpusOptions={availableCorpuses}
-              />
-            </Stack>
-          </FilterGroupCollapse>
-          <FilterGroupCollapse title={t("basicFilters")}>
-            <Stack
-              spacing={1.5}
-              direction={{
-                md: "column",
-                lg: "row",
-              }}
+    <CompareContext.Provider
+      value={{
+        compareIds,
+        setCompareIds: setCompareIdsContext,
+      }}
+    >
+      <div>
+        <CompareOverlay />
+        <Form onSubmit={onSubmit}>
+          <Stack spacing={1} alignItems={"flex-start"} direction={"column"}>
+            <FilterGroupCollapse
+              title={t("metadataFilters")}
+              defaultCollapsed={false}
             >
-              <KeySelect
-                keyValue={params.key}
-                alternativeKeys={params.alternativeKeys}
-              />
-              <TimeSignatureSelect
-                availableTimeSignatures={availableTimeSignatures}
-                timeSignature={params.timeSignature}
-              />
-              <TempoSlider
-                tempoFrom={params.tempoFrom}
-                tempoTo={params.tempoTo}
-                useTempo={params.useTempo}
-              />
+              <Stack direction="row" spacing={1}>
+                <MetadataSelect
+                  metadataFields={params.metadataFields}
+                  metadataQuery={params.metadataQuery}
+                />
+                <CorpusSelect
+                  corpus={params.corpus}
+                  corpusOptions={availableCorpuses}
+                />
+              </Stack>
+            </FilterGroupCollapse>
+            <FilterGroupCollapse title={t("basicFilters")}>
+              <Stack
+                spacing={1.5}
+                direction={{
+                  md: "column",
+                  lg: "row",
+                }}
+              >
+                <KeySelect
+                  keyValue={params.key}
+                  alternativeKeys={params.alternativeKeys}
+                />
+                <TimeSignatureSelect
+                  availableTimeSignatures={availableTimeSignatures}
+                  timeSignature={params.timeSignature}
+                />
+                <TempoSlider
+                  tempoFrom={params.tempoFrom}
+                  tempoTo={params.tempoTo}
+                  useTempo={params.useTempo}
+                />
+              </Stack>
+            </FilterGroupCollapse>
+            <FilterGroupCollapse title={t("ambitusFilters")}>
+              <Stack direction="column" spacing={1}>
+                <NoteRangeSlider
+                  noteFrom={params.noteHighestFrom}
+                  noteTo={params.noteHighestTo}
+                  label={t("highestNote")}
+                  nameFrom="noteHighestFrom"
+                  nameTo="noteHighestTo"
+                />
+                <NoteRangeSlider
+                  noteFrom={params.noteLowestFrom}
+                  noteTo={params.noteLowestTo}
+                  label={t("lowestNote")}
+                  nameFrom="noteLowestFrom"
+                  nameTo="noteLowestTo"
+                />
+                <AmbitusSlider
+                  ambitusFrom={params.ambitusFrom}
+                  ambitusTo={params.ambitusTo}
+                />
+              </Stack>
+            </FilterGroupCollapse>
+            <FilterGroupCollapse title={t("patternFilters")}>
+              <Stack direction="row" spacing={1}>
+                <RhythmNgramSearch rhythmNgram={params.rhythmNgram} />
+                <MelodicNgramSearch
+                  melodicNgram={params.melodicNgram}
+                  melodicNgramRelative={params.melodicNgramRelative}
+                />
+              </Stack>
+            </FilterGroupCollapse>
+            <Stack spacing={1} direction="row">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  py: 1,
+                  px: 3,
+                  boxShadow: "none",
+                }}
+              >
+                {t("search")}
+              </Button>
+              <Button
+                sx={{
+                  py: 1,
+                  px: 3,
+                  boxShadow: "none",
+                }}
+                variant="outlined"
+                onClick={resetFields}
+              >
+                {t("reset")}
+              </Button>
             </Stack>
-          </FilterGroupCollapse>
-          <FilterGroupCollapse title={t("ambitusFilters")}>
-            <Stack direction="column" spacing={1}>
-              <NoteRangeSlider
-                noteFrom={params.noteHighestFrom}
-                noteTo={params.noteHighestTo}
-                label={t("highestNote")}
-                nameFrom="noteHighestFrom"
-                nameTo="noteHighestTo"
-              />
-              <NoteRangeSlider
-                noteFrom={params.noteLowestFrom}
-                noteTo={params.noteLowestTo}
-                label={t("lowestNote")}
-                nameFrom="noteLowestFrom"
-                nameTo="noteLowestTo"
-              />
-              <AmbitusSlider
-                ambitusFrom={params.ambitusFrom}
-                ambitusTo={params.ambitusTo}
-              />
-            </Stack>
-          </FilterGroupCollapse>
-          <FilterGroupCollapse title={t("patternFilters")}>
-            <Stack direction="row" spacing={1}>
-              <RhythmNgramSearch rhythmNgram={params.rhythmNgram} />
-              <MelodicNgramSearch
-                melodicNgram={params.melodicNgram}
-                melodicNgramRelative={params.melodicNgramRelative}
-              />
-            </Stack>
-          </FilterGroupCollapse>
-          <Stack spacing={1} direction="row">
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                py: 1,
-                px: 3,
-                boxShadow: "none",
-              }}
-            >
-              {t("search")}
-            </Button>
-            <Button
-              sx={{
-                py: 1,
-                px: 3,
-                boxShadow: "none",
-              }}
-              variant="outlined"
-              onClick={resetFields}
-            >
-              {t("reset")}
-            </Button>
           </Stack>
-        </Stack>
-      </Form>
-      <ResultList
-        pagination={pagination}
-        songHits={data}
-        availableCorpuses={availableCorpuses}
-      />
-    </div>
+        </Form>
+        <ResultList
+          pagination={pagination}
+          songHits={data}
+          availableCorpuses={availableCorpuses}
+        />
+      </div>
+    </CompareContext.Provider>
   );
 }
