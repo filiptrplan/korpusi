@@ -30,12 +30,23 @@ export const ResultRow: React.FC<ResultRowProps> = ({
 }) => {
   const song = songHit._source!;
   const navigate = useNavigate();
+
   const { t } = useTranslation("search");
+
   const findNoteByValue = (note: number) => {
     return Object.keys(notes).find((key) => {
       return notes[key as keyof typeof notes] == note;
     });
   };
+
+  const createDownloadLink = () => {
+    const blob = new Blob([JSON.stringify(song)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    return url;
+  };
+
   return (
     <Card
       variant="outlined"
@@ -116,7 +127,12 @@ export const ResultRow: React.FC<ResultRowProps> = ({
           </IconButton>
         </Tooltip>
         <Tooltip title="Prenesi datoteko">
-          <IconButton>
+          <IconButton
+            component="a"
+            href={createDownloadLink()}
+            download={`${song.metadata.title}.json`}
+            target="_blank"
+          >
             <FileDownload sx={{ color: "text.primary" }} />
           </IconButton>
         </Tooltip>
