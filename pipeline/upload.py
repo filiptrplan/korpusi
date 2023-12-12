@@ -54,7 +54,7 @@ def upload(index: str,
         
     mapping = json.load(open(mapping_file, 'r', encoding='utf-8'))
     if delete_index is True:
-        client.indices.delete(index=index)
+        client.options(ignore_status=404).indices.delete(index=index)
     client.options(ignore_status=400).indices.create(index=index)
     client.indices.put_mapping(index=index, properties=mapping['properties']) # this is so we don't ignore 400 errors on mapping syntax
     
