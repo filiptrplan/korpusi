@@ -37,9 +37,6 @@ export const RhythmNgramSearch: React.FC<RhythmNgramSearchProps> = ({
           name="rhythmNgram"
           label={t("rhythmNgram")}
           value={rhythmNgramState}
-          sx={{
-            width: "15rem",
-          }}
           onChange={(e) => {
             setRhythmNgramState(e.target.value);
           }}
