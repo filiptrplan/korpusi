@@ -132,9 +132,6 @@ services:
     environment:
       - SERVERNAME=kibana
       - KIBANA_HOST=0.0.0.0
-      - SERVER_BASEPATH=/kibana
-      - SERVER_REWRITEBASEPATH=true
-      - SERVER_PUBLICBASEURL=https://${HOSTNAME}/kibana
       - ELASTICSEARCH_HOSTS=https://es01:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
