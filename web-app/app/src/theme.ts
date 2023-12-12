@@ -28,20 +28,6 @@ const theme = createTheme({
         spacing: 1,
       },
     },
-    MuiTextField: {
-      defaultProps: {
-        sx: {
-          width: "15rem",
-        },
-      },
-    },
-    MuiSelect: {
-      defaultProps: {
-        sx: {
-          width: "15rem",
-        },
-      },
-    },
   },
 });
 

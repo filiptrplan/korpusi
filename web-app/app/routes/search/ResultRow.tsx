@@ -164,7 +164,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
         <Tooltip title="Dodaj primerjavi">
           <IconButton
             sx={{
-              zIndex: 10,
+              zIndex: 2,
             }}
             onClick={onAddToComparison}
           >

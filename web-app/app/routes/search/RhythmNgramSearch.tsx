@@ -34,6 +34,9 @@ export const RhythmNgramSearch: React.FC<RhythmNgramSearchProps> = ({
         }}
       >
         <TextField
+          sx={{
+            width: "20rem",
+          }}
           name="rhythmNgram"
           label={t("rhythmNgram")}
           value={rhythmNgramState}

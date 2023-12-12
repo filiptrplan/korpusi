@@ -1,6 +1,5 @@
 import { Button, Paper, Slide, Stack, Typography } from "@mui/material";
-import { useSearchParams } from "@remix-run/react";
-import { t } from "i18next";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { CompareContext } from "../search";
@@ -8,9 +7,14 @@ import { CompareContext } from "../search";
 export const CompareOverlay: React.FC = ({}) => {
   const { compareIds, setCompareIds } = useContext(CompareContext);
   const { t } = useTranslation("search");
+  const navigate = useNavigate();
 
   const onRemoveAll = () => {
     setCompareIds([]);
+  };
+
+  const onCompare = () => {
+    navigate(`/compare?ids=${compareIds.join(",")}`);
   };
 
   const shouldShow = compareIds.length > 0;
@@ -39,7 +43,9 @@ export const CompareOverlay: React.FC = ({}) => {
             {t("youHaveAddedNItemsToCompare", { count: compareIds.length })}
           </Typography>
           <Stack direction="row" spacing={1}>
-            <Button variant="contained">{t("compare")}</Button>
+            <Button variant="contained" onClick={onCompare}>
+              {t("compare")}
+            </Button>
             <Button variant="text" onClick={onRemoveAll}>
               {t("removeAll")}
             </Button>

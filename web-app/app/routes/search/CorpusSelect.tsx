@@ -23,6 +23,9 @@ export const CorpusSelect: React.FC<CorpusSelectProps> = ({
           label={t("corpus")}
           name="corpus"
           value={corpusState}
+          sx={{
+            minWidth: "10rem",
+          }}
           onChange={(e) => {
             setCorpusState(e.target.value as string[]);
           }}

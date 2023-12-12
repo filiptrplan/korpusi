@@ -33,7 +33,7 @@ export const MelodicNgramSearch: React.FC<MelodicNgramSearchProps> = ({
           label={t("melodicNgram")}
           value={melodicNgramState}
           sx={{
-            width: "15rem",
+            width: "20rem",
           }}
           onChange={(e) => {
             setMelodicNgramState(e.target.value);
