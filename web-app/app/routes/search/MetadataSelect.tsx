@@ -40,9 +40,6 @@ export const MetadataSelect: React.FC<MetadataSelectProps> = ({
         variant="outlined"
         id="metadata-query"
         value={metadataQueryState}
-        sx={{
-          width: "15rem",
-        }}
         onChange={(e) => {
           setMetadataQueryState(e.target.value);
         }}
