@@ -6,7 +6,13 @@ import os
 from typing_extensions import Annotated
 import typer
 import music21
+from typer_config.decorators import use_yaml_config
 from processors import basic_processors, contour_processor
+import upload
+import corpus
+
+app = typer.Typer()
+app.registered_commands = upload.app.registered_commands + corpus.app.registered_commands
 
 music_xml_processors = [
     # Add musicXML processors here
@@ -19,8 +25,9 @@ music_xml_processors = [
     contour_processor.RhythmProcessor
 ]
 
-
-def main(
+@app.command()
+@use_yaml_config()
+def process(
     corpus_id: Annotated[str, typer.Option(help='Id of the corpus which the file belongs to.')],
     in_file: Annotated[str, typer.Option(
         help='Path to the file to process')] = None,
@@ -36,7 +43,7 @@ def main(
         single_output: Annotated[bool, typer.Option(
             help='If all the files should be outputed as one newline delimited JSON')] = False,
 ):
-    """Ingester main function. It processes the files and spits out the results in JSON."""
+    """Processes MusicXMLs and outputs the results in JSON."""
     if in_file is not None and in_dir is not None:
         raise typer.BadParameter("Cannot specify both in_file and in_dir")
     if in_file is None and in_dir is None:
@@ -130,6 +137,5 @@ def process_musicxml(path: str, processors: list):
 
     return results
 
-
 if __name__ == '__main__':
-    typer.run(main)
+    app()

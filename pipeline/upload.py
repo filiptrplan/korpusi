@@ -5,6 +5,9 @@ from typing_extensions import Annotated
 from elasticsearch import Elasticsearch
 from dotenv import load_dotenv
 import typer
+from typer_config.decorators import use_yaml_config
+
+app = typer.Typer()
 
 load_dotenv()
 crt_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../certs/ca/ca.crt'))
@@ -27,7 +30,9 @@ def index_document(json_str: str, index: str):
         raise e
     client.index(index=index, document=json_str, id=calculate_hash(json_str))
 
-def main(index: str, 
+@app.command()
+@use_yaml_config()
+def upload(index: str, 
         json_file: Annotated[str, typer.Option(help='Path to the JSON file to upload. It should feature one JSON file for each line.')] = None,
         json_dir: Annotated[str, typer.Option(help='Path to the directory containing the JSON files to upload. Each file is its separate document')] = None,
         mapping_file: Annotated[str, typer.Option(help='Path to the mapping file. If not specified, it will be inferred from the path of the input file.')] = None,
@@ -72,6 +77,3 @@ def main(index: str,
                     except json.JSONDecodeError:
                         print(f'{json_file} is not valid JSON. Skipping...')
                     print(f'Indexed {json_file}')
-
-if __name__ == '__main__':
-    typer.run(main)

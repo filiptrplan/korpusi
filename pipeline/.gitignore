@@ -2,3 +2,5 @@
 *.musicxml
 *.json
 xmls/
+*.yaml
+__pycache__/
