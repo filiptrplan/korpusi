@@ -1,4 +1,15 @@
 {
     "tooFewSongs": "Premalo pesmi",
-    "tooFewSongsDescription": "Prosimo, dodajte vsaj 2 pesmi za primerjavo."
+    "tooFewSongsDescription": "Prosimo, dodajte vsaj 2 pesmi za primerjavo.",
+    "addSongsTitle": "Dodaj pesmi",
+    "addSongsButton": "Dodaj",
+    "addSongsLabel": "Dodaj pesmi v primerjavo",
+    "measureFromTo": "Odlomek (takti)",
+    "songTitle": "Naslov",
+    "tempo": "Tempo",
+    "key": "Ključ",
+    "timeSignature": "Metrum",
+    "ambitus": "Ambitus(semitoni)",
+    "sheetMusic": "Odlomek zapisa",
+    "measureWidth": "Širina taktov"
 }

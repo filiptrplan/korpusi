@@ -15,28 +15,20 @@ export const CompareSheetMusic: React.FC = ({}) => {
   const songs = useContext(songsContext);
   const { t } = useTranslation("compare");
 
-  const maxMeasures = useMemo(() => {
-    if (songs.length == 0) return 32;
-    const result = songs.reduce((max, song) => {
-      let length = song._source!.rhythm.measure_starts.length;
-      if (length == 0) {
-        length = song._source!.contour.measure_starts.length;
-      }
-      if (length == 0) return max;
-      return Math.min(max, song._source!.rhythm.measure_starts.length);
-    }, Infinity);
-    return result === 0 ? 32 : result;
-  }, [songs]);
+  const maxMeasures = songs.reduce((min, song) => {
+    return Math.min(min, song._source!.duration.measures);
+  }, Infinity);
 
   const [measureRange, setMeasureRange] = useState<[number, number]>([
     1,
     maxMeasures,
   ]);
 
+  const [measureWidth, setMeasureWidth] = useState<number>(20);
+
   useEffect(() => {
-    if (maxMeasures == Infinity || maxMeasures == 0) return;
     setMeasureRange([1, maxMeasures]);
-  }, [maxMeasures]);
+  }, [songs.length]);
 
   const rows = songs.map((song, i) => {
     return (
@@ -53,7 +45,7 @@ export const CompareSheetMusic: React.FC = ({}) => {
                 width: "100%",
               },
             }}
-            fixedMeasureWidth={20}
+            fixedMeasureWidth={measureWidth}
             zoom={0.7}
             key={song._id}
             xml={song._source!.original_file}
@@ -70,23 +62,52 @@ export const CompareSheetMusic: React.FC = ({}) => {
         mb: 1,
       }}
     >
-      <Stack direction="row" spacing={4} alignItems={"center"}>
-        <Typography gutterBottom>{t("measureFromTo")}</Typography>
-        <Slider
-          min={1}
-          max={maxMeasures}
-          defaultValue={[1, maxMeasures]}
-          disableSwap
-          valueLabelDisplay="auto"
-          onChangeCommitted={(e, value) => {
-            // this is for optimization, so we don't rerender the whole thing on every change
-            setMeasureRange(value as [number, number]);
-          }}
+      <Grid container columnGap={2} alignItems={"center"}>
+        <Grid item xs="auto">
+          <Typography gutterBottom>{t("measureFromTo")}:</Typography>
+        </Grid>
+        <Grid item xs={"auto"}>
+          <Slider
+            min={1}
+            max={maxMeasures}
+            defaultValue={[1, maxMeasures]}
+            disableSwap
+            valueLabelDisplay="auto"
+            onChangeCommitted={(e, value) => {
+              // this is for optimization, so we don't rerender the whole thing on every change
+              setMeasureRange(value as [number, number]);
+            }}
+            sx={{
+              width: "20rem",
+            }}
+          />
+        </Grid>
+        <Grid
+          item
+          xs="auto"
           sx={{
-            width: "20rem",
+            pl: 2,
           }}
-        />
-      </Stack>
+        >
+          <Typography gutterBottom>{t("measureWidth")}:</Typography>
+        </Grid>
+        <Grid item xs={"auto"}>
+          <Slider
+            min={1}
+            max={50}
+            defaultValue={20}
+            disableSwap
+            valueLabelDisplay="auto"
+            onChangeCommitted={(e, value) => {
+              // this is for optimization, so we don't rerender the whole thing on every change
+              setMeasureWidth(value as number);
+            }}
+            sx={{
+              width: "20rem",
+            }}
+          />
+        </Grid>
+      </Grid>
       <Grid container alignItems={"center"}>
         {rows}
       </Grid>

@@ -21,6 +21,10 @@ export interface SongResult extends Record<string, any> {
      */
     min_note: number;
   };
+  duration: {
+    beats: number;
+    measures: number;
+  };
   contour: {
     /**
      * Indexes of the start of each measure
