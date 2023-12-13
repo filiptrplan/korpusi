@@ -1,7 +1,26 @@
-import { Button, Grid, Stack } from "@mui/material";
-import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
+import {
+  Box,
+  Button,
+  ClickAwayListener,
+  Collapse,
+  Container,
+  Drawer,
+  Fade,
+  Grid,
+  Paper,
+  Slide,
+  Stack,
+} from "@mui/material";
+import {
+  Form,
+  Outlet,
+  useLoaderData,
+  useMatches,
+  useNavigate,
+  useSubmit,
+} from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
-import { FormEvent, createContext, useEffect, useState } from "react";
+import { FormEvent, createContext, useEffect, useRef, useState } from "react";
 import { elastic } from "~/services/Elastic";
 import { SongResult } from "~/src/DataTypes";
 import {
@@ -27,6 +46,7 @@ import {
   getAvailableTimeSignatures,
   getAvailableCorpuses,
 } from "./search/searchService";
+import { CompareList } from "./compare/CompareList";
 
 export let handle = {
   i18n: "search",
@@ -44,16 +64,37 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     page = parseInt(params.page);
   }
 
+  // Search data fetching
   const data = await elastic.search<SongResult>({
     index: "songs",
     from: (page - 1) * pageSize,
     size: pageSize,
     query: constructQuery(params),
   });
+
   const totalPages =
     Math.ceil((data.hits.total as SearchTotalHits)?.value / pageSize) ?? 0;
+
+  // Compare song fetching
+  let compareIds: string[] = [];
+  if ("compareIds" in params) {
+    compareIds = params.compareIds.split(",");
+  }
+  const compareData = await elastic.search<SongResult>({
+    query: {
+      ids: {
+        values: compareIds,
+      },
+    },
+  });
+
+  if ((compareData.hits.total as SearchTotalHits).value !== compareIds.length) {
+    throw new Error("Not all ids found");
+  }
+
   return {
     data: data.hits.hits,
+    compareData: compareData.hits.hits,
     params,
     availableTimeSignatures: await getAvailableTimeSignatures(),
     availableCorpuses: await getAvailableCorpuses(),
@@ -66,14 +107,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   };
 };
 
-export const CompareContext = createContext<{
-  compareIds: string[];
-  setCompareIds: (ids: string[]) => void;
-}>({
-  compareIds: [],
-  setCompareIds: () => {},
-});
-
 export default function Search() {
   const {
     data,
@@ -81,6 +114,7 @@ export default function Search() {
     pagination,
     availableTimeSignatures,
     availableCorpuses,
+    compareData,
   } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const { t } = useTranslation("search");
@@ -135,26 +169,75 @@ export default function Search() {
     submit(formData);
   };
 
-  const [compareIds, setCompareIds] = useState<string[]>([]);
-  useEffect(() => {
-    if (localStorage.getItem("compareIds")) {
-      setCompareIds(JSON.parse(localStorage.getItem("compareIds")!));
-    }
-  }, []);
-  const setCompareIdsContext = (ids: string[]) => {
-    localStorage.setItem("compareIds", JSON.stringify(ids));
-    setCompareIds(ids);
+  const compareIds = params.compareIds ? params.compareIds.split(",") : [];
+  const [showCompareList, setShowCompareList] = useState(false);
+  const showCompare = compareIds.length > 1 && !showCompareList;
+  const compareRef = useRef<HTMLDivElement>(null);
+
+  const onCompareClickAway = () => {
+    setShowCompareList(false);
   };
 
   return (
-    <CompareContext.Provider
-      value={{
-        compareIds,
-        setCompareIds: setCompareIdsContext,
-      }}
-    >
-      <div>
-        <CompareOverlay />
+    <>
+      <ClickAwayListener onClickAway={onCompareClickAway}>
+        <Slide direction="up" in={showCompare || showCompareList}>
+          <Paper
+            sx={{
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 100,
+              px: 3,
+              py: 2,
+            }}
+            elevation={3}
+          >
+            <Collapse in={showCompare} mountOnEnter timeout={700}>
+              <Box>
+                <CompareOverlay
+                  onCompareClick={() => {
+                    setShowCompareList(true);
+                  }}
+                />
+              </Box>
+            </Collapse>
+            <Collapse in={showCompareList} mountOnEnter timeout={700}>
+              <Container
+                sx={{
+                  height: "90vh",
+                  overflowY: "auto",
+                }}
+                maxWidth="xl"
+              >
+                <CompareList songs={compareData} />
+              </Container>
+            </Collapse>
+          </Paper>
+        </Slide>
+      </ClickAwayListener>
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 20,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          opacity: showCompareList ? 1 : 0,
+          transition: "opacity 0.7s",
+          pointerEvents: showCompareList ? "auto" : "none",
+        }}
+      />
+      <Box
+        sx={{
+          marginBottom: !showCompareList
+            ? `${compareRef.current?.clientHeight ?? 0 + 20}px`
+            : 0,
+        }}
+      >
         <Form onSubmit={onSubmit}>
           <Stack spacing={1} alignItems={"flex-start"} direction={"column"}>
             <FilterGroupCollapse
@@ -178,14 +261,7 @@ export default function Search() {
               </Stack>
             </FilterGroupCollapse>
             <FilterGroupCollapse title={t("basicFilters")}>
-              <Grid
-                container
-                // direction={{
-                //   md: "column",
-                //   lg: "row",
-                // }}
-                spacing={1}
-              >
+              <Grid container spacing={1}>
                 <Grid item xs="auto">
                   <KeySelect
                     keyValue={params.key}
@@ -275,7 +351,7 @@ export default function Search() {
           songHits={data}
           availableCorpuses={availableCorpuses}
         />
-      </div>
-    </CompareContext.Provider>
+      </Box>
+    </>
   );
 }

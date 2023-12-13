@@ -19,7 +19,6 @@ import { InfoCard } from "./InfoCard";
 import { useTranslation } from "react-i18next";
 import notes from "./notes.json";
 import { Dispatch, SetStateAction, useContext } from "react";
-import { CompareContext } from "../search";
 
 export interface ResultRowProps {
   songHit: SearchHit<SongResult>;
@@ -32,9 +31,9 @@ export const ResultRow: React.FC<ResultRowProps> = ({
 }) => {
   const song = songHit._source!;
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
 
   const { t } = useTranslation("search");
-  const { compareIds, setCompareIds } = useContext(CompareContext);
 
   const findNoteByValue = (note: number) => {
     return Object.keys(notes).find((key) => {
@@ -51,9 +50,15 @@ export const ResultRow: React.FC<ResultRowProps> = ({
   };
 
   const onAddToComparison = () => {
-    if (!compareIds.includes(song._id)) {
-      setCompareIds([...compareIds, songHit._id]);
-    }
+    setParams((params) => {
+      const compareIds = params.get("compareIds");
+      if (compareIds) {
+        params.set("compareIds", `${compareIds},${songHit._id}`);
+      } else {
+        params.set("compareIds", songHit._id);
+      }
+      return params;
+    });
   };
 
   return (

@@ -2,56 +2,42 @@ import { Button, Paper, Slide, Stack, Typography } from "@mui/material";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
-import { CompareContext } from "../search";
 
-export const CompareOverlay: React.FC = ({}) => {
-  const { compareIds, setCompareIds } = useContext(CompareContext);
+interface CompareOverlayProps {
+  onCompareClick: () => void;
+}
+
+export const CompareOverlay: React.FC<CompareOverlayProps> = ({
+  onCompareClick,
+}) => {
   const { t } = useTranslation("search");
-  const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
+  const compareIds = params.get("compareIds")?.split(",") || [];
 
   const onRemoveAll = () => {
-    setCompareIds([]);
+    setParams((params) => {
+      params.delete("compareIds");
+      return params;
+    });
   };
-
-  const onCompare = () => {
-    navigate(`/compare?ids=${compareIds.join(",")}`);
-  };
-
-  const shouldShow = compareIds.length > 0;
 
   return (
-    <Slide direction="up" in={shouldShow}>
-      <Paper
-        sx={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          m: 2.5,
-          px: 3,
-          py: 1.5,
-          zIndex: 10,
-        }}
-        elevation={3}
-      >
-        <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
-        >
-          <Typography variant="body1" fontSize={"1.05rem"}>
-            {t("youHaveAddedNItemsToCompare", { count: compareIds.length })}
-          </Typography>
-          <Stack direction="row" spacing={1}>
-            <Button variant="contained" onClick={onCompare}>
-              {t("compare")}
-            </Button>
-            <Button variant="text" onClick={onRemoveAll}>
-              {t("removeAll")}
-            </Button>
-          </Stack>
-        </Stack>
-      </Paper>
-    </Slide>
+    <Stack
+      direction={"row"}
+      justifyContent={"space-between"}
+      alignItems={"center"}
+    >
+      <Typography variant="body1" fontSize={"1.05rem"}>
+        {t("youHaveAddedNItemsToCompare", { count: compareIds.length })}
+      </Typography>
+      <Stack direction="row" spacing={1}>
+        <Button variant="contained" onClick={onCompareClick}>
+          {t("compare")}
+        </Button>
+        <Button variant="text" onClick={onRemoveAll}>
+          {t("removeAll")}
+        </Button>
+      </Stack>
+    </Stack>
   );
 };

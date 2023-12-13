@@ -48,20 +48,5 @@ export default function Compare() {
       </Alert>
     );
   }
-  return (
-    <Stack direction="column" spacing={1}>
-      <Typography variant="h5">{t("addSongsTitle")}</Typography>
-      <Stack direction="row">
-        <TextField label={t("addSongsLabel")} />
-        <Button variant="contained">{t("addSongsButton")}</Button>
-      </Stack>
-      <Divider
-        variant="middle"
-        sx={{
-          py: 0.5,
-        }}
-      />
-      <CompareList songs={songs} />
-    </Stack>
-  );
+  return <CompareList songs={songs} />;
 }

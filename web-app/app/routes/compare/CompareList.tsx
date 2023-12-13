@@ -1,7 +1,13 @@
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
 import { t } from "i18next";
-import React, { createContext, useContext, useReducer, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+  useRef,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { SongResult } from "~/src/DataTypes";
 import {
@@ -82,7 +88,7 @@ const CompareRowCustom: React.FC<{
   );
 };
 
-const scrollWidthContext = createContext<number>(0);
+const scrollWidthContext = createContext<number | string>("100%");
 
 const GridDivider: React.FC = () => {
   const scrollWidth = useContext(scrollWidthContext);
@@ -100,6 +106,10 @@ const GridDivider: React.FC = () => {
 export const CompareList: React.FC<CompareListProps> = ({ songs }) => {
   const { t } = useTranslation("compare");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollWidth = useMemo(() => {
+    if (scrollRef.current) return scrollRef.current.scrollWidth;
+    else return "100%";
+  }, [scrollRef.current]);
   return (
     <Stack
       sx={{
@@ -108,7 +118,7 @@ export const CompareList: React.FC<CompareListProps> = ({ songs }) => {
       }}
     >
       <songsContext.Provider value={songs}>
-        <scrollWidthContext.Provider value={scrollRef.current?.scrollWidth!}>
+        <scrollWidthContext.Provider value={scrollWidth}>
           <Box
             ref={scrollRef}
             sx={{
