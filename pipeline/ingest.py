@@ -21,6 +21,7 @@ music_xml_processors = [
     basic_processors.TempoProcessor,
     basic_processors.AmbitusProcessor,
     basic_processors.MetadataProcessor,
+    basic_processors.DurationProcessor,
     contour_processor.ContourProcessor,
     contour_processor.RhythmProcessor
 ]

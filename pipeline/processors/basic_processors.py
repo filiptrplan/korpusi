@@ -125,4 +125,27 @@ class MetadataProcessor(MusicXMLProcessor):
         my_metadata_dict.pop('fileFormat')
         my_metadata_dict.pop('software')
         return my_metadata_dict
+
+class DurationProcessor(MusicXMLProcessor):
+    """Gets the duration of a song."""
+    song: stream.Stream
+    def __init__(self, song: stream.Stream, name='duration'):
+        super().__init__(song, name)
+        self.mapping = {
+            'properties': {
+                'measures': { 'type': 'long' },
+                'beats': { 'type': 'long' },
+            }
+        }
+
+    def process(self):
+        beats = self.song.duration.quarterLength
+        measures = 0
+        for x in self.song.flatten():
+            if x.measureNumber is not None and x.measureNumber > measures:
+                measures = x.measureNumber
+        return {
+            'measures': measures,
+            'beats': beats
+        }
         
