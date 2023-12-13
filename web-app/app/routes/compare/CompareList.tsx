@@ -1,5 +1,12 @@
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
-import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  CardActionArea,
+  Divider,
+  Grid,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { t } from "i18next";
 import React, {
   createContext,
@@ -39,7 +46,14 @@ const CompareRow: React.FC<{
   const width = Math.max(2, (12 - titleWidth) / songs.length);
 
   return (
-    <Grid item container xs={12} direction="row" wrap="nowrap">
+    <Grid
+      item
+      container
+      xs={12}
+      direction="row"
+      wrap="nowrap"
+      alignItems={"center"}
+    >
       <Grid
         item
         xs={titleWidth}

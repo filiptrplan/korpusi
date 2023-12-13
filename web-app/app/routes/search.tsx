@@ -40,13 +40,14 @@ import { MelodicNgramSearch } from "./search/MelodicNgramSearch";
 import { CorpusSelect } from "./search/CorpusSelect";
 import { FilterGroupCollapse } from "./search/FilterGroupCollapse";
 import { ResultList } from "./search/ResultList";
-import { CompareOverlay } from "./search/CompareOverlay";
+import { CompareOverlay } from "./compare/CompareOverlay";
 import {
   constructQuery,
   getAvailableTimeSignatures,
   getAvailableCorpuses,
 } from "./search/searchService";
 import { CompareList } from "./compare/CompareList";
+import { useUpdateQueryStringValueWithoutNavigation } from "~/utils/misc";
 
 export let handle = {
   i18n: "search",
@@ -170,8 +171,15 @@ export default function Search() {
   };
 
   const compareIds = params.compareIds ? params.compareIds.split(",") : [];
-  const [showCompareList, setShowCompareList] = useState(false);
-  const showCompare = compareIds.length > 1 && !showCompareList;
+  const [showCompareList, setShowCompareList] = useState(
+    params.showCompareList === "1"
+  );
+  useUpdateQueryStringValueWithoutNavigation(
+    "showCompareList",
+    showCompareList ? "1" : "0"
+  );
+
+  const showCompare = compareIds.length > 0 && !showCompareList;
   const compareRef = useRef<HTMLDivElement>(null);
 
   const onCompareClickAway = () => {
@@ -197,6 +205,7 @@ export default function Search() {
             <Collapse in={showCompare} mountOnEnter timeout={700}>
               <Box>
                 <CompareOverlay
+                  songs={compareData}
                   onCompareClick={() => {
                     setShowCompareList(true);
                   }}

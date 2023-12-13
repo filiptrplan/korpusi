@@ -1,5 +1,6 @@
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
-import { Typography } from "@mui/material";
+import { CardActionArea, Typography } from "@mui/material";
+import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import { SongResult } from "~/src/DataTypes";
 
@@ -8,7 +9,20 @@ interface Props {
 }
 
 export const CompareTitle: React.FC<Props> = ({ song }) => {
-  return <Typography>{song._source!.metadata.title}</Typography>;
+  const navigate = useNavigate();
+  return (
+    <CardActionArea
+      sx={{
+        borderRadius: 1,
+        py: 1,
+      }}
+      onClick={() => {
+        navigate(`/song/${song._id}`);
+      }}
+    >
+      <Typography>{song._source!.metadata.title}</Typography>
+    </CardActionArea>
+  );
 };
 
 export const CompareTempo: React.FC<Props> = ({ song }) => {
