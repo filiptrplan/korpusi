@@ -1,6 +1,6 @@
 {
-    "RangeSliderWithTextFields": {
-        "from": "Od",
-        "to": "Do"
+    "ContourGraph": {
+        "beat": "Zaporedna št. note",
+        "contourRange": "Razpon konture"
     }
 }

@@ -36,7 +36,7 @@ interface ContourGraphProps {
 export const ContourGraph: React.FC<ContourGraphProps> = ({
   songs: songProp,
 }) => {
-  const { t } = useTranslation("compare");
+  const { t } = useTranslation("components");
   const songs = Array.isArray(songProp) ? songProp : [songProp];
   const makeData = (
     song: SearchHit<SongResult>
@@ -86,7 +86,7 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
           }}
           noWrap
         >
-          {t("contourRange")}:
+          {t("ContourGraph.contourRange")}:
         </Typography>
         <Slider
           sx={{
@@ -114,7 +114,7 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
             x: {
               title: {
                 display: true,
-                text: t("beat"),
+                text: t("ContourGraph.beat"),
               },
               min: range[0],
               max: range[1],
