@@ -42,8 +42,32 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
       justifyContent={"space-between"}
       alignItems={"center"}
     >
-      <Stack direction={"row"} alignItems="center">
-        <Typography variant="body1" fontSize={"1.05rem"}>
+      <Stack
+        sx={{
+          pl: {
+            xs: 2,
+            md: 0,
+          },
+        }}
+        direction={{
+          xs: "column",
+          md: "row",
+        }}
+        alignItems={{
+          xs: "flex-start",
+          md: "center",
+        }}
+      >
+        <Typography
+          sx={{
+            display: {
+              xs: "none",
+              md: "block",
+            },
+          }}
+          variant="body1"
+          fontSize={"1.05rem"}
+        >
           {t("youHaveAddedNItemsToCompare", { count: compareIds.length })}
         </Typography>
         {songs.map((song) => {
@@ -57,7 +81,19 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
           );
         })}
       </Stack>
-      <Stack direction="row" spacing={1}>
+      <Stack
+        direction={{
+          xs: "column",
+          sm: "row",
+        }}
+        sx={{
+          pr: {
+            xs: 2,
+            md: 0,
+          },
+        }}
+        spacing={1}
+      >
         <Button
           variant="contained"
           onClick={onCompareClick}

@@ -63,49 +63,53 @@ export const CompareSheetMusic: React.FC = ({}) => {
       }}
     >
       <Grid container columnGap={2} alignItems={"center"}>
-        <Grid item xs="auto">
-          <Typography gutterBottom>{t("measureFromTo")}:</Typography>
+        <Grid item xs="auto" columnGap={2} container alignItems={"center"}>
+          <Grid item xs="auto">
+            <Typography gutterBottom>{t("measureFromTo")}:</Typography>
+          </Grid>
+          <Grid item xs={"auto"}>
+            <Slider
+              min={1}
+              max={maxMeasures}
+              defaultValue={[1, maxMeasures]}
+              disableSwap
+              valueLabelDisplay="auto"
+              onChangeCommitted={(e, value) => {
+                // this is for optimization, so we don't rerender the whole thing on every change
+                setMeasureRange(value as [number, number]);
+              }}
+              sx={{
+                width: "20rem",
+              }}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={"auto"}>
-          <Slider
-            min={1}
-            max={maxMeasures}
-            defaultValue={[1, maxMeasures]}
-            disableSwap
-            valueLabelDisplay="auto"
-            onChangeCommitted={(e, value) => {
-              // this is for optimization, so we don't rerender the whole thing on every change
-              setMeasureRange(value as [number, number]);
-            }}
+        <Grid columnGap={2} item xs="auto" container alignItems={"center"}>
+          <Grid
+            item
+            xs="auto"
             sx={{
-              width: "20rem",
+              pl: 2,
             }}
-          />
-        </Grid>
-        <Grid
-          item
-          xs="auto"
-          sx={{
-            pl: 2,
-          }}
-        >
-          <Typography gutterBottom>{t("measureWidth")}:</Typography>
-        </Grid>
-        <Grid item xs={"auto"}>
-          <Slider
-            min={1}
-            max={50}
-            defaultValue={20}
-            disableSwap
-            valueLabelDisplay="auto"
-            onChangeCommitted={(e, value) => {
-              // this is for optimization, so we don't rerender the whole thing on every change
-              setMeasureWidth(value as number);
-            }}
-            sx={{
-              width: "20rem",
-            }}
-          />
+          >
+            <Typography gutterBottom>{t("measureWidth")}:</Typography>
+          </Grid>
+          <Grid item xs={"auto"}>
+            <Slider
+              min={1}
+              max={50}
+              defaultValue={20}
+              disableSwap
+              valueLabelDisplay="auto"
+              onChangeCommitted={(e, value) => {
+                // this is for optimization, so we don't rerender the whole thing on every change
+                setMeasureWidth(value as number);
+              }}
+              sx={{
+                width: "20rem",
+              }}
+            />
+          </Grid>
         </Grid>
       </Grid>
       <Grid container alignItems={"center"}>

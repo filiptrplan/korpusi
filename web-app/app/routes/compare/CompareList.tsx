@@ -11,9 +11,12 @@ import { t } from "i18next";
 import React, {
   createContext,
   useContext,
+  useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
+  useState,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { SongResult } from "~/src/DataTypes";
@@ -90,13 +93,20 @@ const CompareRowCustom: React.FC<{
 }> = ({ title, children }) => {
   const titleWidth = 2;
   return (
-    <Grid item container xs={12} direction="row" alignItems="flex-start">
-      <Grid item xs={titleWidth}>
+    <Grid
+      minWidth={400}
+      item
+      container
+      xs={12}
+      direction="row"
+      alignItems="flex-start"
+    >
+      <Grid item xs={12} md={titleWidth}>
         <Typography variant="h6" fontSize="1.05rem">
           {title}
         </Typography>
       </Grid>
-      <Grid item xs={12 - titleWidth}>
+      <Grid item xs={12} md={12 - titleWidth}>
         {children}
       </Grid>
     </Grid>
@@ -120,11 +130,25 @@ const GridDivider: React.FC = () => {
 
 export const CompareList: React.FC<CompareListProps> = ({ songs }) => {
   const { t } = useTranslation("compare");
+
   const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollWidth = useMemo(() => {
-    if (scrollRef.current) return scrollRef.current.scrollWidth;
-    else return "100%";
+  const [scrollWidth, setScrollWidth] = useState<number | string>("100%");
+
+  // These are here so the divider resize properly on resize of the window
+  useEffect(() => {
+    setScrollWidth(scrollRef.current?.scrollWidth || "100%");
   }, [scrollRef.current]);
+
+  useLayoutEffect(() => {
+    const onResize = () => {
+      setScrollWidth(scrollRef.current?.scrollWidth || "100%");
+    };
+    if (window) window.addEventListener("resize", onResize);
+    return () => {
+      if (window) window.removeEventListener("resize", onResize);
+    };
+  });
+
   return (
     <Stack
       sx={{

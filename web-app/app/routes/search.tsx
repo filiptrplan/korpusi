@@ -10,6 +10,8 @@ import {
   Paper,
   Slide,
   Stack,
+  Theme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Form,
@@ -186,6 +188,15 @@ export default function Search() {
     setShowCompareList(false);
   };
 
+  useEffect(() => {
+    if (!document) return;
+    if (showCompareList) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [showCompareList]);
+
   return (
     <>
       <ClickAwayListener onClickAway={onCompareClickAway}>
@@ -197,7 +208,10 @@ export default function Search() {
               left: 0,
               right: 0,
               zIndex: 100,
-              px: 3,
+              px: {
+                xs: 0,
+                md: 3,
+              },
               py: 2,
             }}
             elevation={3}
@@ -215,7 +229,10 @@ export default function Search() {
             <Collapse in={showCompareList} mountOnEnter timeout={700}>
               <Container
                 sx={{
-                  height: "90vh",
+                  height: {
+                    xs: "80vh",
+                    md: "90vh",
+                  },
                   overflowY: "auto",
                 }}
                 maxWidth="xl"

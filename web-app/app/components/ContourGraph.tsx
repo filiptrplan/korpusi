@@ -1,5 +1,5 @@
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
-import { Slider, Stack, Typography } from "@mui/material";
+import { Box, Slider, Stack, Typography } from "@mui/material";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -67,7 +67,11 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
     labels: Array.from(Array(maxLength).keys()).map((x) => x + 1),
   };
   return (
-    <>
+    <Box
+      sx={{
+        minWidth: "400px",
+      }}
+    >
       <Stack
         sx={{
           pr: 2,
@@ -118,6 +122,6 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
           },
         }}
       />
-    </>
+    </Box>
   );
 };
