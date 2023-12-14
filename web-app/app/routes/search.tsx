@@ -218,12 +218,14 @@ export default function Search() {
           >
             <Collapse in={showCompare} mountOnEnter timeout={700}>
               <Box>
-                <CompareOverlay
-                  songs={compareData}
-                  onCompareClick={() => {
-                    setShowCompareList(true);
-                  }}
-                />
+                <Box ref={compareRef}>
+                  <CompareOverlay
+                    songs={compareData}
+                    onCompareClick={() => {
+                      setShowCompareList(true);
+                    }}
+                  />
+                </Box>
               </Box>
             </Collapse>
             <Collapse in={showCompareList} mountOnEnter timeout={700}>
@@ -257,7 +259,7 @@ export default function Search() {
       <Box
         sx={{
           marginBottom: !showCompareList
-            ? `${compareRef.current?.clientHeight ?? 0 + 20}px`
+            ? `${(compareRef.current?.clientHeight ?? 0) + 40}px`
             : 0,
         }}
       >
