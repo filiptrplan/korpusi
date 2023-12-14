@@ -1,0 +1,21 @@
+{
+    "heroTitle": "Slovenska mladinska in otroška glasba 1945–1991",
+    "projectDescriptionTitle": "O projektu",
+    "projectDescription": "Korpus nastaja v okviru projekta Glasba mladih po 1945 in Glasbena mladina Slovenije, ki ga (so)financira Javna agencija za znanstvenoraziskovalno in inovacijsko dejavnost (J6-3135). Podrobnosti so dostopne na <1>tej povezavi</1>.",
+    "totalSongs": "Število del v naši zbirki",
+    "totalCorpuses": "Število korpusov",
+    "songsCountCorpus": "Število del v korpusu",
+    "composersCountCorpus": "Število skladateljev v korpusu",
+    "metrumChartTitle": "Porazdelitev metrumov (prvih 10 najpogostejših)",
+    "metrumChartXAxis": "Metrum",
+    "metrumChartYAxis": "Število del",
+    "keyChartTitle": "Porazdelitev tonalitet (prvih 10 najpogostejših)",
+    "keyChartXAxis": "Tonaliteta",
+    "keyChartYAxis": "Število del",
+    "ambitusStatsTitle": "Statistika ambitusov (v semitonih)",
+    "ambitusMin": "Najmanjši ambitus",
+    "ambitusMax": "Največji ambitus",
+    "ambitusAvg": "Povprečni ambitus",
+    "corpusStatsTitle": "Osnovni podatki o korpusu",
+    "allStatsTitle": "Aggregirani podatki o korpusih"
+}

@@ -24,16 +24,16 @@ export const InfoCard: React.FC<InfoCardProps> = ({
       >
         <Typography
           variant={isLarge ? "h5" : "caption"}
-          fontSize={isLarge ? "1.5rem" : undefined}
+          fontSize={isLarge ? "1.35rem" : undefined}
           fontWeight={isLarge ? 500 : undefined}
-          lineHeight={isLarge ? "1.75rem" : undefined}
+          lineHeight={isLarge ? "1.55rem" : undefined}
         >
           {title}
         </Typography>
         <Typography
           variant={isLarge ? "body1" : "h6"}
-          fontSize={isLarge ? "1.75rem" : "1.05rem"}
-          lineHeight={isLarge ? "2.25rem" : "1.25rem"}
+          fontSize={isLarge ? "1.55rem" : "1.05rem"}
+          lineHeight={isLarge ? "2rem" : "1.25rem"}
         >
           {value ?? "-"}
         </Typography>
