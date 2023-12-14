@@ -15,7 +15,7 @@ import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import Difference from "@mui/icons-material/Difference";
 import FileDownload from "@mui/icons-material/FileDownload";
-import { InfoCard } from "./InfoCard";
+import { InfoCard } from "../../components/InfoCard";
 import { useTranslation } from "react-i18next";
 import notes from "./notes.json";
 import { Dispatch, SetStateAction, useContext } from "react";
