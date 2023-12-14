@@ -229,10 +229,7 @@ export default function Search() {
             <Collapse in={showCompareList} mountOnEnter timeout={700}>
               <Container
                 sx={{
-                  height: {
-                    xs: "80vh",
-                    md: "90vh",
-                  },
+                  height: "calc(100vh - 64px - 10vh)",
                   overflowY: "auto",
                 }}
                 maxWidth="xl"
