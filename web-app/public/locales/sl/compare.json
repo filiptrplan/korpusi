@@ -9,7 +9,10 @@
     "tempo": "Tempo",
     "key": "Ključ",
     "timeSignature": "Metrum",
-    "ambitus": "Ambitus(semitoni)",
+    "ambitus": "Ambitus (semitoni)",
     "sheetMusic": "Odlomek zapisa",
-    "measureWidth": "Širina taktov"
+    "measureWidth": "Širina taktov",
+    "contour": "Tonska kontura",
+    "beat": "Zaporedna št. note",
+    "contourRange": "Razpon grafa"
 }

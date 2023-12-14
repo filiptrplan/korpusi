@@ -50,7 +50,7 @@ import { CompareList } from "./compare/CompareList";
 import { useUpdateQueryStringValueWithoutNavigation } from "~/utils/misc";
 
 export let handle = {
-  i18n: "search",
+  i18n: ["search", "compare"],
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

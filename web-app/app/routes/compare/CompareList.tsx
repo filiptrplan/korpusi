@@ -25,6 +25,7 @@ import {
   CompareTitle,
 } from "./BasicCompareRows";
 import { CompareSheetMusic } from "./CompareSheetMusic";
+import { CompareContour } from "./CompareContour";
 
 export const songsContext = createContext<SearchHit<SongResult>[]>([]);
 
@@ -158,6 +159,10 @@ export const CompareList: React.FC<CompareListProps> = ({ songs }) => {
               />
               <GridDivider />
               <CompareRow title={t("ambitus")} Component={CompareAmbitus} />
+              <GridDivider />
+              <CompareRowCustom title={t("contour")}>
+                <CompareContour />
+              </CompareRowCustom>
               <GridDivider />
               <CompareRowCustom title={t("sheetMusic")}>
                 <CompareSheetMusic />
