@@ -2,6 +2,7 @@ export interface SongResult extends Record<string, any> {
   corpus_id: string;
   metadata: {
     title: string;
+    lyricist: string;
     author: string;
     composer: string;
     movementName: string;

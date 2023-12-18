@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { useControlledState } from "./useControlledState";
 import { useTranslation } from "react-i18next";
-import notes from "./notes.json";
+import { allNotes, midiToNote, noteToMidi } from "~/utils/notes";
 
 interface NoteRangeSliderProps {
   noteFrom?: string;
@@ -45,14 +45,8 @@ export const NoteRangeSlider: React.FC<NoteRangeSliderProps> = ({
           }}
           disableClearable
           renderInput={(params) => <TextField {...params} label={t("from")} />}
-          options={Object.keys(notes).map(
-            (note) => notes[note as keyof typeof notes]
-          )}
-          getOptionLabel={(option) =>
-            Object.keys(notes).find(
-              (key) => notes[key as keyof typeof notes] === option
-            ) as string
-          }
+          options={Object.keys(allNotes).map((note) => noteToMidi(note))}
+          getOptionLabel={(option) => midiToNote(option)}
         />
         <TextField
           name={nameFrom}
@@ -89,14 +83,8 @@ export const NoteRangeSlider: React.FC<NoteRangeSliderProps> = ({
           }}
           disableClearable
           renderInput={(params) => <TextField {...params} label={t("to")} />}
-          options={Object.keys(notes).map(
-            (note) => notes[note as keyof typeof notes]
-          )}
-          getOptionLabel={(option) =>
-            Object.keys(notes).find(
-              (key) => notes[key as keyof typeof notes] === option
-            ) as string
-          }
+          options={Object.keys(allNotes).map((note) => noteToMidi(note))}
+          getOptionLabel={(option) => midiToNote(option)}
         />
         <TextField
           name={nameTo}

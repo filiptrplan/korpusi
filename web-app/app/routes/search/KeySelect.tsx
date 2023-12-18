@@ -11,6 +11,7 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useControlledState } from "./useControlledState";
+import { useKeyTranslate } from "~/utils/notes";
 
 interface KeySelectProps {
   keyValue?: string;
@@ -26,6 +27,7 @@ export const KeySelect: React.FC<KeySelectProps> = ({
     alternativeKeys == "on" || false
   );
   const { t } = useTranslation("search");
+  const tKeys = useKeyTranslate();
   return (
     <Stack
       spacing={1}
@@ -48,35 +50,35 @@ export const KeySelect: React.FC<KeySelectProps> = ({
             setKeyState(e.target.value as string);
           }}
         >
-          <MenuItem value="none">{t("keys.none")}</MenuItem>
-          <MenuItem value="G">{t("keys.G")}</MenuItem>
-          <MenuItem value="D">{t("keys.D")}</MenuItem>
-          <MenuItem value="A">{t("keys.A")}</MenuItem>
-          <MenuItem value="E">{t("keys.E")}</MenuItem>
-          <MenuItem value="B">{t("keys.B")}</MenuItem>
-          <MenuItem value="F#">{t("keys.F#")}</MenuItem>
-          <MenuItem value="C#">{t("keys.C#")}</MenuItem>
-          <MenuItem value="F">{t("keys.F")}</MenuItem>
-          <MenuItem value="B-">{t("keys.B-")}</MenuItem>
-          <MenuItem value="E-">{t("keys.E-")}</MenuItem>
-          <MenuItem value="A-">{t("keys.A-")}</MenuItem>
-          <MenuItem value="D-">{t("keys.D-")}</MenuItem>
-          <MenuItem value="G-">{t("keys.G-")}</MenuItem>
-          <MenuItem value="C-">{t("keys.C-")}</MenuItem>
-          <MenuItem value="a">{t("keys.a")}</MenuItem>
-          <MenuItem value="e">{t("keys.e")}</MenuItem>
-          <MenuItem value="b">{t("keys.b")}</MenuItem>
-          <MenuItem value="f#">{t("keys.f#")}</MenuItem>
-          <MenuItem value="c#">{t("keys.c#")}</MenuItem>
-          <MenuItem value="g#">{t("keys.g#")}</MenuItem>
-          <MenuItem value="d#">{t("keys.d#")}</MenuItem>
-          <MenuItem value="d">{t("keys.d")}</MenuItem>
-          <MenuItem value="g">{t("keys.g")}</MenuItem>
-          <MenuItem value="c">{t("keys.c")}</MenuItem>
-          <MenuItem value="f">{t("keys.f")}</MenuItem>
-          <MenuItem value="b-">{t("keys.b-")}</MenuItem>
-          <MenuItem value="e-">{t("keys.e-")}</MenuItem>
-          <MenuItem value="a-">{t("keys.a-")}</MenuItem>
+          <MenuItem value="none">{tKeys("none")}</MenuItem>
+          <MenuItem value="G">{tKeys("G")}</MenuItem>
+          <MenuItem value="D">{tKeys("D")}</MenuItem>
+          <MenuItem value="A">{tKeys("A")}</MenuItem>
+          <MenuItem value="E">{tKeys("E")}</MenuItem>
+          <MenuItem value="B">{tKeys("B")}</MenuItem>
+          <MenuItem value="F#">{tKeys("F#")}</MenuItem>
+          <MenuItem value="C#">{tKeys("C#")}</MenuItem>
+          <MenuItem value="F">{tKeys("F")}</MenuItem>
+          <MenuItem value="B-">{tKeys("B-")}</MenuItem>
+          <MenuItem value="E-">{tKeys("E-")}</MenuItem>
+          <MenuItem value="A-">{tKeys("A-")}</MenuItem>
+          <MenuItem value="D-">{tKeys("D-")}</MenuItem>
+          <MenuItem value="G-">{tKeys("G-")}</MenuItem>
+          <MenuItem value="C-">{tKeys("C-")}</MenuItem>
+          <MenuItem value="a">{tKeys("a")}</MenuItem>
+          <MenuItem value="e">{tKeys("e")}</MenuItem>
+          <MenuItem value="b">{tKeys("b")}</MenuItem>
+          <MenuItem value="f#">{tKeys("f#")}</MenuItem>
+          <MenuItem value="c#">{tKeys("c#")}</MenuItem>
+          <MenuItem value="g#">{tKeys("g#")}</MenuItem>
+          <MenuItem value="d#">{tKeys("d#")}</MenuItem>
+          <MenuItem value="d">{tKeys("d")}</MenuItem>
+          <MenuItem value="g">{tKeys("g")}</MenuItem>
+          <MenuItem value="c">{tKeys("c")}</MenuItem>
+          <MenuItem value="f">{tKeys("f")}</MenuItem>
+          <MenuItem value="b-">{tKeys("b-")}</MenuItem>
+          <MenuItem value="e-">{tKeys("e-")}</MenuItem>
+          <MenuItem value="a-">{tKeys("a-")}</MenuItem>
         </Select>
       </FormControl>
       <FormControlLabel

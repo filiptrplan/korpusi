@@ -3,7 +3,7 @@ import {
   AggregationsStringTermsAggregate,
 } from "@elastic/elasticsearch/lib/api/types";
 import { elastic } from "~/services/Elastic";
-import notes from "~/routes/search/notes.json";
+import { noteToMidi } from "~/utils/notes";
 
 export const constructQuery = (
   params: Record<string, string>
@@ -143,16 +143,9 @@ export const constructQuery = (
   if ("melodicNgram" in params) {
     // convert text to midi numbers
     const stringArr = params.melodicNgram.split(" ");
-    const expandedNotes: any = { ...notes };
-    Object.keys(notes).forEach((key) => {
-      // here we expand the notes object to include flat keys with the regular letter b
-      if (key.includes("♭")) {
-        expandedNotes[key.replace("♭", "b")] = notes[key as keyof typeof notes];
-      }
-    });
     const midiNumbers = stringArr.map((x) => {
-      const note = x.replace("♭", "b");
-      return expandedNotes[note as keyof typeof expandedNotes];
+      const note = x.replace("b", "♭");
+      return noteToMidi(note);
     });
     const midiNumbersRelative = [];
     for (let i = 1; i < midiNumbers.length; i++) {

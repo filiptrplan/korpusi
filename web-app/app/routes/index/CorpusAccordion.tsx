@@ -24,6 +24,7 @@ import {
 import { Bar } from "react-chartjs-2";
 import { t } from "i18next";
 import { MAccordion } from "~/components/MAccordion";
+import { useKeyTranslate } from "~/utils/notes";
 
 ChartJS.register(
   CategoryScale,
@@ -84,6 +85,7 @@ export const CorpusAccordion: React.FC<CorpusAccordionProps> = ({ corpus }) => {
     maintainAspectRatio: false,
   };
 
+  const tKeys = useKeyTranslate();
   const keyDatasets: ChartData<"bar"> = {
     datasets: [
       {
@@ -91,7 +93,7 @@ export const CorpusAccordion: React.FC<CorpusAccordionProps> = ({ corpus }) => {
         backgroundColor: corpus.keysBuckets.map((_, i) => getColor(i)),
       },
     ],
-    labels: corpus.keysBuckets.map((bucket) => bucket.key),
+    labels: corpus.keysBuckets.map((bucket) => tKeys(bucket.key)),
   };
 
   const keyOptions: ChartOptions<"bar"> = {

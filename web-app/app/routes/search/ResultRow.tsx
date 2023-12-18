@@ -17,8 +17,8 @@ import Difference from "@mui/icons-material/Difference";
 import FileDownload from "@mui/icons-material/FileDownload";
 import { InfoCard } from "../../components/InfoCard";
 import { useTranslation } from "react-i18next";
-import notes from "./notes.json";
 import { Dispatch, SetStateAction, useContext } from "react";
+import { midiToNote } from "~/utils/notes";
 
 export interface ResultRowProps {
   songHit: SearchHit<SongResult>;
@@ -34,12 +34,6 @@ export const ResultRow: React.FC<ResultRowProps> = ({
   const [params, setParams] = useSearchParams();
 
   const { t } = useTranslation("search");
-
-  const findNoteByValue = (note: number) => {
-    return Object.keys(notes).find((key) => {
-      return notes[key as keyof typeof notes] == note;
-    });
-  };
 
   const createDownloadLink = () => {
     const blob = new Blob([JSON.stringify(song)], {
@@ -149,7 +143,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
                   },
                 }}
                 title={t("highestNote")}
-                value={findNoteByValue(song.ambitus.max_note)}
+                value={midiToNote(song.ambitus.max_note)}
               />
               <InfoCard
                 sx={{
@@ -159,7 +153,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
                   },
                 }}
                 title={t("lowestNote")}
-                value={findNoteByValue(song.ambitus.min_note)}
+                value={midiToNote(song.ambitus.min_note)}
               />
             </Stack>
           </Stack>
