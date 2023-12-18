@@ -12,10 +12,10 @@
     "keyChartTitle": "Porazdelitev tonalitet (prvih 10 najpogostejših)",
     "keyChartXAxis": "Tonaliteta",
     "keyChartYAxis": "Število del",
-    "ambitusStatsTitle": "Statistika ambitusov (v semitonih)",
-    "ambitusMin": "Najmanjši ambitus",
-    "ambitusMax": "Največji ambitus",
-    "ambitusAvg": "Povprečni ambitus",
+    "ambitusStatsTitle": "Statistika ambitusov (v poltonih)",
+    "ambitusMin": "Najmanjši obseg",
+    "ambitusMax": "Največji obseg",
+    "ambitusAvg": "Povprečni obseg",
     "corpusStatsTitle": "Osnovni podatki o korpusu",
-    "allStatsTitle": "Aggregirani podatki o korpusih"
+    "allStatsTitle": "Agregirani podatki o korpusih"
 }

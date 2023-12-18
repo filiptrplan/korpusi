@@ -29,10 +29,6 @@ export const SheetMusic: React.FC = ({}) => {
           xs: "column",
           sm: "row",
         }}
-        spacing={{
-          xs: 1,
-          sm: 2,
-        }}
         alignItems={{
           xs: "flex-start",
           sm: "center",
