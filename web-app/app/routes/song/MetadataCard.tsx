@@ -1,50 +1,61 @@
-import { Box, Card, CardContent, List } from "@mui/material";
-import { useMemo } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  List,
+  Typography,
+} from "@mui/material";
+import { useContext, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { SongResult } from "~/src/DataTypes";
+import { SongContext } from "../song.$id";
 
-export interface MetadataCardProps {
-  song: SongResult;
-}
-
-export const MetadataCard: React.FC<MetadataCardProps> = ({ song }) => {
+export const MetadataCard: React.FC = () => {
+  const song = useContext(SongContext);
   const { metadata } = song;
-  const listItems = useMemo(() => {
-    if (!metadata) return null;
-    const items = Object.entries(metadata).map(([key, value]) => {
+  const { t } = useTranslation("song");
+
+  // The values are the translation keys
+  const metadataLabels: Partial<Record<keyof SongResult["metadata"], string>> =
+    {
+      composer: t("composer"),
+      lyricist: t("lyricist"),
+      title: t("titleSong"),
+    };
+
+  const metadataList = useMemo(() => {
+    const filteredMetadata = Object.entries(metadataLabels).filter(
+      ([key, value]) => {
+        return (
+          Object.keys(metadataLabels).includes(key) &&
+          typeof metadata[key as keyof SongResult["metadata"]] !== "undefined"
+        );
+      }
+    );
+    return filteredMetadata.map(([key, value], i) => {
       return (
-        <li key={key}>
-          <strong>{key}</strong>: {value as string}
-        </li>
-      );
-    });
-    return items;
-  }, [metadata]);
-  return (
-    <Card>
-      <CardContent
-        sx={{
-          padding: 1,
-          paddingBottom: 1,
-          "&:last-child": {
-            paddingBottom: 1,
-          },
-        }}
-      >
-        <Box
+        <Typography
+          key={key}
           sx={{
-            typography: "body2",
+            mb: i === filteredMetadata.length - 1 ? -1 : 0,
           }}
         >
-          <ul
-            style={{
-              listStyle: "inside",
-              paddingInlineStart: "1.5rem",
-            }}
-          >
-            {listItems}
-          </ul>
-        </Box>
-      </CardContent>
+          <strong>{value}</strong>:{" "}
+          {metadata[key as keyof SongResult["metadata"]]}
+        </Typography>
+      );
+    });
+  }, [metadata, metadataLabels]);
+
+  return (
+    <Card
+      sx={{
+        height: "100%",
+      }}
+    >
+      <CardHeader title={t("metadataCardTitle")} />
+      <CardContent>{metadataList}</CardContent>
     </Card>
   );
 };

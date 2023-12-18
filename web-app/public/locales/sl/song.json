@@ -3,5 +3,21 @@
     "lyricist": "Pesnik",
     "titleSong": "Naslov dela",
     "outsideLinks": "Zunanje povezave",
-    "metadataCardTitle": "Metapodatki"
+    "metadataCardTitle": "Metapodatki",
+    "basicData": {
+        "title": "Osnovni podatki",
+        "key": "Ključ",
+        "metrum": "Metrum",
+        "tempo": "Tempo (BPM)",
+        "ambitus": "Obseg (ambitus v poltonih)",
+        "durationMeasures": "Dolžina (v taktih)"
+    },
+    "sheetMusic": {
+        "title": "Notni zapis",
+        "measureRange": "Obseg v taktih",
+        "lyrics": "Prikaži besedilo"
+    },
+    "contourGraph": {
+        "title": "Kontura"
+    }
 }

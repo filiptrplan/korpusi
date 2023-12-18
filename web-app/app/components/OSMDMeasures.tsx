@@ -1,7 +1,4 @@
-import {
-  GraphicalMusicSheet,
-  OpenSheetMusicDisplay,
-} from "opensheetmusicdisplay";
+import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 export interface OSMDMeasureProps {
@@ -40,6 +37,7 @@ export const OSMDMeasures: React.FC<OSMDMeasureProps> = ({
     if (osmd === null) return;
     if (xml === "" || !xml) return;
     await osmd.load(xml);
+    osmd.render();
     if (ref.current) {
       (ref.current as HTMLElement).innerHTML = "";
     }
@@ -53,6 +51,7 @@ export const OSMDMeasures: React.FC<OSMDMeasureProps> = ({
       osmd.setOptions({
         drawFromMeasureNumber: startMeasure,
         drawUpToMeasureNumber: endMeasure,
+        drawLyrics: displayLyrics,
       });
       osmd.zoom = zoom;
       if (fixedMeasureWidth) {
@@ -72,6 +71,11 @@ export const OSMDMeasures: React.FC<OSMDMeasureProps> = ({
     zoom,
     fixedMeasureWidth,
   ]);
+
+  // This is needed so the OSMD renders on page load
+  useEffect(() => {
+    osmd?.render();
+  }, []);
 
   return <div ref={ref} {...divProps}></div>;
 };

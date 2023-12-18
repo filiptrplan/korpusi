@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { t } from "i18next";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { useTranslation } from "react-i18next";
 import { SongResult } from "~/src/DataTypes";
@@ -31,13 +31,22 @@ ChartJS.register(
 
 interface ContourGraphProps {
   songs: SearchHit<SongResult>[] | SearchHit<SongResult>;
+  maxHeight?: string | number;
+  useMeasures?: boolean;
 }
 
 export const ContourGraph: React.FC<ContourGraphProps> = ({
   songs: songProp,
+  maxHeight,
+  useMeasures = false,
 }) => {
+  if (useMeasures && Array.isArray(songProp)) {
+    throw new Error("Can't display measures for multiple songs");
+  }
+
   const { t } = useTranslation("components");
   const songs = Array.isArray(songProp) ? songProp : [songProp];
+
   const makeData = (
     song: SearchHit<SongResult>
   ): ChartData<"line">["datasets"][0] => {
@@ -51,21 +60,42 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
         const index = ctx.dataIndex;
         const value = ctx.dataset.data[index] as number;
         if (value === null) return 0;
-        return Math.abs(value) < 2 ? 2 : 4;
+        return Math.abs(value) < 2 ? 4 : 8;
       },
     };
   };
+
   const maxLength = songs.reduce((max, song) => {
     return Math.max(
       max,
       song._source!.contour.melodic_contour_string_relative.split(" ").length
     );
   }, 0);
+
   const [range, setRange] = useState<number[]>([0, maxLength]);
+
+  const labels = useMemo(() => {
+    const returnArray = Array.from(Array(maxLength).keys()).map((x) => x + 1);
+
+    if (!useMeasures) return returnArray;
+    if (Array.isArray(songProp))
+      throw new Error("Can't display measures for multiple songs");
+
+    const measureStarts = songProp._source!.contour.measure_starts;
+    return returnArray.map((x) => {
+      if (measureStarts.includes(x)) {
+        return measureStarts.indexOf(x) + 1;
+      } else {
+        return "";
+      }
+    });
+  }, [maxLength, useMeasures, songProp]);
+
   const data: ChartData<"line"> = {
     datasets: songs.map((song) => makeData(song)),
-    labels: Array.from(Array(maxLength).keys()).map((x) => x + 1),
+    labels: labels,
   };
+
   return (
     <Box
       sx={{
@@ -101,6 +131,9 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
       </Stack>
       <Line
         data={data}
+        style={{
+          maxHeight,
+        }}
         options={{
           plugins: {
             legend: {
@@ -114,7 +147,9 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
             x: {
               title: {
                 display: true,
-                text: t("ContourGraph.beat"),
+                text: useMeasures
+                  ? t("ContourGraph.measure")
+                  : t("ContourGraph.beat"),
               },
               min: range[0],
               max: range[1],

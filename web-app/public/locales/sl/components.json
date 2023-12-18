@@ -1,6 +1,7 @@
 {
     "ContourGraph": {
         "beat": "Zaporedna št. note",
-        "contourRange": "Razpon konture"
+        "contourRange": "Razpon konture",
+        "measure": "Takt"
     }
 }

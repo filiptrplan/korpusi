@@ -28,6 +28,13 @@ const theme = createTheme({
         spacing: 1,
       },
     },
+    MuiCardHeader: {
+      defaultProps: {
+        sx: {
+          pb: 0,
+        },
+      },
+    },
   },
 });
 
