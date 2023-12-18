@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { MAccordion } from "~/components/MAccordion";
 
 interface FilterGroupCollapseProps {
   title: string;
@@ -50,24 +51,40 @@ export const FilterGroupCollapse: React.FC<FilterGroupCollapseProps> = ({
   }, []);
 
   return (
-    <Accordion
+    <MAccordion
+      title={title}
       sx={{
         width: "100%",
         overflow: "hidden",
-        borderRadius: 1,
       }}
-      elevation={0}
-      disableGutters
-      variant="outlined"
       expanded={!isCollapsed}
       onChange={() => {
         setIsCollapsed(!isCollapsed);
       }}
+      titleTypographyProps={{
+        variant: undefined,
+      }}
     >
-      <AccordionSummary expandIcon={<ArrowDropDown />}>
-        <Typography>{title}</Typography>
-      </AccordionSummary>
-      <AccordionDetails>{children}</AccordionDetails>
-    </Accordion>
+      {children || ""}
+    </MAccordion>
+    // <Accordion
+    //   sx={{
+    //     width: "100%",
+    //     overflow: "hidden",
+    //     borderRadius: 1,
+    //   }}
+    //   elevation={0}
+    //   disableGutters
+    //   variant="outlined"
+    //   expanded={!isCollapsed}
+    //   onChange={() => {
+    //     setIsCollapsed(!isCollapsed);
+    //   }}
+    // >
+    //   <AccordionSummary expandIcon={<ArrowDropDown />}>
+    //     <Typography>{title}</Typography>
+    //   </AccordionSummary>
+    //   <AccordionDetails>{children}</AccordionDetails>
+    // </Accordion>
   );
 };

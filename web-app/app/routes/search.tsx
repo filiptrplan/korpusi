@@ -4,8 +4,6 @@ import {
   ClickAwayListener,
   Collapse,
   Container,
-  Drawer,
-  Fade,
   Grid,
   Paper,
   Slide,
@@ -25,11 +23,7 @@ import { LoaderFunctionArgs } from "@remix-run/server-runtime";
 import { FormEvent, createContext, useEffect, useRef, useState } from "react";
 import { elastic } from "~/services/Elastic";
 import { SongResult } from "~/src/DataTypes";
-import {
-  AggregationsStringTermsAggregate,
-  QueryDslQueryContainer,
-  SearchTotalHits,
-} from "@elastic/elasticsearch/lib/api/types";
+import { SearchTotalHits } from "@elastic/elasticsearch/lib/api/types";
 import { useTranslation } from "react-i18next";
 import { MetadataSelect } from "./search/MetadataSelect";
 import { KeySelect } from "./search/KeySelect";

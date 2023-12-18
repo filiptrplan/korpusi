@@ -23,6 +23,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { t } from "i18next";
+import { MAccordion } from "~/components/MAccordion";
 
 ChartJS.register(
   CategoryScale,
@@ -114,76 +115,62 @@ export const CorpusAccordion: React.FC<CorpusAccordionProps> = ({ corpus }) => {
   };
 
   return (
-    <Accordion
-      variant="outlined"
-      disableGutters
-      defaultExpanded={true}
-      sx={{
-        overflow: "hidden",
-        borderRadius: 1,
-        my: 1,
-      }}
-    >
-      <AccordionSummary expandIcon={<ArrowDropDown />}>
-        <Typography variant="h5">{corpus.corpusName}</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Grid container spacing={1}>
-          <Grid item xs={12}>
-            <Typography variant="h6">{t("corpusStatsTitle")}</Typography>
-          </Grid>
-          <Grid item xs="auto">
-            <InfoCard title={t("songsCountCorpus")} value={corpus.songCount} />
-          </Grid>
-          <Grid item xs="auto">
-            <InfoCard
-              title={t("composersCountCorpus")}
-              value={corpus.composersCount}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">{t("metrumChartTitle")}</Typography>
-          </Grid>
-          <Grid
-            sx={{
-              height: 320,
-              width: "100%",
-            }}
-            item
-            xs={12}
-          >
-            <Bar width="100%" data={metrumDatasets} options={metrumOptions} />
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">{t("keyChartTitle")}</Typography>
-          </Grid>
-          <Grid
-            sx={{
-              height: 320,
-              width: "100%",
-            }}
-            item
-            xs={12}
-          >
-            <Bar width="100%" data={keyDatasets} options={keyOptions} />
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">{t("ambitusStatsTitle")}</Typography>
-          </Grid>
-          <Grid item xs={"auto"}>
-            <InfoCard title={t("ambitusMin")} value={corpus.ambitusStats.min} />
-          </Grid>
-          <Grid item xs={"auto"}>
-            <InfoCard title={t("ambitusMax")} value={corpus.ambitusStats.max} />
-          </Grid>
-          <Grid item xs={"auto"}>
-            <InfoCard
-              title={t("ambitusAvg")}
-              value={corpus.ambitusStats.avg?.toFixed(1)}
-            />
-          </Grid>
+    <MAccordion title={corpus.corpusName}>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <Typography variant="h6">{t("corpusStatsTitle")}</Typography>
         </Grid>
-      </AccordionDetails>
-    </Accordion>
+        <Grid item xs="auto">
+          <InfoCard title={t("songsCountCorpus")} value={corpus.songCount} />
+        </Grid>
+        <Grid item xs="auto">
+          <InfoCard
+            title={t("composersCountCorpus")}
+            value={corpus.composersCount}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h6">{t("metrumChartTitle")}</Typography>
+        </Grid>
+        <Grid
+          sx={{
+            height: 320,
+            width: "100%",
+          }}
+          item
+          xs={12}
+        >
+          <Bar width="100%" data={metrumDatasets} options={metrumOptions} />
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h6">{t("keyChartTitle")}</Typography>
+        </Grid>
+        <Grid
+          sx={{
+            height: 320,
+            width: "100%",
+          }}
+          item
+          xs={12}
+        >
+          <Bar width="100%" data={keyDatasets} options={keyOptions} />
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h6">{t("ambitusStatsTitle")}</Typography>
+        </Grid>
+        <Grid item xs={"auto"}>
+          <InfoCard title={t("ambitusMin")} value={corpus.ambitusStats.min} />
+        </Grid>
+        <Grid item xs={"auto"}>
+          <InfoCard title={t("ambitusMax")} value={corpus.ambitusStats.max} />
+        </Grid>
+        <Grid item xs={"auto"}>
+          <InfoCard
+            title={t("ambitusAvg")}
+            value={corpus.ambitusStats.avg?.toFixed(1)}
+          />
+        </Grid>
+      </Grid>
+    </MAccordion>
   );
 };

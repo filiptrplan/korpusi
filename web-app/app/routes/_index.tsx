@@ -22,6 +22,7 @@ import {
 } from "@elastic/elasticsearch/lib/api/types";
 import { CorpusAccordion } from "./index/CorpusAccordion";
 import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
+import { MAccordion } from "~/components/MAccordion";
 
 export const handle = {
   i18n: "index",
@@ -166,30 +167,16 @@ export default function Index() {
           <Link href="http://muzikologijaff.si/gmgm/"></Link>
         </Trans>
       </Typography>
-      <Accordion
-        variant="outlined"
-        disableGutters
-        defaultExpanded={true}
-        sx={{
-          overflow: "hidden",
-          borderRadius: 1,
-          my: 1,
-        }}
-      >
-        <AccordionSummary expandIcon={<ArrowDropDown />}>
-          <Typography variant="h5">{t("allStatsTitle")}</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid container spacing={1}>
-            <Grid item xs="auto">
-              <InfoCard title={t("totalSongs")} value={allSongsCount} />
-            </Grid>
-            <Grid item xs="auto">
-              <InfoCard title={t("totalCorpuses")} value={allCorpusesCount} />
-            </Grid>
+      <MAccordion title={t("allStatsTitle")}>
+        <Grid container spacing={1}>
+          <Grid item xs="auto">
+            <InfoCard title={t("totalSongs")} value={allSongsCount} />
           </Grid>
-        </AccordionDetails>
-      </Accordion>
+          <Grid item xs="auto">
+            <InfoCard title={t("totalCorpuses")} value={allCorpusesCount} />
+          </Grid>
+        </Grid>
+      </MAccordion>
       {corpusAggregates.map((corpus: CorpusAggregate) => (
         <CorpusAccordion corpus={corpus} />
       ))}
