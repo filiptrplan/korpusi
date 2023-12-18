@@ -40,7 +40,7 @@ export const TimeSignatureSelect: React.FC<TimeSignatureProps> = ({
           setTimeSigState(e.target.value as string);
         }}
       >
-        <MenuItem value="none">{t("keys.none")}</MenuItem>
+        <MenuItem value="none">{t("metrumNone")}</MenuItem>
         {availableTimeSignatures
           ?.sort((a, b) => {
             return a.split("/")[1].localeCompare(b.split("/")[1]);

@@ -33,5 +33,6 @@
     "metadataFilters": "Metapodatki",
     "basicFilters": "Osnovni filtri",
     "ambitusFilters": "Ambitus",
-    "patternFilters": "Vzorci in n-grami"
+    "patternFilters": "Vzorci in n-grami",
+    "metrumNone": "Brez"
 }
