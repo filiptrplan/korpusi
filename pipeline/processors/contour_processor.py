@@ -29,7 +29,8 @@ class ContourProcessor(MusicXMLProcessor):
 
     def process(self):
         pitch_values = []
-        measure_numbers = []  # this is done because you can't set a measure number to a note and a note in a chord doesn't have one
+        # this is done because you can't set a measure number to a note and a note in a chord doesn't have one
+        measure_numbers = [] 
         beats = []
         for x in self.song.parts[0].flatten():
             if len(measure_numbers) != 0:
@@ -104,7 +105,7 @@ class RhythmProcessor(MusicXMLProcessor):
             note = x
             if not isinstance(x, (music21.note.Note, music21.note.Rest, music21.chord.Chord)):
                 continue
-                
+
             # notes in chords lose their measure number so we save it here 
             measure_number = x.measureNumber
             if isinstance(x, music21.chord.Chord):

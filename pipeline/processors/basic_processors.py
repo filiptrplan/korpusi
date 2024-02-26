@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from music21 import stream, tempo, note, interval, metadata, key
 from processors.musicxml_processor import MusicXMLProcessor
 
@@ -102,10 +100,8 @@ class AmbitusProcessor(MusicXMLProcessor):
         min_note = note.Note('C8')  # je tole v redu? Ponavadi gre od 0 do 8 po oktavah navzgor
         max_note = note.Note('A0')
         for n in notes:
-            if n > max_note:
-                max_note = n
-            if n < min_note:
-                min_note = n
+            max_note = max(n, max_note)
+            min_note = min(n, min_note)
 
         my_interval = interval.Interval(noteStart=min_note, noteEnd=max_note)
 

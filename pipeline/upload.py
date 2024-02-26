@@ -7,12 +7,16 @@ from dotenv import load_dotenv
 import typer
 from typer_config.decorators import use_yaml_config
 
+# pylint: disable=too-many-arguments,too-many-branches,duplicate-code
+
 app = typer.Typer()
 
 load_dotenv()
 crt_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../certs/ca/ca.crt'))
-client = Elasticsearch(hosts=os.getenv('ELASTIC_HOST'), basic_auth=(os.getenv('ELASTIC_USER'), os.getenv('ELASTIC_PASSWORD')),
+client = Elasticsearch(hosts=os.getenv('ELASTIC_HOST'),
+                       basic_auth=(os.getenv('ELASTIC_USER'), os.getenv('ELASTIC_PASSWORD')),
                        ca_certs=crt_path, verify_certs=True)
+
 
 def calculate_hash(json_str: str):
     """Calculates the hash of the original file from the JSON string."""
@@ -22,6 +26,7 @@ def calculate_hash(json_str: str):
     m.update(orig_file.encode('utf-8'))
     return m.hexdigest()
 
+
 def index_document(json_str: str, index: str):
     """Indexes a single document in the ElasticSearch database."""
     try:
@@ -30,13 +35,17 @@ def index_document(json_str: str, index: str):
         raise e
     client.index(index=index, document=json_str, id=calculate_hash(json_str))
 
+
 @app.command()
 @use_yaml_config()
-def upload(index: str, 
-        json_file: Annotated[str, typer.Option(help='Path to the JSON file to upload. It should feature one JSON file for each line.')] = None,
-        json_dir: Annotated[str, typer.Option(help='Path to the directory containing the JSON files to upload. Each file is its separate document')] = None,
-        mapping_file: Annotated[str, typer.Option(help='Path to the mapping file. If not specified, it will be inferred from the path of the input file.')] = None,
-        delete_index: Annotated[bool, typer.Option(help='Whether to delete the index before uploading.')] = False):
+def upload(index: str,
+           json_file: Annotated[str, typer.Option(
+               help='Path to the JSON file to upload. It should feature one JSON file for each line.')] = None,
+           json_dir: Annotated[str, typer.Option(
+               help='Path to the directory containing the JSON files to upload. Each file is its separate document')] = None,
+           mapping_file: Annotated[str, typer.Option(
+               help='Path to the mapping file. If not specified, it will be inferred from the path of the input file.')] = None,
+           delete_index: Annotated[bool, typer.Option(help='Whether to delete the index before uploading.')] = False):
     """Uploads JSON files to the ElasticSearch database."""
     if json_file is not None and json_dir is not None:
         raise typer.BadParameter("Cannot specify both json_file and json_dir")
@@ -51,13 +60,15 @@ def upload(index: str,
             mapping_file = os.path.join(os.path.dirname(json_dir), 'mapping.json')
             if os.path.exists(mapping_file) is False:
                 raise typer.BadParameter(f"Mapping file {mapping_file} does not exist")
-        
-    mapping = json.load(open(mapping_file, 'r', encoding='utf-8'))
+
+    with open(mapping_file, 'r', encoding='utf-8') as f:
+        mapping = json.load(f)
     if delete_index is True:
         client.options(ignore_status=404).indices.delete(index=index)
     client.options(ignore_status=400).indices.create(index=index)
-    client.indices.put_mapping(index=index, properties=mapping['properties']) # this is so we don't ignore 400 errors on mapping syntax
-    
+    client.indices.put_mapping(index=index, properties=mapping[
+        'properties'])  # this is so we don't ignore 400 errors on mapping syntax
+
     if json_file is not None:
         with open(json_file, 'r', encoding='utf-8') as f:
             for i, line in enumerate(f):
@@ -66,7 +77,6 @@ def upload(index: str,
                 except json.JSONDecodeError:
                     print(f'Line {i} in {json_file} is not valid JSON. Skipping...')
                 print(f'Indexed line {i} in {json_file}')
-
 
     if json_dir is not None:
         for file in os.listdir(json_dir):
