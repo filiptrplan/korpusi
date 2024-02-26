@@ -26,12 +26,13 @@ music_xml_processors = [
     contour_processor.RhythmProcessor
 ]
 
+
 @app.command()
 @use_yaml_config()
 def process(
-    corpus_id: Annotated[str, typer.Option(help='Id of the corpus which the file belongs to.')],
-    in_file: Annotated[str, typer.Option(
-        help='Path to the file to process')] = None,
+        corpus_id: Annotated[str, typer.Option(help='Id of the corpus which the file belongs to.')],
+        in_file: Annotated[str, typer.Option(
+            help='Path to the file to process')] = None,
         out_file: str = None,
         mapping_file: str = None,
         in_dir: Annotated[str, typer.Option(
@@ -66,8 +67,12 @@ def process(
     if in_dir is not None:
         if out_dir is None:
             out_dir = in_dir
+
+        # remove old results.json
         if single_output is True and os.path.isfile(os.path.join(out_dir, 'results.json')):
             os.remove(os.path.join(out_dir, 'results.json'))
+
+        # process all files in the directory
         files = sorted(os.listdir(in_dir))
         for file in files:
             if file.endswith(".xml") or file.endswith(".musicxml"):
@@ -137,6 +142,7 @@ def process_musicxml(path: str, processors: list):
         results[processor_instance.get_name()] = processor_instance.process()
 
     return results
+
 
 if __name__ == '__main__':
     app()

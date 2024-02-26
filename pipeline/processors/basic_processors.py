@@ -1,9 +1,13 @@
+from typing import Dict, List
+
 from music21 import stream, tempo, note, interval, metadata, key
 from processors.musicxml_processor import MusicXMLProcessor
+
 
 class KeyProcessor(MusicXMLProcessor):
     """Get the key signature of the song."""
     song: stream.Stream
+
     def __init__(self, song: stream.Stream, name='key'):
         super().__init__(song, name)
         self.mapping = {
@@ -11,34 +15,37 @@ class KeyProcessor(MusicXMLProcessor):
                 'most_certain_key': {
                     'type': 'keyword',
                     'fields': {
-                        'text': { 'type': 'text'}
+                        'text': {'type': 'text'}
                     }
                 },
                 'alternate_keys': {
                     'type': 'keyword',
                     'fields': {
-                        'text': { 'type': 'text'}
+                        'text': {'type': 'text'}
                     }
                 }
             }
         }
 
-    def process(self) -> str:
+    def process(self) -> dict[str, list[str] | str]:
         song_key: key.Key = self.song.analyze('key')
         return {
             'most_certain_key': song_key.tonicPitchNameWithCase,
-            'alternate_keys': [x.tonicPitchNameWithCase for x in song_key.alternateInterpretations[0:4]] # get the first 4 alternate keys
+            'alternate_keys': [x.tonicPitchNameWithCase for x in song_key.alternateInterpretations[0:4]]
+            # get the first 4 alternate keys
         }
+
 
 class TimeSignatureProcessor(MusicXMLProcessor):
     """Get the time signature of the song."""
     song: stream.Stream
+
     def __init__(self, song: stream.Stream, name='time_signature'):
         super().__init__(song, name)
         self.mapping = {
             'type': 'keyword',
             'fields': {
-                'text': { 'type': 'text'}
+                'text': {'type': 'text'}
             }
         }
 
@@ -47,9 +54,11 @@ class TimeSignatureProcessor(MusicXMLProcessor):
         time_signature = str(first_measure.timeSignature.ratioString)
         return time_signature
 
+
 class TempoProcessor(MusicXMLProcessor):
     """Get the tempo of the song."""
     song: stream.Stream
+
     def __init__(self, song: stream.Stream, name='tempo'):
         super().__init__(song, name)
         self.mapping = {
@@ -68,27 +77,29 @@ class TempoProcessor(MusicXMLProcessor):
         else:
             tempo_str = str(tempo_marks[0].number)
         return tempo_str
-   
+
+
 class AmbitusProcessor(MusicXMLProcessor):
     """Gets the 'ambitus' of a song. This is the range of the song."""
     song: stream.Stream
+
     def __init__(self, song: stream.Stream, name='ambitus'):
         super().__init__(song, name)
         self.mapping = {
             'properties': {
-                'min_note': { 
-                    'type': 'long',           
+                'min_note': {
+                    'type': 'long',
                 },
-                'max_note': { 
-                    'type': 'long',           
+                'max_note': {
+                    'type': 'long',
                 },
-                'ambitus_semitones': { 'type': 'long' }
+                'ambitus_semitones': {'type': 'long'}
             }
         }
 
     def process(self):
         notes = self.song.flatten().getElementsByClass(note.Note)
-        min_note = note.Note('C8') # je tole v redu? Ponavadi gre od 0 do 8 po oktavah navzgor
+        min_note = note.Note('C8')  # je tole v redu? Ponavadi gre od 0 do 8 po oktavah navzgor
         max_note = note.Note('A0')
         for n in notes:
             if n > max_note:
@@ -106,9 +117,11 @@ class AmbitusProcessor(MusicXMLProcessor):
 
         return result
 
+
 class MetadataProcessor(MusicXMLProcessor):
     """Gets the metadata of a song."""
     song: stream.Stream
+
     def __init__(self, song: stream.Stream, name='metadata'):
         super().__init__(song, name)
         self.mapping = {
@@ -126,15 +139,17 @@ class MetadataProcessor(MusicXMLProcessor):
         my_metadata_dict.pop('software')
         return my_metadata_dict
 
+
 class DurationProcessor(MusicXMLProcessor):
     """Gets the duration of a song."""
     song: stream.Stream
+
     def __init__(self, song: stream.Stream, name='duration'):
         super().__init__(song, name)
         self.mapping = {
             'properties': {
-                'measures': { 'type': 'long' },
-                'beats': { 'type': 'long' },
+                'measures': {'type': 'long'},
+                'beats': {'type': 'long'},
             }
         }
 
@@ -148,4 +163,3 @@ class DurationProcessor(MusicXMLProcessor):
             'measures': measures,
             'beats': beats
         }
-        
