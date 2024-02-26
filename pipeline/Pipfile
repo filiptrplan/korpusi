@@ -17,6 +17,7 @@ pip = "*"
 python-dotenv = "*"
 typer-config = {extras = ["all"], version = "*"}
 colorama = "*"
+pytest = "*"
 
 [dev-packages]
 
