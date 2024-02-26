@@ -16,6 +16,7 @@ elasticsearch = "*"
 pip = "*"
 python-dotenv = "*"
 typer-config = {extras = ["all"], version = "*"}
+colorama = "*"
 
 [dev-packages]
 
