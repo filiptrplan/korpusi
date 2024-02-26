@@ -1,5 +1,5 @@
 # Pipeline
-This is the main processing pipeline that turns musicXML or audio files into usable data that can be inserted into ES.
+This is the main processing pipeline that turns musicXML or audio files into usable data that can be inserted into ES(ElasticSearch).
 
 The `ingest.py` file is the main script to run if you want JSON output ready to be inserted into ES.
 
@@ -33,3 +33,6 @@ So if we set the name of our `KeySignatureProcessor` to `key_signature`, then th
     ...
 }
 ```
+
+Each processor should also define `self.mapping` in the constructor. This is a dictionary that maps the attribute name to the data type.
+It follows the format for Elastic Search mapping which you can learn more about [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html).

@@ -30,7 +30,7 @@ class ContourProcessor(MusicXMLProcessor):
     def process(self):
         pitch_values = []
         # this is done because you can't set a measure number to a note and a note in a chord doesn't have one
-        measure_numbers = [] 
+        measure_numbers = []
         beats = []
         for x in self.song.parts[0].flatten():
             if len(measure_numbers) != 0:
