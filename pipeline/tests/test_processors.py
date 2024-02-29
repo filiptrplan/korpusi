@@ -11,17 +11,9 @@ def song():
 
 class TestBasicProcessors:
     """Tests processors from basic_processors.py"""
-    def test_key_processor(self):
+    def test_key_processor(self, snapshot):
         key_processor = KeyProcessor(song())
-        assert key_processor.process() == {
-            "most_certain_key": "C",
-            "alternate_keys": [
-                "d",
-                "c",
-                "g",
-                "G"
-            ]
-        }
+        assert key_processor.process() == snapshot
 
     def test_time_signature_processor(self):
         time_signature_processor = TimeSignatureProcessor(song())
@@ -39,17 +31,10 @@ class TestBasicProcessors:
             "ambitus_semitones": 5
         }
 
-    def test_metadata_processor(self):
+    def test_metadata_processor(self, snapshot):
         metadata_processor = MetadataProcessor(song())
-        assert metadata_processor.process() == {
-            "composer": "Lovrenc Arni\u010d",
-            "movementName": "test.musicxml",
-            "title": "Mati"
-        }
+        assert metadata_processor.process() == snapshot
 
-    def test_duration_processor(self):
+    def test_duration_processor(self, snapshot):
         duration_processor = DurationProcessor(song())
-        assert duration_processor.process() == {
-            "measures": 33,
-            "beats": 49.5
-        }
+        assert duration_processor.process() == snapshot

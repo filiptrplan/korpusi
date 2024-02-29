@@ -1,0 +1,25 @@
+# serializer version: 1
+# name: TestBasicProcessors.test_duration_processor
+  dict({
+    'beats': 49.5,
+    'measures': 33,
+  })
+# ---
+# name: TestBasicProcessors.test_key_processor
+  dict({
+    'alternate_keys': list([
+      'd',
+      'c',
+      'g',
+      'G',
+    ]),
+    'most_certain_key': 'C',
+  })
+# ---
+# name: TestBasicProcessors.test_metadata_processor
+  dict({
+    'composer': 'Lovrenc Arnič',
+    'movementName': 'test.musicxml',
+    'title': 'Mati',
+  })
+# ---
