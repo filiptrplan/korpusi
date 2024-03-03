@@ -7,3 +7,5 @@ __pycache__/
 *.wav
 *.mp3
 pretrained_models/
+.vscode/
+.idea/
