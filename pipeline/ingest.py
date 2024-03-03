@@ -7,9 +7,11 @@ from typing_extensions import Annotated
 import typer
 import music21
 from typer_config.decorators import use_yaml_config
-from processors import basic_processors, contour_processor
+from processors import basic_processors, contour_processor, audio_processors
 import upload
 import corpus
+
+# pylint: disable=too-many-arguments,too-many-branches,duplicate-code,too-many-locals
 
 app = typer.Typer()
 app.registered_commands = upload.app.registered_commands + corpus.app.registered_commands
@@ -26,6 +28,12 @@ music_xml_processors = [
     contour_processor.RhythmProcessor
 ]
 
+audio_processors = [
+    # Add audio processors here
+    audio_processors.AudioFileInfoProcessor,
+    audio_processors.AudioBPMProcessor,
+    audio_processors.AudioPitchContourProcessor
+]
 
 @app.command()
 @use_yaml_config()
@@ -119,17 +127,33 @@ def process_file(in_file: str, pretty: bool, include_original: bool, corpus_id: 
     """Processes a single file and writes the results in JSON."""
     if not os.path.isfile(in_file):
         raise typer.BadParameter(f"File does not exist: {in_file}")
+        
+    if in_file.endswith(".xml") or in_file.endswith(".musicxml"):
+        results = process_musicxml(in_file, music_xml_processors)
+    else:
+        results = process_audio(in_file, audio_processors) 
+        
 
-    results = process_musicxml(in_file, music_xml_processors)
     results['corpus_id'] = corpus_id
     if include_original:
         results['filename'] = os.path.basename(in_file)
-        with open(in_file, 'r', encoding='utf-8') as f:
-            results['original_file'] = f.read()
+        # include original only if it's a musicXML file
+        if in_file.endswith(".xml") or in_file.endswith(".musicxml"):
+            with open(in_file, 'r', encoding='utf-8') as f:
+                results['original_file'] = f.read()
     if pretty:
         results = json.dumps(results, indent=4)
     else:
         results = json.dumps(results)
+    return results
+    
+def process_audio(path: str, processors: list):
+    """Processes a single audio file and spits out the results in dictionary form."""
+    results = {}
+    for processor in processors:
+        processor_instance = processor(path)
+        results[processor_instance.get_name()] = processor_instance.process()
+
     return results
 
 

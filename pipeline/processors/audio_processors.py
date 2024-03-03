@@ -1,5 +1,6 @@
 import os
-import wave
+import essentia
+import essentia.standard
 
 import soundfile
 
@@ -12,7 +13,7 @@ class AudioProcessor(BaseProcessor):
     All processors that process audio files should inherit from this class and implement the process method.
     """
 
-    def __init__(self, song: any, name: str = None, mapping=None):
+    def __init__(self, song: str, name: str = None, mapping=None):
         """
         any song: The path to the song to process.
         str name: The name of the processor. This is the name of the field that the results will be stored in.
@@ -21,11 +22,16 @@ class AudioProcessor(BaseProcessor):
             raise ValueError("Song path must be a string")
         if not os.path.exists(song):
             raise ValueError("Song path does not exist")
-        if not song.endswith('.wav'):
-            raise ValueError("Song must be a .wav file. Please re-encode any other formats to WAV.")
+        if not song.endswith('.wav') and not song.endswith('.flac') and not song.endswith('.ogg') and not song.endswith(
+                '.mp3'):
+            raise ValueError("Song must be an audio file")
         if name is None:
             name = self.__class__.__name__
         super().__init__(song, name, mapping)
+
+    def process(self):
+        """The main function of the processor. It should spit out the results in dictionary format or a single value."""
+        raise NotImplementedError("Subclasses must implement this method")
 
 
 class AudioFileInfoProcessor(AudioProcessor):
@@ -41,7 +47,7 @@ class AudioFileInfoProcessor(AudioProcessor):
                 'duration': {
                     'type': 'float'
                 },
-                'bit_depth': {
+                'encoding_subtype': {
                     'type': 'float'
                 }
             }
@@ -49,11 +55,10 @@ class AudioFileInfoProcessor(AudioProcessor):
 
     def process(self):
         file = soundfile.SoundFile(self.song)
-        print(file.subtype)
         return {
             'sample_rate': file.samplerate,
             'duration': file.frames / file.samplerate,
-            'bit_depth': file.subtype[0]
+            'encoding_subtype': file.subtype
         }
 
 
@@ -73,3 +78,42 @@ class AudioBPMProcessor(AudioProcessor):
             }
         }
 
+    def process(self):
+        loader = essentia.standard.MonoLoader(filename=self.song)
+        audio = loader()
+
+        rhythm_extractor = essentia.standard.RhythmExtractor2013(method="multifeature")
+        beats = rhythm_extractor(audio)
+
+        return {
+            'bpm': beats[0],
+            'beat_ticks': beats[1].tolist()
+        }
+
+
+class AudioPitchContourProcessor(AudioProcessor):
+    """Gets the pitch contour of the song."""
+
+    def __init__(self, song: any, name='pitch_contour'):
+        super().__init__(song, name)
+        self.mapping = {
+            'properties': {
+                'pitch_contour_hz_voice': {
+                    'type': 'float'
+                },
+                'pitch_contour_hz_instrumental': {
+                    'type': 'float'
+                },
+                'time_step_ms': {
+                    'type': 'float'
+                }
+            }
+        }
+
+    def process(self):
+        if not os.path.exists(self.song + '.voice'):
+            raise ValueError(
+                f"{self.song}.voice does not exist. Please run the voice extraction first. Refer to extract_voice.md for more information."
+            )
+        # loader = essentia.standard.MonoLoader(filename=self.song + '.voice')
+        # audio = loader()

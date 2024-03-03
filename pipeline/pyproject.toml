@@ -7,15 +7,16 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.10"
-typer = "^0.9.0"
-essentia = "^2.1b6.dev1110"
+python = ">=3.10,<3.11"
+typer = "0.9.0"
 essentia-tensorflow = "^2.1b6.dev1110"
 music21 = "^9.1.0"
 soundfile = "^0.12.1"
 typer-config = {extras = ["yaml"], version = "^1.4.0"}
 elasticsearch = "^8.12.1"
 python-dotenv = "^1.0.1"
+essentia = "^2.1b6.dev1110"
+pesto-pitch = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.2"

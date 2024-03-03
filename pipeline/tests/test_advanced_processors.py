@@ -18,9 +18,7 @@ class TestAdvancedProcessors:
         result = contour_processor.process()
         assert result == snapshot
 
-
     def test_rhythm_processor(self, snapshot):
         rhythm_processor = RhythmProcessor(song())
         result = rhythm_processor.process()
         assert result == snapshot
-
