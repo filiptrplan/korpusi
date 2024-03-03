@@ -4,3 +4,6 @@
 xmls/
 *.yaml
 __pycache__/
+*.wav
+*.mp3
+pretrained_models/
