@@ -1,3 +1,5 @@
 .env
 certs/
 .vercel
+.idea/
+.vscode/
