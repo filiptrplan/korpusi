@@ -102,3 +102,11 @@ The `song` parameter in the constructor now gets a path to the audio file.
 
 ## Setup
 We use `pre-commit` to enforce some development rules. To install it, run
+```bash
+pre-commit install
+```
+This will install the hooks and run them on every commit. If you want to run them manually, you can run
+```bash
+pre-commit run --all-files
+```
+If you are not using Git in a CLI, please run the hooks manually before pushing your changes.
