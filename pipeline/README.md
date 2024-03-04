@@ -7,7 +7,18 @@
 <!-- TOC -->
 
 # Installation
-This projects uses Python 3.10 as specified in the `pyproject.toml` file. You can use `poetry` to install it.
+Because of some bugs when it comes to installing the `essentia` package in a virtual environment, you should first install 
+it globally by running:
+```bash
+pip install essentia
+```
+To use the system-wide install then create a virtual environment manually and use the `--system-site-packages` option. 
+```bash
+python -m venv --system-site-packages .venv
+source .venv/bin/activate
+```
+
+Then you can use the `poetry` package manager to install the rest of the dependencies.
 Please refer to [this link](https://python-poetry.org/docs/#installation) to install `poetry`. To install all the dependencies, run 
 ```bash 
 poetry install
