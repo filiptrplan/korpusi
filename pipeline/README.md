@@ -110,3 +110,9 @@ This will install the hooks and run them on every commit. If you want to run the
 pre-commit run --all-files
 ```
 If you are not using Git in a CLI, please run the hooks manually before pushing your changes.
+
+You can also run the checks manually by running
+```bash
+ruff check .
+ruff format .
+```
