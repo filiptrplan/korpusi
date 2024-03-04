@@ -1,4 +1,3 @@
-# pylint: disable=import-error, missing-function-docstring
 import music21
 from processors.contour_processor import ContourProcessor, RhythmProcessor
 
@@ -7,7 +6,7 @@ def song():
     """
     Returns a music21 stream object of the test song.
     """
-    return music21.converter.parse('tests/test.musicxml')
+    return music21.converter.parse("tests/test.musicxml")
 
 
 class TestAdvancedProcessors:

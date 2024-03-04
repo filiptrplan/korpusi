@@ -8,22 +8,14 @@ class ContourProcessor(MusicXMLProcessor):
 
     song: music21.stream.Stream
 
-    def __init__(self, song: music21.stream.Stream, name='contour'):
+    def __init__(self, song: music21.stream.Stream, name="contour"):
         super().__init__(song, name)
         self.mapping = {
-            'properties': {
-                'melodic_contour_string_relative': {
-                    'type': 'text'
-                },
-                'melodic_contour_string': {
-                    'type': 'text'
-                },
-                'measure_starts': {
-                    'type': 'long'
-                },
-                'melodic_contour_string_absolute': {
-                    'type': 'text'
-                }
+            "properties": {
+                "melodic_contour_string_relative": {"type": "text"},
+                "melodic_contour_string": {"type": "text"},
+                "measure_starts": {"type": "long"},
+                "melodic_contour_string_absolute": {"type": "text"},
             }
         }
 
@@ -34,7 +26,10 @@ class ContourProcessor(MusicXMLProcessor):
         beats = []
         for x in self.song.parts[0].flatten():
             if len(measure_numbers) != 0:
-                if measure_numbers[len(measure_numbers) - 1] == x.measureNumber and beats[len(beats) - 1] == x.beat:
+                if (
+                    measure_numbers[len(measure_numbers) - 1] == x.measureNumber
+                    and beats[len(beats) - 1] == x.beat
+                ):
                     continue  # prevents adding two notes that are played at the same time
             if isinstance(x, music21.note.Note):
                 pitch_values.append(x)
@@ -48,11 +43,15 @@ class ContourProcessor(MusicXMLProcessor):
         melodic_contour = []
         melodic_contour_string = ""
         for i in range(len(pitch_values) - 1):
-            pitch_interval = music21.interval.Interval(pitch_values[i], pitch_values[i + 1])
+            pitch_interval = music21.interval.Interval(
+                pitch_values[i], pitch_values[i + 1]
+            )
             semi = pitch_interval.semitones
             melodic_contour.append(semi)
 
-        melodic_contour_string_absolute = ' '.join([str(x.pitch.midi) for x in pitch_values])
+        melodic_contour_string_absolute = " ".join(
+            [str(x.pitch.midi) for x in pitch_values]
+        )
 
         melodic_contour_string = ""
         for x in melodic_contour:
@@ -62,15 +61,23 @@ class ContourProcessor(MusicXMLProcessor):
                 melodic_contour_string += "D"
             else:
                 melodic_contour_string += "S"
-            melodic_contour_string += " "  # this is here so we can better search for the contour
+            melodic_contour_string += (
+                " "  # this is here so we can better search for the contour
+            )
 
-        measure_starts = [i for i in range(len(pitch_values)) if measure_numbers[i] != measure_numbers[i - 1]]
+        measure_starts = [
+            i
+            for i in range(len(pitch_values))
+            if measure_numbers[i] != measure_numbers[i - 1]
+        ]
 
         return {
-            'melodic_contour_string_relative': ' '.join([str(x) for x in melodic_contour]),
-            'melodic_contour_string': melodic_contour_string,
-            'melodic_contour_string_absolute': melodic_contour_string_absolute,
-            'measure_starts': measure_starts
+            "melodic_contour_string_relative": " ".join(
+                [str(x) for x in melodic_contour]
+            ),
+            "melodic_contour_string": melodic_contour_string,
+            "melodic_contour_string_absolute": melodic_contour_string_absolute,
+            "measure_starts": measure_starts,
         }
 
 
@@ -79,16 +86,12 @@ class RhythmProcessor(MusicXMLProcessor):
 
     song: music21.stream.Stream
 
-    def __init__(self, song: music21.stream.Stream, name='rhythm'):
+    def __init__(self, song: music21.stream.Stream, name="rhythm"):
         super().__init__(song, name)
         self.mapping = {
-            'properties': {
-                'measure_starts': {
-                    'type': 'long'
-                },
-                'rhythm_string': {
-                    'type': 'text'
-                },
+            "properties": {
+                "measure_starts": {"type": "long"},
+                "rhythm_string": {"type": "text"},
             }
         }
 
@@ -99,14 +102,19 @@ class RhythmProcessor(MusicXMLProcessor):
         beats = []
         for x in self.song.parts[0].flatten():
             if len(measure_numbers) != 0:
-                if measure_numbers[len(measure_numbers) - 1] == x.measureNumber and beats[len(beats) - 1] == x.beat:
+                if (
+                    measure_numbers[len(measure_numbers) - 1] == x.measureNumber
+                    and beats[len(beats) - 1] == x.beat
+                ):
                     continue  # prevents adding two notes that are played at the same time
 
             note = x
-            if not isinstance(x, (music21.note.Note, music21.note.Rest, music21.chord.Chord)):
+            if not isinstance(
+                x, (music21.note.Note, music21.note.Rest, music21.chord.Chord)
+            ):
                 continue
 
-            # notes in chords lose their measure number so we save it here 
+            # notes in chords lose their measure number so we save it here
             measure_number = x.measureNumber
             if isinstance(x, music21.chord.Chord):
                 note = x.sortAscending()[len(x) - 1]
@@ -114,10 +122,14 @@ class RhythmProcessor(MusicXMLProcessor):
             beats.append(note.beat)
             measure_numbers.append(measure_number)
             fraction = note.duration.quarterLength.as_integer_ratio()
-            rhythm_numeric.append(f'{fraction[0]}/{fraction[1]}')
+            rhythm_numeric.append(f"{fraction[0]}/{fraction[1]}")
 
-        rhythm_string = ' '.join([str(x) for x in rhythm_numeric])
+        rhythm_string = " ".join([str(x) for x in rhythm_numeric])
         return {
-            'rhythm_string': rhythm_string,
-            'measure_starts': [i for i in range(len(rhythm_numeric)) if measure_numbers[i] != measure_numbers[i - 1]]
+            "rhythm_string": rhythm_string,
+            "measure_starts": [
+                i
+                for i in range(len(rhythm_numeric))
+                if measure_numbers[i] != measure_numbers[i - 1]
+            ],
         }

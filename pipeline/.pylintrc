@@ -1,8 +1,0 @@
-[MASTER]
-disable=
-    C0114,
-    C0303,
-    too-few-public-methods,
-    import-error
-
-max-line-length=150

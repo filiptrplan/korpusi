@@ -98,4 +98,7 @@ By default, the `ingest` command will use the `audio_processors` list to process
 To add a new audio processor, you can follow the same steps as for the musicXML processors. The only difference is that you should inherit from `AudioProcessor` instead of `MusicXMLProcessor`.
 The `song` parameter in the constructor now gets a path to the audio file.
 
+# Development
 
+## Setup
+We use `pre-commit` to enforce some development rules. To install it, run

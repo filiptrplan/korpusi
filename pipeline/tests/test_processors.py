@@ -1,16 +1,22 @@
-# pylint: disable=import-error, missing-function-docstring
 import music21
 
-from processors.basic_processors import DurationProcessor, MetadataProcessor, AmbitusProcessor, TempoProcessor, \
-    TimeSignatureProcessor, KeyProcessor
+from processors.basic_processors import (
+    DurationProcessor,
+    MetadataProcessor,
+    AmbitusProcessor,
+    TempoProcessor,
+    TimeSignatureProcessor,
+    KeyProcessor,
+)
 
 
 def song():
-    return music21.converter.parse('tests/test.musicxml')
+    return music21.converter.parse("tests/test.musicxml")
 
 
 class TestBasicProcessors:
     """Tests processors from basic_processors.py"""
+
     def test_key_processor(self, snapshot):
         key_processor = KeyProcessor(song())
         assert key_processor.process() == snapshot
@@ -21,14 +27,14 @@ class TestBasicProcessors:
 
     def test_tempo_processor(self):
         tempo_processor = TempoProcessor(song())
-        assert tempo_processor.process() == '120'
+        assert tempo_processor.process() == "120"
 
     def test_ambitus_processor(self):
         ambitus_processor = AmbitusProcessor(song())
         assert ambitus_processor.process() == {
             "min_note": 55,
             "max_note": 60,
-            "ambitus_semitones": 5
+            "ambitus_semitones": 5,
         }
 
     def test_metadata_processor(self, snapshot):

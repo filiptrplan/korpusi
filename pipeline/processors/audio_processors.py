@@ -22,8 +22,12 @@ class AudioProcessor(BaseProcessor):
             raise ValueError("Song path must be a string")
         if not os.path.exists(song):
             raise ValueError("Song path does not exist")
-        if not song.endswith('.wav') and not song.endswith('.flac') and not song.endswith('.ogg') and not song.endswith(
-                '.mp3'):
+        if (
+            not song.endswith(".wav")
+            and not song.endswith(".flac")
+            and not song.endswith(".ogg")
+            and not song.endswith(".mp3")
+        ):
             raise ValueError("Song must be an audio file")
         if name is None:
             name = self.__class__.__name__
@@ -37,45 +41,32 @@ class AudioProcessor(BaseProcessor):
 class AudioFileInfoProcessor(AudioProcessor):
     """Gets the file information of the song like the duration, sample rate, and bit rate."""
 
-    def __init__(self, song: any, name='sample_rate'):
+    def __init__(self, song: any, name="sample_rate"):
         super().__init__(song, name)
         self.mapping = {
-            'properties': {
-                'sample_rate': {
-                    'type': 'float'
-                },
-                'duration': {
-                    'type': 'float'
-                },
-                'encoding_subtype': {
-                    'type': 'float'
-                }
+            "properties": {
+                "sample_rate": {"type": "float"},
+                "duration": {"type": "float"},
+                "encoding_subtype": {"type": "float"},
             }
         }
 
     def process(self):
         file = soundfile.SoundFile(self.song)
         return {
-            'sample_rate': file.samplerate,
-            'duration': file.frames / file.samplerate,
-            'encoding_subtype': file.subtype
+            "sample_rate": file.samplerate,
+            "duration": file.frames / file.samplerate,
+            "encoding_subtype": file.subtype,
         }
 
 
 class AudioBPMProcessor(AudioProcessor):
     """Gets the BPM of the song."""
 
-    def __init__(self, song: any, name='bpm'):
+    def __init__(self, song: any, name="bpm"):
         super().__init__(song, name)
         self.mapping = {
-            'properties': {
-                'bpm': {
-                    'type': 'float'
-                },
-                'beat_ticks': {
-                    'type': 'float'
-                }
-            }
+            "properties": {"bpm": {"type": "float"}, "beat_ticks": {"type": "float"}}
         }
 
     def process(self):
@@ -85,33 +76,24 @@ class AudioBPMProcessor(AudioProcessor):
         rhythm_extractor = essentia.standard.RhythmExtractor2013(method="multifeature")
         beats = rhythm_extractor(audio)
 
-        return {
-            'bpm': beats[0],
-            'beat_ticks': beats[1].tolist()
-        }
+        return {"bpm": beats[0], "beat_ticks": beats[1].tolist()}
 
 
 class AudioPitchContourProcessor(AudioProcessor):
     """Gets the pitch contour of the song."""
 
-    def __init__(self, song: any, name='pitch_contour'):
+    def __init__(self, song: any, name="pitch_contour"):
         super().__init__(song, name)
         self.mapping = {
-            'properties': {
-                'pitch_contour_hz_voice': {
-                    'type': 'float'
-                },
-                'pitch_contour_hz_instrumental': {
-                    'type': 'float'
-                },
-                'time_step_ms': {
-                    'type': 'float'
-                }
+            "properties": {
+                "pitch_contour_hz_voice": {"type": "float"},
+                "pitch_contour_hz_instrumental": {"type": "float"},
+                "time_step_ms": {"type": "float"},
             }
         }
 
     def process(self):
-        if not os.path.exists(self.song + '.voice'):
+        if not os.path.exists(self.song + ".voice"):
             raise ValueError(
                 f"{self.song}.voice does not exist. Please run the voice extraction first. Refer to extract_voice.md for more information."
             )

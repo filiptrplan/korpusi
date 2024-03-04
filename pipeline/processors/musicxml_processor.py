@@ -9,7 +9,7 @@ class MusicXMLProcessor(BaseProcessor):
     """
 
     def __init__(self, song: music21.stream.Stream, name: str = None, mapping=None):
-        """    
+        """
         music21.stream.Stream song: The song to process. This should be output from music21.converter.parse.
 
         The name of the processor is automatically set to the name of the class. It should be hard-coded in the class to
