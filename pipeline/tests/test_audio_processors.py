@@ -1,8 +1,15 @@
-from processors.audio_processors import AudioFileInfoProcessor, AudioBPMProcessor
+import os
+
+from processors.audio_processors import (
+    AudioFileInfoProcessor,
+    AudioBPMProcessor,
+    AudioPitchContourProcessor,
+)
 
 
 def song():
-    return "test.mp3"
+    base_path = os.path.dirname(__file__)
+    return os.path.join(base_path, "test.mp3")
 
 
 class TestAudioProcessors:
@@ -15,3 +22,7 @@ class TestAudioProcessors:
     def test_audio_bpm_processor(self, snapshot):
         audio_bpm_processor = AudioBPMProcessor(song())
         assert audio_bpm_processor.process() == snapshot
+
+    def test_audio_contour_processor(self, snapshot):
+        audio_contour_processor = AudioPitchContourProcessor(song())
+        assert audio_contour_processor.process() == snapshot

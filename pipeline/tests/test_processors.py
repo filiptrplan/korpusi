@@ -1,3 +1,5 @@
+import os
+
 import music21
 
 from processors.basic_processors import (
@@ -11,7 +13,10 @@ from processors.basic_processors import (
 
 
 def song():
-    return music21.converter.parse("tests/test.musicxml")
+    base_path = os.path.dirname(__file__)
+    path = os.path.join(base_path, "test.musicxml")
+
+    return music21.converter.parse(path)
 
 
 class TestBasicProcessors:
