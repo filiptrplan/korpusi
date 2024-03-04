@@ -3,6 +3,9 @@ import essentia
 import essentia.standard
 
 import soundfile
+import torchaudio
+import torch
+from pesto import predict
 
 from processors.base_processor import BaseProcessor
 
@@ -93,9 +96,45 @@ class AudioPitchContourProcessor(AudioProcessor):
         }
 
     def process(self):
-        if not os.path.exists(self.song + ".voice"):
+        file_extension = self.song.split(".")[-1]
+        rest_of_path = self.song[: -len(file_extension) - 1]
+        step_size = 10.0
+
+        voice_path = rest_of_path + ".vocals.wav"
+        instrumental_path = rest_of_path + ".accompaniment.wav"
+        if not os.path.exists(voice_path):
             raise ValueError(
-                f"{self.song}.voice does not exist. Please run the voice extraction first. Refer to extract_voice.md for more information."
+                f"{voice_path} does not exist. Please run the voice extraction first. Refer to extract_voice.md for more information."
             )
-        # loader = essentia.standard.MonoLoader(filename=self.song + '.voice')
-        # audio = loader()
+
+        if not os.path.exists(instrumental_path):
+            raise ValueError(
+                f"{instrumental_path} does not exist. Please run the voice extraction first. Refer to extract_voice.md for more information."
+            )
+
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        x, sr = torchaudio.load(voice_path)
+        x = x.mean(dim=0)  # PESTO takes mono audio as input
+        x = x.to(device)
+
+        timesteps, predictions_voice, confidence, activations = predict(
+            x, sr, step_size
+        )
+
+        x, sr = torchaudio.load(instrumental_path)
+        x = x.mean(dim=0)
+        x = x.to(device)
+        timesteps, predictions_instrumental, confidence, activations = predict(
+            x, sr, step_size
+        )
+
+        return {
+            "pitch_contour_hz_voice": torch.round(
+                predictions_voice, decimals=4
+            ).tolist(),
+            "pitch_contour_hz_instrumental": torch.round(
+                predictions_instrumental, decimals=4
+            ).tolist(),
+            "time_step_ms": step_size,
+        }

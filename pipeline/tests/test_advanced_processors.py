@@ -1,3 +1,5 @@
+import os
+
 import music21
 from processors.contour_processor import ContourProcessor, RhythmProcessor
 
@@ -6,7 +8,10 @@ def song():
     """
     Returns a music21 stream object of the test song.
     """
-    return music21.converter.parse("tests/test.musicxml")
+    base_path = os.path.dirname(__file__)
+    path = os.path.join(base_path, "test.musicxml")
+
+    return music21.converter.parse(path)
 
 
 class TestAdvancedProcessors:
