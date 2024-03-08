@@ -34,6 +34,7 @@ audio_processors = [
     audio_processors.AudioFileInfoProcessor,
     audio_processors.AudioBPMProcessor,
     audio_processors.AudioPitchContourProcessor,
+    audio_processors.AudioChordProcessor,
 ]
 
 

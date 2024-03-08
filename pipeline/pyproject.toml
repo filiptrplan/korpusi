@@ -16,6 +16,9 @@ elasticsearch = "^8.12.1"
 python-dotenv = "^1.0.1"
 essentia = "^2.1b6.dev1110"
 pesto-pitch = "^1.0.0"
+numpy = "^1.26.4"
+vamp = "^1.1.0"
+autochord = "^0.1.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.2"

@@ -5,6 +5,7 @@ import essentia.standard
 import soundfile
 import torchaudio
 import torch
+import autochord
 from pesto import predict
 
 from processors.base_processor import BaseProcessor
@@ -138,6 +139,31 @@ class AudioPitchContourProcessor(AudioProcessor):
                 predictions_instrumental.tolist()
             ),
             "time_step_ms": step_size,
+        }
+
+
+class AudioChordProcessor(AudioProcessor):
+    """Gets the chord progression of the song."""
+
+    def __init__(self, song: any, name="chords"):
+        super().__init__(song, name)
+        self.mapping = {
+            "properties": {
+                "chord_name": {"type": "string"},
+                "chord_start": {"type": "float"},
+                "chord_end": {"type": "float"},
+            }
+        }
+
+    def process(self):
+        output = autochord.recognize(self.song)
+        chord_names = [x[0] for x in output]
+        chord_starts = round_floats([x[1] for x in output])
+        chord_ends = round_floats([x[2] for x in output])
+        return {
+            "chord_name": chord_names,
+            "chord_start": chord_starts,
+            "chord_end": chord_ends,
         }
 
 

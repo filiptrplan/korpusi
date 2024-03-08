@@ -1,16 +1,37 @@
 <!-- TOC -->
 * [Installation](#installation)
+  * [Default installation](#default-installation)
+  * [In case of CUDA errors](#in-case-of-cuda-errors)
 * [Usage](#usage)
 * [Pipeline](#pipeline)
   * [MusicXML processing](#musicxml-processing)
   * [Audio processing](#audio-processing)
+* [Development](#development)
+  * [Setup](#setup)
 <!-- TOC -->
 
 # Installation
-Because of some bugs when it comes to installing the `essentia` package in a virtual environment, you should first install 
+## Default installation
+Please refer to [this link](https://python-poetry.org/docs/#installation) to install `poetry`. To install all the dependencies, run
+```bash 
+pip wheel "vamp (==1.1.0)"
+pip install vamp==1.1.0 --no-binary :all:
+poetry install
+``` 
+
+## In case of CUDA errors
+If you ware getting various CUDA errors while running ingest.py, follow these steps to install the dependencies.
+
+First install CUDA 11 and cuDNN 8(for CUDA 11) by following instructions on these two links:
+- [CUDA 11](https://developer.nvidia.com/cuda-11-8-0-download-archive)
+- [cuDNN 8](https://developer.nvidia.com/rdp/cudnn-archive)
+Be sure to run the `sudo apt install cuda-11-8` instead of `sudo apt install cuda` to install the correct version of CUDA.
+
+Because of some bugs when it comes to installing the `essentia` and `autochord` packages in a virtual environment, you should first install 
 it globally by running:
 ```bash
 pip install essentia
+pip install autochord
 ```
 To use the system-wide install then create a virtual environment manually and use the `--system-site-packages` option. 
 ```bash
@@ -21,6 +42,8 @@ source .venv/bin/activate
 Then you can use the `poetry` package manager to install the rest of the dependencies.
 Please refer to [this link](https://python-poetry.org/docs/#installation) to install `poetry`. To install all the dependencies, run 
 ```bash 
+pip wheel "vamp (==1.1.0)"
+pip install vamp==1.1.0 --no-binary :all:
 poetry install
 ``` 
 in the root directory of the project.
@@ -115,4 +138,15 @@ You can also run the checks manually by running
 ```bash
 ruff check .
 ruff format .
+```
+
+## Testing
+To run the tests, you can run
+```bash
+pytest
+```
+This will run all the tests in the `tests` directory. This projects uses `syrupy` to generate snapshots for complex
+data outputs. If you want to update the snapshots, you can run
+```bash
+pytest --snapshot-update
 ```
