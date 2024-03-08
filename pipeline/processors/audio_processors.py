@@ -79,7 +79,10 @@ class AudioBPMProcessor(AudioProcessor):
         rhythm_extractor = essentia.standard.RhythmExtractor2013(method="multifeature")
         beats = rhythm_extractor(audio)
 
-        return {"bpm": beats[0], "beat_ticks": beats[1].tolist()}
+        bpm = round_floats(beats[0])
+        beat_ticks = round_floats(beats[1].tolist())
+
+        return {"bpm": bpm, "beat_ticks": beat_ticks}
 
 
 class AudioPitchContourProcessor(AudioProcessor):
@@ -130,11 +133,19 @@ class AudioPitchContourProcessor(AudioProcessor):
         )
 
         return {
-            "pitch_contour_hz_voice": torch.round(
-                predictions_voice, decimals=4
-            ).tolist(),
-            "pitch_contour_hz_instrumental": torch.round(
-                predictions_instrumental, decimals=4
-            ).tolist(),
+            "pitch_contour_hz_voice": round_floats(predictions_voice.tolist()),
+            "pitch_contour_hz_instrumental": round_floats(
+                predictions_instrumental.tolist()
+            ),
             "time_step_ms": step_size,
         }
+
+
+def round_floats(o):
+    if isinstance(o, float):
+        return round(o, 2)
+    if isinstance(o, dict):
+        return {k: round_floats(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [round_floats(x) for x in o]
+    return o
