@@ -1,12 +1,6 @@
 import os
-import essentia
-import essentia.standard
 
 import soundfile
-import torchaudio
-import torch
-import autochord
-from pesto import predict
 
 from processors.base_processor import BaseProcessor
 
@@ -74,6 +68,8 @@ class AudioBPMProcessor(AudioProcessor):
         }
 
     def process(self):
+        import essentia.standard
+
         loader = essentia.standard.MonoLoader(filename=self.song)
         audio = loader()
 
@@ -100,6 +96,10 @@ class AudioPitchContourProcessor(AudioProcessor):
         }
 
     def process(self):
+        import torchaudio
+        import torch
+        from pesto import predict
+
         file_extension = self.song.split(".")[-1]
         rest_of_path = self.song[: -len(file_extension) - 1]
         step_size = 10.0
@@ -156,6 +156,8 @@ class AudioChordProcessor(AudioProcessor):
         }
 
     def process(self):
+        import autochord
+
         output = autochord.recognize(self.song)
         chord_names = [x[0] for x in output]
         chord_starts = round_floats([x[1] for x in output])
