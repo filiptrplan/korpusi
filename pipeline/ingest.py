@@ -11,6 +11,7 @@ from typer_config.decorators import use_yaml_config
 from processors import basic_processors, contour_processor, audio_processors
 import upload
 import corpus
+from processors.metadata_processors import CSVMetadataProcessor
 
 app = typer.Typer()
 app.registered_commands = (
@@ -46,12 +47,16 @@ def process(
     ],
     in_file: Annotated[str, typer.Option(help="Path to the file to process")] = None,
     out_file: str = None,
-    mapping_file: str = None,
+    mapping_file: Annotated[
+        str, typer.Option(help="Path to the file to write the mapping to")
+    ] = None,
     in_dir: Annotated[
         str, typer.Option(help="Path to the directory to process")
     ] = None,
     out_dir: str = None,
-    pretty: bool = False,
+    pretty: Annotated[
+        bool, typer.Option(help="Whether to enable pretty printing")
+    ] = False,
     include_original: Annotated[
         bool,
         typer.Option(
@@ -65,18 +70,24 @@ def process(
             help="If all the files should be outputed as one newline delimited JSON"
         ),
     ] = False,
+    csv_path: Annotated[
+        str,
+        typer.Option(help="Path to the CSV file containing the metadata for the files"),
+    ] = None,
 ):
     """Processes MusicXMLs and outputs the results in JSON."""
     if in_file is not None and in_dir is not None:
         raise typer.BadParameter("Cannot specify both in_file and in_dir")
     if in_file is None and in_dir is None:
         raise typer.BadParameter("Must specify either in_file or in_dir")
+    if out_file is not None and out_dir is not None:
+        raise typer.BadParameter("Cannot specify both out_file and out_dir")
 
     # pretty printing is not supported for single output
     pretty = pretty and not single_output
 
     if in_file is not None:
-        results = process_file(in_file, pretty, include_original, corpus_id)
+        results = process_file(in_file, pretty, include_original, corpus_id, csv_path)
         if print_output is True:
             print(results)
         else:
@@ -100,7 +111,9 @@ def process(
         for file in files:
             if file.endswith(".xml") or file.endswith(".musicxml"):
                 in_file = os.path.join(in_dir, file)
-                results = process_file(in_file, pretty, include_original, corpus_id)
+                results = process_file(
+                    in_file, pretty, include_original, corpus_id, csv_path
+                )
                 if print_output is True:
                     print(results)
                 else:
@@ -117,12 +130,14 @@ def process(
                     print(f"Processed {in_file}")
 
     if mapping_file is None:
-        if out_dir is None:
-            if out_file is None:
-                mapping_file = os.path.join(os.path.dirname(in_file), "mapping.json")
-            else:
-                mapping_file = os.path.join(os.path.dirname(out_file), "mapping.json")
-        else:
+        # if both are none then use the same directory as the input file
+        if out_file is None and out_dir is None:
+            mapping_file = os.path.join(os.path.dirname(in_file), "mapping.json")
+        # if out_file is not none, then use the same directory as the output file
+        if out_file is not None and out_dir is None:
+            mapping_file = os.path.join(os.path.dirname(out_file), "mapping.json")
+        # else just use the out_dir
+        if out_dir is not None:
             mapping_file = os.path.join(out_dir, "mapping.json")
         with open(mapping_file, "w", encoding="utf-8") as f:
             mapping = {
@@ -140,7 +155,13 @@ def process(
             f.write(json.dumps(mapping, indent=4))
 
 
-def process_file(in_file: str, pretty: bool, include_original: bool, corpus_id: str):
+def process_file(
+    in_file: str,
+    pretty: bool,
+    include_original: bool,
+    corpus_id: str,
+    csv_path: str = None,
+):
     """Processes a single file and writes the results in JSON."""
     if not os.path.isfile(in_file):
         raise typer.BadParameter(f"File does not exist: {in_file}")
@@ -149,6 +170,12 @@ def process_file(in_file: str, pretty: bool, include_original: bool, corpus_id: 
         results = process_musicxml(in_file, music_xml_processors)
     else:
         results = process_audio(in_file, audio_processors)
+
+    metadata = process_metadata(in_file, csv_path)
+    if "metadata" not in results:
+        results["metadata"] = {}
+    # add metadata to the metadata field because other processors might have a field with the same name
+    results["metadata"].update(metadata)
 
     results["corpus_id"] = corpus_id
     if include_original:
@@ -183,6 +210,18 @@ def process_musicxml(path: str, processors: list):
         results[processor_instance.get_name()] = processor_instance.process()
 
     return results
+
+
+def process_metadata(path: str, csv_path):
+    """Uses special metadata processors to process the metadata of the file."""
+    metadata = {}
+    if csv_path is not None:
+        if not os.path.isfile(csv_path):
+            raise typer.BadParameter(f"CSV file does not exist: {csv_path}")
+        csv_processor = CSVMetadataProcessor(csv_path)
+        metadata = csv_processor.process(path)
+
+    return metadata
 
 
 if __name__ == "__main__":

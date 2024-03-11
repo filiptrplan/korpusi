@@ -11,3 +11,5 @@ pretrained_models/
 .vscode/
 .idea/
 .venv/
+*.csv
+songs/
