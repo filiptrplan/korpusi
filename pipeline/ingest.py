@@ -4,10 +4,20 @@ This file is the main entry point for the program.
 
 import json
 import os
+
+from tqdm import tqdm
 from typing_extensions import Annotated
 import typer
 import music21
 from typer_config.decorators import use_yaml_config
+
+import preprocess
+from helpers import (
+    check_xml_extension_allowed,
+    check_audio_extension_allowed,
+    check_file_length,
+    filter_files,
+)
 from processors import basic_processors, contour_processor, audio_processors
 import upload
 import corpus
@@ -15,7 +25,9 @@ from processors.metadata_processors import CSVMetadataProcessor
 
 app = typer.Typer()
 app.registered_commands = (
-    upload.app.registered_commands + corpus.app.registered_commands
+    upload.app.registered_commands
+    + corpus.app.registered_commands
+    + preprocess.app.registered_commands
 )
 
 music_xml_processors = [
@@ -37,6 +49,9 @@ audio_processors = [
     audio_processors.AudioPitchContourProcessor,
     audio_processors.AudioChordProcessor,
 ]
+
+
+# see also helpers.py for some extra configuration
 
 
 @app.command()
@@ -108,12 +123,15 @@ def process(
 
         # process all files in the directory
         files = sorted(os.listdir(in_dir))
-        for file in files:
-            if file.endswith(".xml") or file.endswith(".musicxml"):
+        filtered_files = filter_files(files)
+
+        with tqdm(total=len(filtered_files)) as pbar:
+            for file in filtered_files:
                 in_file = os.path.join(in_dir, file)
                 results = process_file(
                     in_file, pretty, include_original, corpus_id, csv_path
                 )
+                pbar.update(1)
                 if print_output is True:
                     print(results)
                 else:
@@ -127,7 +145,6 @@ def process(
                         )
                         with open(out_file, "w", encoding="utf-8") as f:
                             f.write(results)
-                    print(f"Processed {in_file}")
 
     if mapping_file is None:
         # if both are none then use the same directory as the input file
@@ -166,10 +183,12 @@ def process_file(
     if not os.path.isfile(in_file):
         raise typer.BadParameter(f"File does not exist: {in_file}")
 
-    if in_file.endswith(".xml") or in_file.endswith(".musicxml"):
+    if check_xml_extension_allowed(in_file):
         results = process_musicxml(in_file, music_xml_processors)
-    else:
+    elif check_audio_extension_allowed(in_file):
         results = process_audio(in_file, audio_processors)
+    else:
+        raise typer.BadParameter(f"File type not supported: {in_file}")
 
     metadata = process_metadata(in_file, csv_path)
     if "metadata" not in results:
@@ -194,6 +213,11 @@ def process_file(
 def process_audio(path: str, processors: list):
     """Processes a single audio file and spits out the results in dictionary form."""
     results = {}
+    if not check_file_length(path):
+        raise typer.BadParameter(
+            f"{path} is too long. Must be less than 10 minutes. Refer to the preprocess "
+            f"command to preprocess the files."
+        )
     for processor in processors:
         processor_instance = processor(path)
         results[processor_instance.get_name()] = processor_instance.process()

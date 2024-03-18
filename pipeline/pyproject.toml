@@ -19,6 +19,8 @@ pesto-pitch = "^1.0.0"
 numpy = "^1.26.4"
 vamp = "^1.1.0"
 autochord = "^0.1.4"
+tqdm = "^4.66.2"
+ffmpeg-python = "^0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.2"
