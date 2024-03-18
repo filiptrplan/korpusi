@@ -14,6 +14,7 @@
 ## Default installation
 Please refer to [this link](https://python-poetry.org/docs/#installation) to install `poetry`. To install all the dependencies, run
 ```bash 
+sudo apt install ffmpeg
 pip wheel "vamp (==1.1.0)"
 pip install vamp==1.1.0 --no-binary :all:
 poetry install
@@ -52,9 +53,24 @@ in the root directory of the project.
 First you must configure the `.env` file. You can copy the `.env.example` file and fill in the values. 
 The `ELASTIC_HOST` specifies the URL of the ElasticSearch server. `ELASTIC_USER` and `ELASTIC_PASSWORD` are the credentials to access the server.
 
-The source files must first be ingested and transformed into appropriate JSON files. This is done by running
+## Preprocessing
+If you are not working with audio files, you can skip this step. 
+If you are working with audio files, you must first preprocess them. 
+
+First, you must extract the stems from the audio files. Refer to [extract_voice.md](extract_voice.md) for more information 
+on how to do this. After you have extracted the stems run the following command to preprocess the files:
 ```bash
-python ingest.py ingest
+python ingest.py preprocess <in_dir> <out_dir>
+```
+This will shorten all your files to sub-10 minute clips, downsample them to 16kHz and convert them to MP3. Now you 
+can continue with the rest of the pipeline.
+
+## Ingesting
+
+The source files must first be ingested and transformed into appropriate JSON files that contain
+the data of our analysis. This is done by running
+```bash
+python ingest.py process
 ``` 
 For available options, run 
 ```bash
