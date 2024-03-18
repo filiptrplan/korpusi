@@ -2,7 +2,8 @@
 *.musicxml
 *.json
 xmls/
-ingest.yaml
+*.yaml
+!ingest.yaml.example
 upload.yaml
 __pycache__/
 *.wav
