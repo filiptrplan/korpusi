@@ -2,6 +2,7 @@ import os
 
 import soundfile
 
+from helpers import check_audio_extension_allowed
 from processors.base_processor import BaseProcessor
 
 
@@ -20,12 +21,7 @@ class AudioProcessor(BaseProcessor):
             raise ValueError("Song path must be a string")
         if not os.path.exists(song):
             raise ValueError("Song path does not exist")
-        if (
-            not song.endswith(".wav")
-            and not song.endswith(".flac")
-            and not song.endswith(".ogg")
-            and not song.endswith(".mp3")
-        ):
+        if not check_audio_extension_allowed(song):
             raise ValueError("Song must be an audio file")
         if name is None:
             name = self.__class__.__name__
@@ -104,8 +100,8 @@ class AudioPitchContourProcessor(AudioProcessor):
         rest_of_path = self.song[: -len(file_extension) - 1]
         step_size = 10.0
 
-        voice_path = rest_of_path + ".vocals.wav"
-        instrumental_path = rest_of_path + ".accompaniment.wav"
+        voice_path = rest_of_path + ".vocals.mp3"
+        instrumental_path = rest_of_path + ".accompaniment.mp3"
         if not os.path.exists(voice_path):
             raise ValueError(
                 f"{voice_path} does not exist. Please run the voice extraction first. Refer to extract_voice.md for more information."
