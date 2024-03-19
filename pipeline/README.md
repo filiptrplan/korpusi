@@ -93,6 +93,16 @@ After ingesting the files, you can insert them into the ElasticSearch server by 
 
 Any other options for the specific command can be found by running `python ingest.py <command> --help`.
 
+## Errors
+
+### `SSLError([Errno 13] Permission denied))`
+This means you have the wrong permissions set on the `certs` folder in the root directory of the repo.
+Fix this by running:
+```bash
+sudo chmod 777 -R certs/ca/ca.crt
+```
+
+
 # Pipeline
 This is the main processing pipeline that turns musicXML or audio files into usable data that can be inserted into ES(ElasticSearch).
 
