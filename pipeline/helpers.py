@@ -2,8 +2,7 @@ import os
 
 import soundfile
 
-supported_xml_extensions = [".xml", ".musicxml"]
-supported_audio_extensions = [".wav", ".flac", ".ogg", ".mp3"]
+from config import supported_xml_extensions, supported_audio_extensions
 
 
 def filter_files(files):

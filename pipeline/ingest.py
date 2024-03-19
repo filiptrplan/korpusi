@@ -11,6 +11,7 @@ import typer
 import music21
 from typer_config.decorators import use_yaml_config
 
+import generate_mapping
 import preprocess
 from helpers import (
     check_xml_extension_allowed,
@@ -18,7 +19,7 @@ from helpers import (
     check_file_length,
     filter_files,
 )
-from processors import basic_processors, contour_processor, audio_processors
+from config import music_xml_processors, audio_processors
 import upload
 import corpus
 from processors.metadata_processors import CSVMetadataProcessor
@@ -28,30 +29,10 @@ app.registered_commands = (
     upload.app.registered_commands
     + corpus.app.registered_commands
     + preprocess.app.registered_commands
+    + generate_mapping.app.registered_commands
 )
 
-music_xml_processors = [
-    # Add musicXML processors here
-    basic_processors.KeyProcessor,
-    basic_processors.TimeSignatureProcessor,
-    basic_processors.TempoProcessor,
-    basic_processors.AmbitusProcessor,
-    basic_processors.MetadataProcessor,
-    basic_processors.DurationProcessor,
-    contour_processor.ContourProcessor,
-    contour_processor.RhythmProcessor,
-]
-
-audio_processors = [
-    # Add audio processors here
-    audio_processors.AudioFileInfoProcessor,
-    audio_processors.AudioBPMProcessor,
-    audio_processors.AudioPitchContourProcessor,
-    audio_processors.AudioChordProcessor,
-]
-
-
-# see also helpers.py for some extra configuration
+# see also config.py for configuration
 
 
 @app.command()
@@ -62,9 +43,6 @@ def process(
     ],
     in_file: Annotated[str, typer.Option(help="Path to the file to process")] = None,
     out_file: str = None,
-    mapping_file: Annotated[
-        str, typer.Option(help="Path to the file to write the mapping to")
-    ] = None,
     in_dir: Annotated[
         str, typer.Option(help="Path to the directory to process")
     ] = None,
@@ -146,31 +124,6 @@ def process(
                         with open(out_file, "w", encoding="utf-8") as f:
                             f.write(results)
 
-    if mapping_file is None:
-        # if both are none then use the same directory as the input file
-        if out_file is None and out_dir is None:
-            mapping_file = os.path.join(os.path.dirname(in_file), "mapping.json")
-        # if out_file is not none, then use the same directory as the output file
-        if out_file is not None and out_dir is None:
-            mapping_file = os.path.join(os.path.dirname(out_file), "mapping.json")
-        # else just use the out_dir
-        if out_dir is not None:
-            mapping_file = os.path.join(out_dir, "mapping.json")
-        with open(mapping_file, "w", encoding="utf-8") as f:
-            mapping = {
-                "properties": {
-                    "filename": {"enabled": False},
-                    "original_file": {"enabled": False},
-                    "corpus_id": {"type": "keyword"},
-                }
-            }
-            for processor in music_xml_processors:
-                processor_instance = processor(None)
-                mapping["properties"][processor_instance.get_name()] = (
-                    processor_instance.get_mapping()
-                )
-            f.write(json.dumps(mapping, indent=4))
-
 
 def process_file(
     in_file: str,
@@ -197,8 +150,8 @@ def process_file(
     results["metadata"].update(metadata)
 
     results["corpus_id"] = corpus_id
+    results["filename"] = os.path.basename(in_file)
     if include_original:
-        results["filename"] = os.path.basename(in_file)
         # include original only if it's a musicXML file
         if in_file.endswith(".xml") or in_file.endswith(".musicxml"):
             with open(in_file, "r", encoding="utf-8") as f:
