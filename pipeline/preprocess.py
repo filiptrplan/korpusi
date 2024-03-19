@@ -35,7 +35,7 @@ def preprocess(in_dir: str, out_dir: str):
 
 def preprocess_file(in_file, out_file):
     input = ffmpeg.input(in_file)
-    audio_cut = input.audio.filter("atrim", duration=600)
+    audio_cut = input.audio.filter("atrim", duration=180)
     file_without_extension = os.path.splitext(out_file)[0]
 
     # Set the sample rate to 16000 if the file is vocals or accompaniment because PESTO requires 16kHz sample rate
