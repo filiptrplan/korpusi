@@ -14,3 +14,4 @@ pretrained_models/
 .venv/
 *.csv
 songs/
+.pytest_cache/
