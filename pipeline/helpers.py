@@ -8,7 +8,7 @@ supported_audio_extensions = [".wav", ".flac", ".ogg", ".mp3"]
 
 def filter_files(files):
     filter_extensions = [file for file in files if check_file_extension_allowed(file)]
-    filter_splits = [file for file in filter_extensions if is_split_file(file)]
+    filter_splits = [file for file in filter_extensions if not is_split_file(file)]
     filter_dirs = [file for file in filter_splits if not os.path.isdir(file)]
     return filter_dirs
 
