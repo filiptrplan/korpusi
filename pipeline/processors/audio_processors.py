@@ -17,12 +17,14 @@ class AudioProcessor(BaseProcessor):
         any song: The path to the song to process.
         str name: The name of the processor. This is the name of the field that the results will be stored in.
         """
-        if not isinstance(song, str):
-            raise ValueError("Song path must be a string")
-        if not os.path.exists(song):
-            raise ValueError("Song path does not exist")
-        if not check_audio_extension_allowed(song):
-            raise ValueError("Song must be an audio file")
+        # Song is None when using it for mapping generation
+        if song is not None:
+            if not isinstance(song, str):
+                raise ValueError("Song path must be a string")
+            if not os.path.exists(song):
+                raise ValueError("Song path does not exist")
+            if not check_audio_extension_allowed(song):
+                raise ValueError("Song must be an audio file")
         if name is None:
             name = self.__class__.__name__
         super().__init__(song, name, mapping)
@@ -145,7 +147,7 @@ class AudioChordProcessor(AudioProcessor):
         super().__init__(song, name)
         self.mapping = {
             "properties": {
-                "chord_name": {"type": "string"},
+                "chord_name": {"type": "keyword"},
                 "chord_start": {"type": "float"},
                 "chord_end": {"type": "float"},
             }
