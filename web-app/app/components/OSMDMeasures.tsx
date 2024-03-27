@@ -1,5 +1,5 @@
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 
 export interface OSMDMeasureProps {
   xml?: string;

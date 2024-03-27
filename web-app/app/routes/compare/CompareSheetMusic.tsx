@@ -1,17 +1,10 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { songsContext } from "./CompareList";
 import { OSMDMeasures } from "~/components/OSMDMeasures";
-import {
-  FormControl,
-  FormControlLabel,
-  Grid,
-  Slider,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Grid, Slider, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-export const CompareSheetMusic: React.FC = ({}) => {
+export const CompareSheetMusic: React.FC = () => {
   const songs = useContext(songsContext);
   const { t } = useTranslation("compare");
 

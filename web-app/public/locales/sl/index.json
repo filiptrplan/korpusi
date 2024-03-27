@@ -17,5 +17,6 @@
     "ambitusMax": "Največji obseg",
     "ambitusAvg": "Povprečni obseg",
     "corpusStatsTitle": "Osnovni podatki o korpusu",
-    "allStatsTitle": "Agregirani podatki o korpusih"
+    "allStatsTitle": "Agregirani podatki o korpusih",
+    "unknownName": "Neznano ime"
 }

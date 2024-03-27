@@ -1,13 +1,4 @@
-import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  InputLabel,
-  Menu,
-  MenuItem,
-  Select,
-  Stack,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useControlledState } from "./useControlledState";

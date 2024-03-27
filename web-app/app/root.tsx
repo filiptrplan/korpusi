@@ -20,7 +20,6 @@ import "./i18n";
 import i18next from "./i18next.server";
 import { LoaderFunctionArgs, json } from "@remix-run/server-runtime";
 import { useChangeLanguage } from "remix-i18next";
-import { useTranslation } from "react-i18next";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const locale = await i18next.getLocale(request);
@@ -57,11 +56,11 @@ const Document = withEmotionCache(
       emotionCache.sheet.flush();
       tags.forEach((tag) => {
         // eslint-disable-next-line no-underscore-dangle
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (emotionCache.sheet as any)._insertTag(tag);
       });
       // reset cache to reapply global styles
       clientStyleData.reset();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     // Get the locale from the loader
     const load = useLoaderData<typeof loader>();

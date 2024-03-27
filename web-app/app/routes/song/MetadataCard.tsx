@@ -1,11 +1,4 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  List,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, CardHeader, Typography } from "@mui/material";
 import { useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SongResult } from "~/src/DataTypes";
@@ -26,7 +19,7 @@ export const MetadataCard: React.FC = () => {
 
   const metadataList = useMemo(() => {
     const filteredMetadata = Object.entries(metadataLabels).filter(
-      ([key, value]) => {
+      ([key, _value]) => {
         return (
           Object.keys(metadataLabels).includes(key) &&
           typeof metadata[key as keyof SongResult["metadata"]] !== "undefined"

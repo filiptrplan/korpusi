@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, Menu, MenuItem, Select } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useControlledState } from "./useControlledState";
 

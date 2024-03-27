@@ -1,7 +1,7 @@
 import { Box, Button, ButtonGroup, Paper, TextField } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useControlledState } from "./useControlledState";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 interface RhythmNgramSearchProps {
   rhythmNgram?: string;

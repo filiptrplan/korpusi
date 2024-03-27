@@ -8,12 +8,10 @@ import {
   Paper,
   Slide,
   Stack,
-  Theme,
-  useMediaQuery,
 } from "@mui/material";
 import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
-import { FormEvent, createContext, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { elastic } from "~/services/Elastic";
 import { SongResult } from "~/src/DataTypes";
 import { SearchTotalHits } from "@elastic/elasticsearch/lib/api/types";

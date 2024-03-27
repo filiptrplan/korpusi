@@ -1,8 +1,5 @@
-import {
-  GraphicalMusicSheet,
-  OpenSheetMusicDisplay,
-} from "opensheetmusicdisplay";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
+import React, { useEffect, useMemo, useRef } from "react";
 
 export interface OSMDProps {
   xml?: string;
@@ -18,8 +15,6 @@ export const OSMD: React.FC<OSMDProps> = ({
   displayLyrics = false,
 }) => {
   const ref = useRef(null);
-  const [originalGraphicSheet, setOriginalGraphicSheet] =
-    useState<GraphicalMusicSheet>();
   const osmd = useMemo(() => {
     if (ref.current === null) return null;
     return new OpenSheetMusicDisplay(ref.current, {

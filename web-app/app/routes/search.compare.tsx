@@ -1,14 +1,6 @@
 import { SearchTotalHits } from "@elastic/elasticsearch/lib/api/types";
-import {
-  Alert,
-  AlertTitle,
-  Button,
-  Divider,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useLoaderData, useRouteError } from "@remix-run/react";
+import { Alert, AlertTitle } from "@mui/material";
+import { useLoaderData } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
 import { useTranslation } from "react-i18next";
 import { elastic } from "~/services/Elastic";

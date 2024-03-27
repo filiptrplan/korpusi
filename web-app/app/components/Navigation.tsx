@@ -1,13 +1,4 @@
-import {
-  AppBar,
-  Button,
-  IconButton,
-  Stack,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import { Box } from "@mui/system";
-import MenuIcon from "@mui/icons-material/Menu";
+import { AppBar, Button, Stack, Toolbar, Typography } from "@mui/material";
 import { Link } from "@remix-run/react";
 
 export default function Navigation() {
@@ -24,10 +15,12 @@ export default function Navigation() {
           >
             Mladinska glasba
           </Typography>
-          {/* @ts-ignore */}
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+          {/* @ts-expect-error */}
           <Button LinkComponent={Link} color="inherit" to="/">
             Domov
           </Button>
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
           {/* @ts-ignore */}
           <Button LinkComponent={Link} color="inherit" to="/search">
             Iskanje

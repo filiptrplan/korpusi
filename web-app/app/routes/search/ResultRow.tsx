@@ -4,7 +4,6 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
-  CardHeader,
   IconButton,
   Stack,
   Tooltip,
@@ -15,9 +14,8 @@ import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import Difference from "@mui/icons-material/Difference";
 import FileDownload from "@mui/icons-material/FileDownload";
-import { InfoCard } from "../../components/InfoCard";
+import { InfoCard } from "~/components/InfoCard";
 import { useTranslation } from "react-i18next";
-import { Dispatch, SetStateAction, useContext } from "react";
 import { midiToNote } from "~/utils/notes";
 
 export interface ResultRowProps {
@@ -31,7 +29,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
 }) => {
   const song = songHit._source!;
   const navigate = useNavigate();
-  const [params, setParams] = useSearchParams();
+  const [_params, setParams] = useSearchParams();
 
   const { t } = useTranslation("search");
 
@@ -63,7 +61,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
       }}
     >
       <CardActionArea
-        onClick={(e) => {
+        onClick={() => {
           navigate(`/song/${songHit._id}`);
         }}
       >

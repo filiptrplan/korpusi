@@ -3,7 +3,6 @@ import {
   FormControl,
   FormControlLabel,
   InputLabel,
-  Menu,
   MenuItem,
   Select,
   Stack,

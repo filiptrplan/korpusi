@@ -12,7 +12,6 @@ interface AmbitusSliderProps {
 export const AmbitusSlider: React.FC<AmbitusSliderProps> = ({
   ambitusFrom,
   ambitusTo,
-  useTempo,
 }) => {
   const [ambitusFromState, setAmbituFromState] = useControlledState(
     ambitusFrom ? parseInt(ambitusFrom) : 0,

@@ -1,7 +1,6 @@
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
-import { Button, Chip, Paper, Slide, Stack, Typography } from "@mui/material";
-import { useNavigate, useSearchParams } from "@remix-run/react";
-import { useContext } from "react";
+import { Button, Chip, Stack, Typography } from "@mui/material";
+import { useSearchParams } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import { SongResult } from "~/src/DataTypes";
 
@@ -74,6 +73,7 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
           const title = song._source!.metadata.title;
           return (
             <Chip
+              key={title}
               label={title}
               variant="outlined"
               onDelete={() => onSongDelete(song)}

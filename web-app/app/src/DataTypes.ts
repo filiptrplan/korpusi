@@ -1,4 +1,4 @@
-export interface SongResult extends Record<string, any> {
+export interface SongResult extends Record<string, unknown> {
   corpus_id: string;
   metadata: {
     title: string;

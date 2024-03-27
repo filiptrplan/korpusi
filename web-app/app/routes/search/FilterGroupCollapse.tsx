@@ -1,17 +1,3 @@
-import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
-import ArrowDropUp from "@mui/icons-material/ArrowDropUp";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  CardActionArea,
-  Collapse,
-  Divider,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
 import { useEffect, useState } from "react";
 import { MAccordion } from "~/components/MAccordion";
 

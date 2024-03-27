@@ -25,6 +25,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       id: params.id,
     });
     return data;
+    // eslint-disable-next-line
   } catch (e: any) {
     if (e.meta?.body?.found === false) {
       throw new Response(null, {
@@ -35,18 +36,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       throw e;
     }
   }
-};
-
-const DataAccordion: React.FC<{
-  label: string;
-  song: SongResult;
-  Component: React.FC<{ song: SongResult }>;
-}> = ({ label, song, Component }) => {
-  return (
-    <MAccordion title={label}>
-      <Component song={song} />
-    </MAccordion>
-  );
 };
 
 export const SongContext = createContext<SongResult>({} as SongResult);

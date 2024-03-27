@@ -3,7 +3,6 @@ import { SongContext } from "../song.$id";
 import {
   Box,
   Checkbox,
-  FormControl,
   FormControlLabel,
   Slider,
   Stack,
@@ -12,7 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { OSMDMeasures } from "~/components/OSMDMeasures";
 
-export const SheetMusic: React.FC = ({}) => {
+export const SheetMusic: React.FC = () => {
   const song = useContext(SongContext);
   const { t } = useTranslation("song");
   const [range, setRange] = useState<[number, number]>([
