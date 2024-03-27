@@ -43,7 +43,7 @@ class AudioFileInfoProcessor(AudioProcessor):
             "properties": {
                 "sample_rate": {"type": "float"},
                 "duration": {"type": "float"},
-                "encoding_subtype": {"type": "float"},
+                "encoding_subtype": {"type": "keyword"},
             }
         }
 
@@ -149,7 +149,7 @@ class AudioChordProcessor(AudioProcessor):
             "properties": {
                 "chord_name": {"type": "keyword"},
                 "chord_start": {"type": "float"},
-                "chord_end": {"type": "float"},
+                "chord_end": {"type": "text"},
             }
         }
 

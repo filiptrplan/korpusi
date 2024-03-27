@@ -1,6 +1,8 @@
 import json
 import os
 import hashlib
+
+from tqdm import tqdm
 from typing_extensions import Annotated
 from elasticsearch import Elasticsearch
 from dotenv import load_dotenv
@@ -25,7 +27,6 @@ def calculate_hash(json_str: str):
     """Calculates the hash of the original file from the JSON string."""
     obj = json.loads(json_str)
     m = hashlib.sha256()
-    print(obj)
     if "original_file" not in obj:
         orig_file = obj["filename"]
     else:
@@ -111,14 +112,11 @@ def upload(
     client.options(ignore_status=400).indices.create(index=index)
 
     merged_mapping = mapping
-    # print(merged_mapping)
 
     if merge_mapping is True:
         existing_mapping = client.indices.get_mapping(index=index)
         existing_mapping_dict = existing_mapping[index]["mappings"]
         merged_mapping = merge(mapping, existing_mapping_dict)
-
-    print(json.dumps(merged_mapping, indent=4))
 
     client.indices.put_mapping(
         index=index, properties=merged_mapping["properties"]
@@ -126,19 +124,17 @@ def upload(
 
     if json_file is not None:
         with open(json_file, "r", encoding="utf-8") as f:
-            for i, line in enumerate(f):
+            for i, line in tqdm(enumerate(f)):
                 try:
                     index_document(line, index)
                 except json.JSONDecodeError:
-                    print(f"Line {i} in {json_file} is not valid JSON. Skipping...")
-                print(f"Indexed line {i} in {json_file}")
+                    print(f"Line {i} is not valid JSON. Skipping...")
 
     if json_dir is not None:
-        for file in os.listdir(json_dir):
+        for file in tqdm(os.listdir(json_dir)):
             if file.endswith(".json"):
                 with open(os.path.join(json_dir, file), "r", encoding="utf-8") as f:
                     try:
                         index_document(f, index)
                     except json.JSONDecodeError:
                         print(f"{json_file} is not valid JSON. Skipping...")
-                    print(f"Indexed {json_file}")
