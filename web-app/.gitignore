@@ -6,3 +6,8 @@ node_modules
 .env
 .vercel/
 .vercel
+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+.pnp.*
