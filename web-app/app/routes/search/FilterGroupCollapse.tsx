@@ -33,7 +33,7 @@ export const FilterGroupCollapse: React.FC<FilterGroupCollapseProps> = ({
       return;
     }
     const collapsedList = JSON.parse(
-      localStorage.getItem("collapsedList") || "{}"
+      localStorage.getItem("collapsedList") || "{}",
     );
     collapsedList[title] = isCollapsed;
     localStorage.setItem("collapsedList", JSON.stringify(collapsedList));
@@ -41,12 +41,12 @@ export const FilterGroupCollapse: React.FC<FilterGroupCollapseProps> = ({
 
   useEffect(() => {
     const collapsedList = JSON.parse(
-      localStorage.getItem("collapsedList") || "{}"
+      localStorage.getItem("collapsedList") || "{}",
     );
     setIsCollapsed(
       typeof collapsedList[title] === "boolean"
         ? collapsedList[title]
-        : defaultCollapsed
+        : defaultCollapsed,
     );
   }, []);
 

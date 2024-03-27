@@ -12,7 +12,7 @@ export const MAccordion = (
   props: AccordionProps & {
     title: string;
     titleTypographyProps?: TypographyProps;
-  }
+  },
 ) => {
   const { title, sx, titleTypographyProps, ...rest } = props;
   return (

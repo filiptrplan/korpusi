@@ -23,11 +23,11 @@ import { useChangeLanguage } from "remix-i18next";
 import { useTranslation } from "react-i18next";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  let locale = await i18next.getLocale(request);
+  const locale = await i18next.getLocale(request);
   return json({ locale: locale });
 }
 
-export let handle = {
+export const handle = {
   // In the handle export, we can add a i18n key with namespaces our route
   // will need to load. This key can be a single string or an array of strings.
   // TIP: In most cases, you should set this to your defaultNS from your i18n config
@@ -64,7 +64,7 @@ const Document = withEmotionCache(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     // Get the locale from the loader
-    let load = useLoaderData<typeof loader>();
+    const load = useLoaderData<typeof loader>();
     // This hook will change the i18n instance language to the current locale
     // detected by the loader, this way, when we do something to change the
     // language, this locale will change and i18next will load the correct
@@ -104,7 +104,7 @@ const Document = withEmotionCache(
         </body>
       </html>
     );
-  }
+  },
 );
 
 // https://remix.run/docs/en/main/route/component

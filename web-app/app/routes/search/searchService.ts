@@ -6,9 +6,9 @@ import { elastic } from "~/services/Elastic";
 import { noteToMidi } from "~/utils/notes";
 
 export const constructQuery = (
-  params: Record<string, string>
+  params: Record<string, string>,
 ): QueryDslQueryContainer => {
-  let queries: QueryDslQueryContainer[] = [];
+  const queries: QueryDslQueryContainer[] = [];
 
   // CORPUS QUERY
   if ("corpus" in params) {

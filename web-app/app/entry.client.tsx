@@ -26,7 +26,7 @@ function ClientCacheProvider({ children }: ClientCacheProviderProps) {
         setCache(createEmotionCache());
       },
     }),
-    []
+    [],
   );
 
   return (
@@ -67,7 +67,7 @@ const hydrate = async () => {
             <RemixBrowser />
           </ThemeProvider>
         </ClientCacheProvider>
-      </I18nextProvider>
+      </I18nextProvider>,
     );
   });
 };

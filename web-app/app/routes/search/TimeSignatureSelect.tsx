@@ -22,7 +22,7 @@ export const TimeSignatureSelect: React.FC<TimeSignatureProps> = ({
   availableTimeSignatures,
 }) => {
   const [timeSigState, setTimeSigState] = useControlledState(
-    timeSignature || ""
+    timeSignature || "",
   );
   const { t } = useTranslation("search");
   return (

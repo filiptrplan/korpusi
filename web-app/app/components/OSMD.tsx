@@ -74,7 +74,7 @@ export const OSMD: React.FC<OSMDProps> = ({
           staffEntry.graphicalVoiceEntries.forEach((voiceEntry) => {
             if (voiceEntry.notes) {
               const notes = voiceEntry.notes.filter(
-                (x) => !x.sourceNote.isRest()
+                (x) => !x.sourceNote.isRest(),
               );
               noteCounter += notes.length;
               if (noteCounter >= _displayFirstNNotes && measureNumber === -1) {
@@ -114,7 +114,7 @@ export const OSMD: React.FC<OSMDProps> = ({
           reversedVoiceEntries.forEach((voiceEntry) => {
             if (voiceEntry.notes) {
               const notes = voiceEntry.notes.filter(
-                (x) => !x.sourceNote.isRest()
+                (x) => !x.sourceNote.isRest(),
               );
               noteCounter += notes.length;
               if (noteCounter >= _displayLastNNotes && measureNumber === -1) {

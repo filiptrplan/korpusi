@@ -23,12 +23,12 @@ export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: EntryContext
+  remixContext: EntryContext,
 ) {
   //  -------- i18n ---------
-  let instance = createInstance();
-  let lng = await i18next.getLocale(request);
-  let ns = i18next.getRouteNamespaces(remixContext);
+  const instance = createInstance();
+  const lng = await i18next.getLocale(request);
+  const ns = i18next.getRouteNamespaces(remixContext);
 
   await instance
     .use(initReactI18next) // Tell our instance to use react-i18next
@@ -59,7 +59,7 @@ export default async function handleRequest(
   const html = ReactDOMServer.renderToString(
     <I18nextProvider i18n={instance}>
       <MuiRemixServer />
-    </I18nextProvider>
+    </I18nextProvider>,
   );
 
   // Grab the CSS from emotion
@@ -76,7 +76,7 @@ export default async function handleRequest(
   // Add the Emotion style tags after the insertion point meta tag
   const markup = html.replace(
     /<meta(\s)*name="emotion-insertion-point"(\s)*content="emotion-insertion-point"(\s)*\/>/,
-    `<meta name="emotion-insertion-point" content="emotion-insertion-point"/>${stylesHTML}`
+    `<meta name="emotion-insertion-point" content="emotion-insertion-point"/>${stylesHTML}`,
   );
 
   responseHeaders.set("Content-Type", "text/html");

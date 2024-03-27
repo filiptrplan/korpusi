@@ -12,7 +12,6 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { t } from "i18next";
 import { useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { useTranslation } from "react-i18next";
@@ -26,7 +25,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Colors
+  Colors,
 );
 
 interface ContourGraphProps {
@@ -48,7 +47,7 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
   const songs = Array.isArray(songProp) ? songProp : [songProp];
 
   const makeData = (
-    song: SearchHit<SongResult>
+    song: SearchHit<SongResult>,
   ): ChartData<"line">["datasets"][0] => {
     return {
       label: song._source!.metadata.title,
@@ -56,7 +55,7 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
         ._source!.contour.melodic_contour_string_relative.split(" ")
         .map((x) => parseInt(x)),
       tension: 0.4,
-      pointRadius(ctx, options) {
+      pointRadius(ctx, _options) {
         const index = ctx.dataIndex;
         const value = ctx.dataset.data[index] as number;
         if (value === null) return 0;
@@ -68,7 +67,7 @@ export const ContourGraph: React.FC<ContourGraphProps> = ({
   const maxLength = songs.reduce((max, song) => {
     return Math.max(
       max,
-      song._source!.contour.melodic_contour_string_relative.split(" ").length
+      song._source!.contour.melodic_contour_string_relative.split(" ").length,
     );
   }, 0);
 

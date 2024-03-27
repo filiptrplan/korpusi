@@ -38,7 +38,7 @@ import {
 import { CompareList } from "./compare/CompareList";
 import { useUpdateQueryStringValueWithoutNavigation } from "~/utils/misc";
 
-export let handle = {
+export const handle = {
   i18n: ["search", "compare"],
 };
 
@@ -144,7 +144,7 @@ export default function Search() {
     if (pagination.pageSize !== 10) {
       formData.set("pageSize", pagination.pageSize.toString());
     }
-    for (let value of originalFormData.keys()) {
+    for (const value of originalFormData.keys()) {
       // delete empty keys
       if (
         formData.get(value) === "" ||
@@ -161,11 +161,11 @@ export default function Search() {
 
   const compareIds = params.compareIds ? params.compareIds.split(",") : [];
   const [showCompareList, setShowCompareList] = useState(
-    params.showCompareList === "1"
+    params.showCompareList === "1",
   );
   useUpdateQueryStringValueWithoutNavigation(
     "showCompareList",
-    showCompareList ? "1" : "0"
+    showCompareList ? "1" : "0",
   );
 
   const showCompare = compareIds.length > 0 && !showCompareList;

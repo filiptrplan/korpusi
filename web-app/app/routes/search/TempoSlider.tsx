@@ -22,13 +22,13 @@ export const TempoSlider: React.FC<TempoSliderProps> = ({
   useTempo,
 }) => {
   const [tempoFromState, setTempoFromState] = useControlledState(
-    tempoFrom ? parseInt(tempoFrom) : 20
+    tempoFrom ? parseInt(tempoFrom) : 20,
   );
   const [tempoToState, setTempoToState] = useControlledState(
-    tempoTo ? parseInt(tempoTo) : 160
+    tempoTo ? parseInt(tempoTo) : 160,
   );
   const [useTempoState, setUseTempoState] = useControlledState(
-    useTempo == "on" || false
+    useTempo == "on" || false,
   );
 
   const { t } = useTranslation("search");

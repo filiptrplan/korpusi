@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, Stack } from "@mui/material";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { InfoCard } from "~/components/InfoCard";
-import { SongResult } from "~/src/DataTypes";
 import { useKeyTranslate } from "~/utils/notes";
 import { SongContext } from "../song.$id";
 

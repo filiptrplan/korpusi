@@ -21,10 +21,10 @@ export const MetadataSelect: React.FC<MetadataSelectProps> = ({
 }) => {
   const { t } = useTranslation("search");
   const [metadataQueryState, setMetadataQueryState] = useControlledState(
-    metadataQuery || ""
+    metadataQuery || "",
   );
   const [metadataFieldsState, setMetadataFieldsState] = useControlledState(
-    metadataFields?.split(",") ?? ["title", "composer", "lyricist"]
+    metadataFields?.split(",") ?? ["title", "composer", "lyricist"],
   );
   return (
     <Stack

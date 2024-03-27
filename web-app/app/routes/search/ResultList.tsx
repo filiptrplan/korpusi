@@ -134,7 +134,7 @@ export const ResultList: React.FC<ResultListProps> = ({
               if (pageSize * (pagination.current - 1) > pagination.totalHits) {
                 link.set(
                   "page",
-                  Math.ceil(pagination.totalHits / pageSize).toString()
+                  Math.ceil(pagination.totalHits / pageSize).toString(),
                 );
               }
               navigate(`?${link.toString()}`);

@@ -4,7 +4,7 @@ import notes from "./notes.json";
 export const midiToNote = (midi: number): string => {
   return (
     Object.keys(notes).find(
-      (key) => notes[key as keyof typeof notes] === midi
+      (key) => notes[key as keyof typeof notes] === midi,
     ) || ""
   );
 };

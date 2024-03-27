@@ -30,7 +30,7 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
       params.delete("compareIds");
       params.append(
         "compareIds",
-        compareIds.filter((id) => id !== song._id).join(",")
+        compareIds.filter((id) => id !== song._id).join(","),
       );
       return params;
     });

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 // https://github.com/kentcdodds/kentcdodds.com/blob/main/app/utils/misc.tsx#L296-L323
 export function useUpdateQueryStringValueWithoutNavigation(
   queryKey: string,
-  queryValue: string
+  queryValue: string,
 ) {
   useEffect(() => {
     const currentSearchParams = new URLSearchParams(window.location.search);

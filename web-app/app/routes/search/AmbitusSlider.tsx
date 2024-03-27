@@ -1,13 +1,4 @@
-import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Input,
-  Slider,
-  Stack,
-  TextField,
-} from "@mui/material";
+import { FormLabel, Slider, Stack, TextField } from "@mui/material";
 import React from "react";
 import { useControlledState } from "./useControlledState";
 import { useTranslation } from "react-i18next";
@@ -24,13 +15,10 @@ export const AmbitusSlider: React.FC<AmbitusSliderProps> = ({
   useTempo,
 }) => {
   const [ambitusFromState, setAmbituFromState] = useControlledState(
-    ambitusFrom ? parseInt(ambitusFrom) : 0
+    ambitusFrom ? parseInt(ambitusFrom) : 0,
   );
   const [ambitusToState, setAmbitusToState] = useControlledState(
-    ambitusTo ? parseInt(ambitusTo) : 80
-  );
-  const [useTempoState, setUseTempoState] = useControlledState(
-    useTempo == "on" || false
+    ambitusTo ? parseInt(ambitusTo) : 80,
   );
 
   const { t } = useTranslation("search");

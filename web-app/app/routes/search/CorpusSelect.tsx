@@ -12,7 +12,7 @@ export const CorpusSelect: React.FC<CorpusSelectProps> = ({
 }) => {
   const { t } = useTranslation("search");
   const [corpusState, setCorpusState] = useControlledState(
-    corpus?.split(",") || []
+    corpus?.split(",") || [],
   );
   return (
     <>

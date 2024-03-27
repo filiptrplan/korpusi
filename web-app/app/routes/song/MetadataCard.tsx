@@ -31,7 +31,7 @@ export const MetadataCard: React.FC = () => {
           Object.keys(metadataLabels).includes(key) &&
           typeof metadata[key as keyof SongResult["metadata"]] !== "undefined"
         );
-      }
+      },
     );
     return filteredMetadata.map(([key, value], i) => {
       return (

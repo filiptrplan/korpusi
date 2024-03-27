@@ -12,7 +12,7 @@ export const RhythmNgramSearch: React.FC<RhythmNgramSearchProps> = ({
 }) => {
   const { t } = useTranslation("search");
   const [rhythmNgramState, setRhythmNgramState] = useControlledState(
-    rhythmNgram ?? ""
+    rhythmNgram ?? "",
   );
 
   const addNoteValue = (i: number) => {

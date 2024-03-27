@@ -13,11 +13,11 @@ export const MelodicNgramSearch: React.FC<MelodicNgramSearchProps> = ({
 }) => {
   const { t } = useTranslation("search");
   const [melodicNgramState, setMelodicNgramState] = useControlledState(
-    melodicNgram ?? ""
+    melodicNgram ?? "",
   );
   const [melodicNgramRelativeState, setMelodicNgramRelativeState] =
     useControlledState(
-      melodicNgramRelative ? melodicNgramRelative === "on" : false
+      melodicNgramRelative ? melodicNgramRelative === "on" : false,
     );
   return (
     <>

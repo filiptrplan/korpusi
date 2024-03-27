@@ -25,10 +25,10 @@ export const NoteRangeSlider: React.FC<NoteRangeSliderProps> = ({
   nameTo,
 }) => {
   const [noteFromState, setNoteFromState] = useControlledState(
-    noteFrom ? parseInt(noteFrom) : 23
+    noteFrom ? parseInt(noteFrom) : 23,
   );
   const [noteToState, setNoteToState] = useControlledState(
-    noteTo ? parseInt(noteTo) : 132
+    noteTo ? parseInt(noteTo) : 132,
   );
   const { t } = useTranslation("search");
   return (

@@ -24,7 +24,7 @@ export const KeySelect: React.FC<KeySelectProps> = ({
 }) => {
   const [keyState, setKeyState] = useControlledState(keyValue || "");
   const [alternativeKeysState, setAlternativeKeysState] = useControlledState(
-    alternativeKeys == "on" || false
+    alternativeKeys == "on" || false,
   );
   const { t } = useTranslation("search");
   const tKeys = useKeyTranslate();

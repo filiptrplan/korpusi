@@ -1,20 +1,10 @@
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
-import {
-  Box,
-  CardActionArea,
-  Divider,
-  Grid,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { t } from "i18next";
+import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
 import React, {
   createContext,
   useContext,
   useEffect,
   useLayoutEffect,
-  useMemo,
-  useReducer,
   useRef,
   useState,
 } from "react";
