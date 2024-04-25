@@ -7,8 +7,8 @@ class KeyProcessor(MusicXMLProcessor):
 
     song: stream.Stream
 
-    def __init__(self, song: stream.Stream, name="key"):
-        super().__init__(song, name)
+    def __init__(self, song: stream.Stream, feature_name="key"):
+        super().__init__(song, feature_name)
         self.mapping = {
             "properties": {
                 "most_certain_key": {
@@ -38,8 +38,8 @@ class TimeSignatureProcessor(MusicXMLProcessor):
 
     song: stream.Stream
 
-    def __init__(self, song: stream.Stream, name="time_signature"):
-        super().__init__(song, name)
+    def __init__(self, song: stream.Stream, feature_name="time_signature"):
+        super().__init__(song, feature_name)
         self.mapping = {"type": "keyword", "fields": {"text": {"type": "text"}}}
 
     def process(self) -> str:
@@ -55,8 +55,8 @@ class TempoProcessor(MusicXMLProcessor):
 
     song: stream.Stream
 
-    def __init__(self, song: stream.Stream, name="tempo"):
-        super().__init__(song, name)
+    def __init__(self, song: stream.Stream, feature_name="tempo"):
+        super().__init__(song, feature_name)
         self.mapping = {"type": "long"}
 
     def process(self) -> str:
@@ -78,8 +78,8 @@ class AmbitusProcessor(MusicXMLProcessor):
 
     song: stream.Stream
 
-    def __init__(self, song: stream.Stream, name="ambitus"):
-        super().__init__(song, name)
+    def __init__(self, song: stream.Stream, feature_name="ambitus"):
+        super().__init__(song, feature_name)
         self.mapping = {
             "properties": {
                 "min_note": {
@@ -118,8 +118,8 @@ class MetadataProcessor(MusicXMLProcessor):
 
     song: stream.Stream
 
-    def __init__(self, song: stream.Stream, name="metadata"):
-        super().__init__(song, name)
+    def __init__(self, song: stream.Stream, feature_name="metadata"):
+        super().__init__(song, feature_name)
         self.mapping = {
             "type": "object",
         }
@@ -141,8 +141,8 @@ class DurationProcessor(MusicXMLProcessor):
 
     song: stream.Stream
 
-    def __init__(self, song: stream.Stream, name="duration"):
-        super().__init__(song, name)
+    def __init__(self, song: stream.Stream, feature_name="duration"):
+        super().__init__(song, feature_name)
         self.mapping = {
             "properties": {
                 "measures": {"type": "long"},

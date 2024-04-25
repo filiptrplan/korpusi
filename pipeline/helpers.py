@@ -2,8 +2,6 @@ import os
 
 import soundfile
 
-from config import supported_xml_extensions, supported_audio_extensions
-
 
 def filter_files(files):
     filter_extensions = [file for file in files if check_file_extension_allowed(file)]
@@ -30,6 +28,8 @@ def check_file_extension_allowed(path: str):
 
 
 def check_xml_extension_allowed(path: str):
+    from config import supported_xml_extensions
+
     for ext in supported_xml_extensions:
         if path.endswith(ext):
             return True
@@ -37,6 +37,8 @@ def check_xml_extension_allowed(path: str):
 
 
 def check_audio_extension_allowed(path: str):
+    from config import supported_audio_extensions
+
     for ext in supported_audio_extensions:
         if path.endswith(ext):
             return True

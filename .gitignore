@@ -3,3 +3,4 @@ certs/
 .vercel
 .idea/
 .vscode/
+*.mp3

@@ -4,6 +4,7 @@ This file is the main entry point for the program.
 
 import json
 import os
+from typing import Type
 
 from tqdm import tqdm
 from typing_extensions import Annotated
@@ -13,6 +14,8 @@ from typer_config.decorators import use_yaml_config
 
 import generate_mapping
 import preprocess
+import processors.musicxml_processor
+import processors.audio_processors
 from helpers import (
     check_xml_extension_allowed,
     check_audio_extension_allowed,
@@ -31,6 +34,7 @@ app.registered_commands = (
     + preprocess.app.registered_commands
     + generate_mapping.app.registered_commands
 )
+
 
 # see also config.py for configuration
 
@@ -163,7 +167,9 @@ def process_file(
     return results
 
 
-def process_audio(path: str, processors: list):
+def process_audio(
+    path: str, processor_list: list[Type[processors.audio_processors.AudioProcessor]]
+) -> dict[str, dict[str, object]]:
     """Processes a single audio file and spits out the results in dictionary form."""
     results = {}
     if not check_file_length(path):
@@ -171,20 +177,28 @@ def process_audio(path: str, processors: list):
             f"{path} is too long. Must be less than 10 minutes. Refer to the preprocess "
             f"command to preprocess the files."
         )
-    for processor in processors:
+
+    for processor in processor_list:
         processor_instance = processor(path)
-        results[processor_instance.get_name()] = processor_instance.process()
+        if processor_instance.get_feature_name() not in results:
+            results[processor_instance.get_feature_name()] = {}
+        results[processor_instance.get_feature_name()][
+            processor_instance.get_algorithm_name()
+        ] = processor_instance.process()
 
     return results
 
 
-def process_musicxml(path: str, processors: list):
+def process_musicxml(
+    path: str,
+    processor_list: list[Type[processors.musicxml_processor.MusicXMLProcessor]],
+) -> dict[str, object]:
     """Processes a single MusicXML file and spits out the results in dictionary form."""
     music21_song = music21.converter.parse(path)
     results = {}
-    for processor in processors:
+    for processor in processor_list:
         processor_instance = processor(music21_song)
-        results[processor_instance.get_name()] = processor_instance.process()
+        results[processor_instance.get_feature_name()] = processor_instance.process()
 
     return results
 

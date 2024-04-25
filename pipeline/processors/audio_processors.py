@@ -12,7 +12,13 @@ class AudioProcessor(BaseProcessor):
     All processors that process audio files should inherit from this class and implement the process method.
     """
 
-    def __init__(self, song: str, name: str = None, mapping=None):
+    def __init__(
+        self,
+        song: str,
+        algorithm_name: str = None,
+        feature_name: str = None,
+        mapping=None,
+    ):
         """
         any song: The path to the song to process.
         str name: The name of the processor. This is the name of the field that the results will be stored in.
@@ -25,20 +31,27 @@ class AudioProcessor(BaseProcessor):
                 raise ValueError("Song path does not exist")
             if not check_audio_extension_allowed(song):
                 raise ValueError("Song must be an audio file")
-        if name is None:
-            name = self.__class__.__name__
-        super().__init__(song, name, mapping)
+        if feature_name is None:
+            feature_name = self.__class__.__name__
+        if algorithm_name is None:
+            raise ValueError("Algorithm name must be specified.")
+        self.algorithm_name = algorithm_name
+        super().__init__(song, feature_name, mapping)
 
     def process(self):
         """The main function of the processor. It should spit out the results in dictionary format or a single value."""
         raise NotImplementedError("Subclasses must implement this method")
 
+    def get_algorithm_name(self):
+        """Returns the name of the algorithm used for the processor."""
+        return self.algorithm_name
+
 
 class AudioFileInfoProcessor(AudioProcessor):
     """Gets the file information of the song like the duration, sample rate, and bit rate."""
 
-    def __init__(self, song: any, name="sample_rate"):
-        super().__init__(song, name)
+    def __init__(self, song: any):
+        super().__init__(song, "file_info", "sample_rate")
         self.mapping = {
             "properties": {
                 "sample_rate": {"type": "float"},
@@ -59,8 +72,8 @@ class AudioFileInfoProcessor(AudioProcessor):
 class AudioBPMProcessor(AudioProcessor):
     """Gets the BPM of the song."""
 
-    def __init__(self, song: any, name="bpm"):
-        super().__init__(song, name)
+    def __init__(self, song: any):
+        super().__init__(song, "essentia_multifeature", "bpm")
         self.mapping = {
             "properties": {"bpm": {"type": "float"}, "beat_ticks": {"type": "float"}}
         }
@@ -83,8 +96,8 @@ class AudioBPMProcessor(AudioProcessor):
 class AudioPitchContourProcessor(AudioProcessor):
     """Gets the pitch contour of the song."""
 
-    def __init__(self, song: any, name="pitch_contour"):
-        super().__init__(song, name)
+    def __init__(self, song: any):
+        super().__init__(song, "pesto", "pitch_contour")
         self.mapping = {
             "properties": {
                 "pitch_contour_hz_voice": {"type": "float"},
@@ -143,8 +156,8 @@ class AudioPitchContourProcessor(AudioProcessor):
 class AudioChordProcessor(AudioProcessor):
     """Gets the chord progression of the song."""
 
-    def __init__(self, song: any, name="chords"):
-        super().__init__(song, name)
+    def __init__(self, song: any):
+        super().__init__(song, "autochord", "chords")
         self.mapping = {
             "properties": {
                 "chord_name": {"type": "keyword"},

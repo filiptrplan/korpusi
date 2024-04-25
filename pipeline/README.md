@@ -25,7 +25,7 @@ If you ware getting various CUDA errors while running ingest.py, follow these st
 
 First install CUDA 11 and cuDNN 8(for CUDA 11) by following instructions on these two links:
 - [CUDA 11](https://developer.nvidia.com/cuda-11-8-0-download-archive)
-- [cuDNN 8](https://developer.nvidia.com/rdp/cudnn-archive)
+- [cuDNN 8](https://developer.nvidia.com/rdp/cudnn-archive)[test-mp3](..%2Ftest-mp3)
 Be sure to run the `sudo apt install cuda-11-8` instead of `sudo apt install cuda` to install the correct version of CUDA.
 
 Because of some bugs when it comes to installing the `essentia` and `autochord` packages in a virtual environment, you should first install 

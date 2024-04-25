@@ -38,7 +38,7 @@ def generate_mapping(
         }
         for processor in processors:
             processor_instance = processor(None)
-            mapping["properties"][processor_instance.get_name()] = (
+            mapping["properties"][processor_instance.get_feature_name()] = (
                 processor_instance.get_mapping()
             )
         f.write(json.dumps(mapping, indent=4))

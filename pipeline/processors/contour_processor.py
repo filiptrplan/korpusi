@@ -8,8 +8,8 @@ class ContourProcessor(MusicXMLProcessor):
 
     song: music21.stream.Stream
 
-    def __init__(self, song: music21.stream.Stream, name="contour"):
-        super().__init__(song, name)
+    def __init__(self, song: music21.stream.Stream, feature_name="contour"):
+        super().__init__(song, feature_name)
         self.mapping = {
             "properties": {
                 "melodic_contour_string_relative": {"type": "text"},
@@ -86,8 +86,8 @@ class RhythmProcessor(MusicXMLProcessor):
 
     song: music21.stream.Stream
 
-    def __init__(self, song: music21.stream.Stream, name="rhythm"):
-        super().__init__(song, name)
+    def __init__(self, song: music21.stream.Stream, feature_name="rhythm"):
+        super().__init__(song, feature_name)
         self.mapping = {
             "properties": {
                 "measure_starts": {"type": "long"},
