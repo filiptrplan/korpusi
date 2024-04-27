@@ -161,29 +161,7 @@ def process_file(
     if not os.path.isfile(in_file):
         raise typer.BadParameter(f"File does not exist: {in_file}")
 
-    filtered_musicxml_processors = music_xml_processors
-    filtered_audio_processors = audio_processors
-
-    # don't process features that won't be overwritten
-    if should_merge_existing:
-        filtered_audio_processors = [
-            proc
-            for proc in audio_processors
-            if (proc(in_file).get_feature_name()) in overwrite_features
-        ]
-        filtered_musicxml_processors = [
-            proc
-            for proc in music_xml_processors
-            if (proc(in_file).get_feature_name()) in overwrite_features
-        ]
-
-    if check_xml_extension_allowed(in_file):
-        results = process_musicxml(in_file, filtered_musicxml_processors)
-    elif check_audio_extension_allowed(in_file):
-        results = process_audio(in_file, filtered_audio_processors)
-    else:
-        raise typer.BadParameter(f"File type not supported: {in_file}")
-
+    results = {}
     metadata = process_metadata(in_file, csv_path)
     if "metadata" not in results:
         results["metadata"] = {}
@@ -200,24 +178,45 @@ def process_file(
         m.update(data)
         results["file_hash_sha256"] = m.hexdigest()
 
-    if include_original:
-        # include original only if it's a musicXML file
-        if in_file.endswith(".xml") or in_file.endswith(".musicxml"):
-            with open(in_file, "r", encoding="utf-8") as f:
-                results["original_file"] = f.read()
+    filtered_musicxml_processors = music_xml_processors
+    filtered_audio_processors = audio_processors
 
-    # merge results
+    # don't process features that won't be overwritten
     if should_merge_existing:
+        # merge results
         if results["file_hash_sha256"] not in existing_json:
             print(
                 "New file: "
                 + results["file_hash_sha256"]
                 + ", not merging with existing"
             )
-            exit()
         else:
             existing = existing_json[results["file_hash_sha256"]]
             results.update(existing)
+            # filter only if we have a match
+            filtered_audio_processors = [
+                proc
+                for proc in audio_processors
+                if (proc(in_file).get_feature_name()) in overwrite_features
+            ]
+            filtered_musicxml_processors = [
+                proc
+                for proc in music_xml_processors
+                if (proc(in_file).get_feature_name()) in overwrite_features
+            ]
+
+    if check_xml_extension_allowed(in_file):
+        results.update(process_musicxml(in_file, filtered_musicxml_processors))
+    elif check_audio_extension_allowed(in_file):
+        results.update(process_audio(in_file, filtered_audio_processors))
+    else:
+        raise typer.BadParameter(f"File type not supported: {in_file}")
+
+    if include_original:
+        # include original only if it's a musicXML file
+        if in_file.endswith(".xml") or in_file.endswith(".musicxml"):
+            with open(in_file, "r", encoding="utf-8") as f:
+                results["original_file"] = f.read()
 
     if pretty:
         results = json.dumps(results, indent=4)
