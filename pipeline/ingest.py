@@ -2,6 +2,7 @@
 This file is the main entry point for the program.
 """
 
+import hashlib
 import json
 import os
 from typing import Type
@@ -155,6 +156,15 @@ def process_file(
 
     results["corpus_id"] = corpus_id
     results["filename"] = os.path.basename(in_file)
+
+    with open(in_file, "rb") as file_to_hash:
+        # read contents of the file
+        data = file_to_hash.read()
+        # pipe contents of the file through
+        m = hashlib.sha256()
+        m.update(data)
+        results["file_hash_sha256"] = m.hexdigest()
+
     if include_original:
         # include original only if it's a musicXML file
         if in_file.endswith(".xml") or in_file.endswith(".musicxml"):

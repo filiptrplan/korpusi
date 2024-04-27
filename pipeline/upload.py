@@ -1,6 +1,5 @@
 import json
 import os
-import hashlib
 
 import urllib3
 from tqdm import tqdm
@@ -32,25 +31,16 @@ else:
     )
 
 
-def calculate_hash(json_str: str):
-    """Calculates the hash of the original file from the JSON string."""
-    obj = json.loads(json_str)
-    m = hashlib.sha256()
-    if "original_file" not in obj:
-        orig_file = obj["filename"]
-    else:
-        orig_file = obj["original_file"]
-    m.update(orig_file.encode("utf-8"))
-    return m.hexdigest()
-
-
 def index_document(json_str: str, index: str):
     """Indexes a single document in the ElasticSearch database."""
     try:
         json.loads(json_str)
     except json.JSONDecodeError as e:
         raise e
-    client.index(index=index, document=json_str, id=calculate_hash(json_str))
+    json_obj = json.loads(json_str)
+    if "file_hash_sha256" not in json_obj:
+        raise ValueError("file_hash_sha256 field is missing")
+    client.index(index=index, document=json_str, id=json_obj["file_hash_sha256"])
 
 
 def merge(source, destination):
