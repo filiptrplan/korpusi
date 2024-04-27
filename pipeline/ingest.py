@@ -122,18 +122,17 @@ def read_existing_output_file(output_file: str):
     """Reads the existing output file and outputs a dictionary with the file hashes as keys and the pre-existing
     data as values"""
     results = {}
-    print(output_file)
     if not os.path.exists(output_file):
         return None
     with open(output_file, "r", encoding="utf-8") as file:
         for line in file:
             try:
                 row = json.loads(line)
-                if "filename" not in row:
+                if "file_hash_sha256" not in row:
                     raise ValueError(
                         "File hash not in existing JSON. Can't match with files"
                     )
-                results[row["filename"]] = row
+                results[row["file_hash_sha256"]] = row
             except json.JSONDecodeError:
                 print(
                     "Invalid JSON on existing output file. Ignoring... Recommended to rename the existing file"
@@ -209,11 +208,15 @@ def process_file(
 
     # merge results
     if should_merge_existing:
-        if results["filename"] not in existing_json:
-            print("New file: " + results["filename"] + ", not merging with existing")
+        if results["file_hash_sha256"] not in existing_json:
+            print(
+                "New file: "
+                + results["file_hash_sha256"]
+                + ", not merging with existing"
+            )
             exit()
         else:
-            existing = existing_json[results["filename"]]
+            existing = existing_json[results["file_hash_sha256"]]
             results.update(existing)
 
     if pretty:
