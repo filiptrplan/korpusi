@@ -34,6 +34,7 @@ def generate_mapping(
                 "filename": {"enabled": False},
                 "original_file": {"enabled": False},
                 "corpus_id": {"type": "keyword"},
+                "file_hash_sha256": {"enabled": False},
             }
         }
         for processor in processors:
