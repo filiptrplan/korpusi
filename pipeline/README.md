@@ -89,6 +89,12 @@ If you want to create a new one, you can run
 python ingest.py create-corpus <index> <corpus_name>
 ```
 
+After ingesting the files, you must then also generate the mapping that will be used in ES to specify the structure
+of the data. This is done by running
+```bash
+python ingest.py generate-mapping <output_file> [audio|musicxml]
+```
+
 After ingesting the files, you can insert them into the ElasticSearch server by running `python ingest.py upload`.
 
 Any other options for the specific command can be found by running `python ingest.py <command> --help`.
