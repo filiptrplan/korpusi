@@ -1,4 +1,6 @@
 import os
+
+import urllib3
 from elasticsearch import Elasticsearch
 from dotenv import load_dotenv
 import typer
@@ -9,12 +11,20 @@ load_dotenv()
 crt_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "../certs/ca/ca.crt")
 )
-client = Elasticsearch(
-    hosts=os.getenv("ELASTIC_HOST"),
-    basic_auth=(os.getenv("ELASTIC_USER"), os.getenv("ELASTIC_PASSWORD")),
-    ca_certs=crt_path,
-    verify_certs=True,
-)
+if os.getenv("ENABLE_SSL") == "true":
+    client = Elasticsearch(
+        hosts=os.getenv("ELASTIC_HOST"),
+        basic_auth=(os.getenv("ELASTIC_USER"), os.getenv("ELASTIC_PASSWORD")),
+        ca_certs=crt_path,
+        verify_certs=True,
+    )
+else:
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    client = Elasticsearch(
+        hosts=os.getenv("ELASTIC_HOST"),
+        basic_auth=(os.getenv("ELASTIC_USER"), os.getenv("ELASTIC_PASSWORD")),
+        verify_certs=False,
+    )
 
 
 @app.command()

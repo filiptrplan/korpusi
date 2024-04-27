@@ -2,6 +2,7 @@ import json
 import os
 import hashlib
 
+import urllib3
 from tqdm import tqdm
 from typing_extensions import Annotated
 from elasticsearch import Elasticsearch
@@ -15,12 +16,20 @@ load_dotenv()
 crt_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "../certs/ca/ca.crt")
 )
-client = Elasticsearch(
-    hosts=os.getenv("ELASTIC_HOST"),
-    basic_auth=(os.getenv("ELASTIC_USER"), os.getenv("ELASTIC_PASSWORD")),
-    ca_certs=crt_path,
-    verify_certs=True,
-)
+if os.getenv("ENABLE_SSL") == "true":
+    client = Elasticsearch(
+        hosts=os.getenv("ELASTIC_HOST"),
+        basic_auth=(os.getenv("ELASTIC_USER"), os.getenv("ELASTIC_PASSWORD")),
+        ca_certs=crt_path,
+        verify_certs=True,
+    )
+else:
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    client = Elasticsearch(
+        hosts=os.getenv("ELASTIC_HOST"),
+        basic_auth=(os.getenv("ELASTIC_USER"), os.getenv("ELASTIC_PASSWORD")),
+        verify_certs=False,
+    )
 
 
 def calculate_hash(json_str: str):
