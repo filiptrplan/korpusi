@@ -5,7 +5,7 @@ This file is the main entry point for the program.
 import hashlib
 import json
 import os
-from typing import Type
+from typing import Type, List
 
 from tqdm import tqdm
 from typing_extensions import Annotated
@@ -46,15 +46,11 @@ def process(
     corpus_id: Annotated[
         str, typer.Option(help="Id of the corpus which the file belongs to.")
     ],
-    in_file: Annotated[str, typer.Option(help="Path to the file to process")] = None,
     out_file: str = None,
+    out_dir: str = None,
     in_dir: Annotated[
         str, typer.Option(help="Path to the directory to process")
     ] = None,
-    out_dir: str = None,
-    pretty: Annotated[
-        bool, typer.Option(help="Whether to enable pretty printing")
-    ] = False,
     include_original: Annotated[
         bool,
         typer.Option(
@@ -62,72 +58,88 @@ def process(
         ),
     ] = True,
     print_output: bool = False,
-    single_output: Annotated[
-        bool,
-        typer.Option(
-            help="If all the files should be outputed as one newline delimited JSON"
-        ),
-    ] = False,
     csv_path: Annotated[
         str,
         typer.Option(help="Path to the CSV file containing the metadata for the files"),
     ] = None,
+    overwrite_features: Annotated[
+        List[str],
+        typer.Option(
+            help="By default, the program checks whether the output file already exists and writes only "
+            "non-existing features. You can specify all the features you want processed again or just write"
+            "'all' to overwrite them all"
+        ),
+    ] = None,
 ):
     """Processes MusicXMLs and outputs the results in JSON."""
-    if in_file is not None and in_dir is not None:
-        raise typer.BadParameter("Cannot specify both in_file and in_dir")
-    if in_file is None and in_dir is None:
-        raise typer.BadParameter("Must specify either in_file or in_dir")
-    if out_file is not None and out_dir is not None:
-        raise typer.BadParameter("Cannot specify both out_file and out_dir")
+    if in_dir is None:
+        raise typer.BadParameter("Must specify in_dir")
+    if out_dir is None:
+        out_dir = in_dir
+    if out_file is None:
+        out_file = os.path.join(out_dir, "results.json")
 
-    # pretty printing is not supported for single output
-    pretty = pretty and not single_output
-
-    if in_file is not None:
-        results = process_file(in_file, pretty, include_original, corpus_id, csv_path)
-        if print_output is True:
-            print(results)
+    # remove old results.json
+    existing_out_file = out_file
+    if os.path.exists(out_file):
+        # if we overwrite all, just delete the file
+        if "all" in overwrite_features:
+            os.remove(out_file)
         else:
-            if out_file is None:
-                out_file = os.path.splitext(in_file)[0] + ".json"
-            with open(out_file, "w", encoding="utf-8") as f:
-                f.write(results)
+            existing_out_file = out_file + ".backup.json"
+            with open(out_file, "r") as file1, open(existing_out_file, "w") as file2:
+                file2.write(file1.read())
+            os.remove(out_file)
 
-    if in_dir is not None:
-        if out_dir is None:
-            out_dir = in_dir
+    # process all files in the directory
+    files = sorted(os.listdir(in_dir))
+    filtered_files = filter_files(files)
 
-        # remove old results.json
-        if single_output is True and os.path.isfile(
-            os.path.join(out_dir, "results.json")
-        ):
-            os.remove(os.path.join(out_dir, "results.json"))
+    with tqdm(total=len(filtered_files)) as pbar:
+        existing_json = None
+        existing_json = read_existing_output_file(existing_out_file)
+        for file in filtered_files:
+            in_file = os.path.join(in_dir, file)
+            results = process_file(
+                in_file,
+                print_output,
+                include_original,
+                corpus_id,
+                existing_json,
+                csv_path,
+                overwrite_features,
+            )
 
-        # process all files in the directory
-        files = sorted(os.listdir(in_dir))
-        filtered_files = filter_files(files)
+            pbar.update(1)
+            if print_output is True:
+                print(results)
+            else:
+                with open(out_file, "a", encoding="utf-8") as f:
+                    f.write(results + "\n")
 
-        with tqdm(total=len(filtered_files)) as pbar:
-            for file in filtered_files:
-                in_file = os.path.join(in_dir, file)
-                results = process_file(
-                    in_file, pretty, include_original, corpus_id, csv_path
+
+def read_existing_output_file(output_file: str):
+    """Reads the existing output file and outputs a dictionary with the file hashes as keys and the pre-existing
+    data as values"""
+    results = {}
+    print(output_file)
+    if not os.path.exists(output_file):
+        return None
+    with open(output_file, "r", encoding="utf-8") as file:
+        for line in file:
+            try:
+                row = json.loads(line)
+                if "filename" not in row:
+                    raise ValueError(
+                        "File hash not in existing JSON. Can't match with files"
+                    )
+                results[row["filename"]] = row
+            except json.JSONDecodeError:
+                print(
+                    "Invalid JSON on existing output file. Ignoring... Recommended to rename the existing file"
                 )
-                pbar.update(1)
-                if print_output is True:
-                    print(results)
-                else:
-                    if single_output is True:
-                        out_file = os.path.join(out_dir, "results.json")
-                        with open(out_file, "a", encoding="utf-8") as f:
-                            f.write(results + "\n")
-                    else:
-                        out_file = os.path.join(
-                            out_dir, os.path.splitext(file)[0] + ".json"
-                        )
-                        with open(out_file, "w", encoding="utf-8") as f:
-                            f.write(results)
+
+    return results
 
 
 def process_file(
@@ -135,16 +147,41 @@ def process_file(
     pretty: bool,
     include_original: bool,
     corpus_id: str,
+    existing_json: dict,
     csv_path: str = None,
+    overwrite_features=None,
 ):
     """Processes a single file and writes the results in JSON."""
+    if overwrite_features is None:
+        overwrite_features = []
+
+    should_merge_existing = (
+        existing_json is not None and "all" not in overwrite_features
+    )
+
     if not os.path.isfile(in_file):
         raise typer.BadParameter(f"File does not exist: {in_file}")
 
+    filtered_musicxml_processors = music_xml_processors
+    filtered_audio_processors = audio_processors
+
+    # don't process features that won't be overwritten
+    if should_merge_existing:
+        filtered_audio_processors = [
+            proc
+            for proc in audio_processors
+            if (proc(in_file).get_feature_name()) in overwrite_features
+        ]
+        filtered_musicxml_processors = [
+            proc
+            for proc in music_xml_processors
+            if (proc(in_file).get_feature_name()) in overwrite_features
+        ]
+
     if check_xml_extension_allowed(in_file):
-        results = process_musicxml(in_file, music_xml_processors)
+        results = process_musicxml(in_file, filtered_musicxml_processors)
     elif check_audio_extension_allowed(in_file):
-        results = process_audio(in_file, audio_processors)
+        results = process_audio(in_file, filtered_audio_processors)
     else:
         raise typer.BadParameter(f"File type not supported: {in_file}")
 
@@ -157,10 +194,9 @@ def process_file(
     results["corpus_id"] = corpus_id
     results["filename"] = os.path.basename(in_file)
 
+    # calculate file hash
     with open(in_file, "rb") as file_to_hash:
-        # read contents of the file
         data = file_to_hash.read()
-        # pipe contents of the file through
         m = hashlib.sha256()
         m.update(data)
         results["file_hash_sha256"] = m.hexdigest()
@@ -170,6 +206,16 @@ def process_file(
         if in_file.endswith(".xml") or in_file.endswith(".musicxml"):
             with open(in_file, "r", encoding="utf-8") as f:
                 results["original_file"] = f.read()
+
+    # merge results
+    if should_merge_existing:
+        if results["filename"] not in existing_json:
+            print("New file: " + results["filename"] + ", not merging with existing")
+            exit()
+        else:
+            existing = existing_json[results["filename"]]
+            results.update(existing)
+
     if pretty:
         results = json.dumps(results, indent=4)
     else:
