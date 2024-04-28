@@ -170,9 +170,9 @@ class AudioChordProcessor(AudioProcessor):
         import autochord
 
         output = autochord.recognize(self.song)
-        chord_names = [x[0] for x in output]
-        chord_starts = round_floats([x[1] for x in output])
-        chord_ends = round_floats([x[2] for x in output])
+        chord_names = [x[2] for x in output]
+        chord_starts = round_floats([x[0] for x in output])
+        chord_ends = round_floats([x[1] for x in output])
         return {
             "chord_name": chord_names,
             "chord_start": chord_starts,
