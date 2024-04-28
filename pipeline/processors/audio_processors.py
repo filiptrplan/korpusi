@@ -162,7 +162,7 @@ class AudioChordProcessor(AudioProcessor):
             "properties": {
                 "chord_name": {"type": "keyword"},
                 "chord_start": {"type": "float"},
-                "chord_end": {"type": "text"},
+                "chord_end": {"type": "float"},
             }
         }
 
