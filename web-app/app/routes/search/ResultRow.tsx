@@ -32,6 +32,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
   const [_params, setParams] = useSearchParams();
 
   const { t } = useTranslation("search");
+  const { t: tKeys } = useTranslation("keys");
 
   const createDownloadLink = () => {
     const blob = new Blob([JSON.stringify(song)], {
@@ -111,7 +112,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
                   },
                 }}
                 title={t("key")}
-                value={t(`keys.${song.key.most_certain_key}`)}
+                value={tKeys(song.key.most_certain_key)}
               />
               <InfoCard
                 sx={{
