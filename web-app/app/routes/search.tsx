@@ -14,7 +14,10 @@ import { LoaderFunctionArgs } from "@remix-run/server-runtime";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { elastic } from "~/services/Elastic";
 import { SongResult } from "~/src/DataTypes";
-import { SearchTotalHits } from "@elastic/elasticsearch/lib/api/types";
+import {
+  SearchHit,
+  SearchTotalHits,
+} from "@elastic/elasticsearch/lib/api/types";
 import { useTranslation } from "react-i18next";
 import { MetadataSelect } from "./search/MetadataSelect";
 import { KeySelect } from "./search/KeySelect";
@@ -69,6 +72,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     compareIds = params.compareIds.split(",");
   }
   const compareData = await elastic.search<SongResult>({
+    index: "songs",
     query: {
       ids: {
         values: compareIds,
@@ -94,6 +98,186 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     },
   };
 };
+
+export const CompareCollapseAndList: React.FC<{
+  onClickAway: () => void;
+  showCompareList: boolean;
+  compareRef: React.MutableRefObject<HTMLDivElement | null>;
+  compareSongs: SearchHit<SongResult>[];
+  onCompareClick: () => void;
+}> = ({
+  compareRef,
+  compareSongs,
+  onClickAway,
+  onCompareClick,
+  showCompareList,
+}) => {
+  const showCompare = compareSongs.length > 0 && !showCompareList;
+  return (
+    <ClickAwayListener onClickAway={onClickAway}>
+      <Slide direction="up" in={showCompare || showCompareList}>
+        <Paper
+          sx={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            px: {
+              xs: 0,
+              md: 3,
+            },
+            py: 2,
+          }}
+          elevation={3}
+        >
+          <Collapse in={showCompare} mountOnEnter timeout={700}>
+            <Box>
+              <Box ref={compareRef}>
+                <CompareOverlay
+                  songs={compareSongs}
+                  onCompareClick={onCompareClick}
+                />
+              </Box>
+            </Box>
+          </Collapse>
+          <Collapse in={showCompareList} mountOnEnter timeout={700}>
+            <Container
+              sx={{
+                height: "calc(100vh - 64px - 10vh)",
+                overflowY: "auto",
+              }}
+              maxWidth="xl"
+            >
+              <CompareList songs={compareSongs} />
+            </Container>
+          </Collapse>
+        </Paper>
+      </Slide>
+    </ClickAwayListener>
+  );
+};
+
+function SearchFilters(props: {
+  params: Record<string, string>;
+  corpusOptions: { value: string; label: string }[] | undefined;
+  availableTimeSignatures: string[] | undefined;
+}) {
+  const { t } = useTranslation("search");
+  const navigate = useNavigate();
+  const resetFields = () => {
+    localStorage.removeItem("searchParams");
+    navigate("/search");
+  };
+  return (
+    <>
+      <FilterGroupCollapse
+        title={t("metadataFilters")}
+        defaultCollapsed={false}
+      >
+        <Stack
+          direction={{
+            sm: "column",
+            md: "row",
+          }}
+        >
+          <MetadataSelect
+            metadataFields={props.params.metadataFields}
+            metadataQuery={props.params.metadataQuery}
+          />
+          <CorpusSelect
+            corpus={props.params.corpus}
+            corpusOptions={props.corpusOptions}
+          />
+        </Stack>
+      </FilterGroupCollapse>
+      <FilterGroupCollapse title={t("basicFilters")}>
+        <Grid container spacing={1}>
+          <Grid item xs="auto">
+            <KeySelect
+              keyValue={props.params.key}
+              alternativeKeys={props.params.alternativeKeys}
+            />
+          </Grid>
+          <Grid item xs={12} sm="auto">
+            <TimeSignatureSelect
+              availableTimeSignatures={props.availableTimeSignatures}
+              timeSignature={props.params.timeSignature}
+            />
+          </Grid>
+          <Grid item xs="auto" md={12}>
+            <TempoSlider
+              tempoFrom={props.params.tempoFrom}
+              tempoTo={props.params.tempoTo}
+              useTempo={props.params.useTempo}
+            />
+          </Grid>
+        </Grid>
+      </FilterGroupCollapse>
+      <FilterGroupCollapse title={t("ambitusFilters")}>
+        <Stack direction="column" spacing={1}>
+          <NoteRangeSlider
+            noteFrom={props.params.noteHighestFrom}
+            noteTo={props.params.noteHighestTo}
+            label={t("highestNote")}
+            nameFrom="noteHighestFrom"
+            nameTo="noteHighestTo"
+          />
+          <NoteRangeSlider
+            noteFrom={props.params.noteLowestFrom}
+            noteTo={props.params.noteLowestTo}
+            label={t("lowestNote")}
+            nameFrom="noteLowestFrom"
+            nameTo="noteLowestTo"
+          />
+          <AmbitusSlider
+            ambitusFrom={props.params.ambitusFrom}
+            ambitusTo={props.params.ambitusTo}
+          />
+        </Stack>
+      </FilterGroupCollapse>
+      <FilterGroupCollapse title={t("patternFilters")}>
+        <Stack
+          direction={{
+            xs: "column",
+            md: "row",
+          }}
+          spacing={1}
+        >
+          <RhythmNgramSearch rhythmNgram={props.params.rhythmNgram} />
+          <MelodicNgramSearch
+            melodicNgram={props.params.melodicNgram}
+            melodicNgramRelative={props.params.melodicNgramRelative}
+          />
+        </Stack>
+      </FilterGroupCollapse>
+      <Stack spacing={1} direction="row">
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{
+            py: 1,
+            px: 3,
+            boxShadow: "none",
+          }}
+        >
+          {t("search")}
+        </Button>
+        <Button
+          sx={{
+            py: 1,
+            px: 3,
+            boxShadow: "none",
+          }}
+          variant="outlined"
+          onClick={resetFields}
+        >
+          {t("reset")}
+        </Button>
+      </Stack>
+    </>
+  );
+}
 
 export default function Search() {
   const {
@@ -130,11 +314,6 @@ export default function Search() {
 
   const submit = useSubmit();
 
-  const resetFields = () => {
-    localStorage.removeItem("searchParams");
-    navigate("/search");
-  };
-
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -154,10 +333,11 @@ export default function Search() {
         formData.delete(value);
       }
     }
+    // keep compare data
+    formData.set("compareIds", params.compareIds);
     submit(formData);
   };
 
-  const compareIds = params.compareIds ? params.compareIds.split(",") : [];
   const [showCompareList, setShowCompareList] = useState(
     params.showCompareList === "1",
   );
@@ -166,12 +346,7 @@ export default function Search() {
     showCompareList ? "1" : "0",
   );
 
-  const showCompare = compareIds.length > 0 && !showCompareList;
   const compareRef = useRef<HTMLDivElement>(null);
-
-  const onCompareClickAway = () => {
-    setShowCompareList(false);
-  };
 
   useEffect(() => {
     if (!document) return;
@@ -184,49 +359,17 @@ export default function Search() {
 
   return (
     <>
-      <ClickAwayListener onClickAway={onCompareClickAway}>
-        <Slide direction="up" in={showCompare || showCompareList}>
-          <Paper
-            sx={{
-              position: "fixed",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              zIndex: 100,
-              px: {
-                xs: 0,
-                md: 3,
-              },
-              py: 2,
-            }}
-            elevation={3}
-          >
-            <Collapse in={showCompare} mountOnEnter timeout={700}>
-              <Box>
-                <Box ref={compareRef}>
-                  <CompareOverlay
-                    songs={compareData}
-                    onCompareClick={() => {
-                      setShowCompareList(true);
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Collapse>
-            <Collapse in={showCompareList} mountOnEnter timeout={700}>
-              <Container
-                sx={{
-                  height: "calc(100vh - 64px - 10vh)",
-                  overflowY: "auto",
-                }}
-                maxWidth="xl"
-              >
-                <CompareList songs={compareData} />
-              </Container>
-            </Collapse>
-          </Paper>
-        </Slide>
-      </ClickAwayListener>
+      <CompareCollapseAndList
+        onClickAway={() => {
+          setShowCompareList(false);
+        }}
+        showCompareList={showCompareList}
+        compareRef={compareRef}
+        compareSongs={compareData}
+        onCompareClick={() => {
+          setShowCompareList(true);
+        }}
+      />
       <div
         style={{
           position: "fixed",
@@ -250,110 +393,11 @@ export default function Search() {
       >
         <Form onSubmit={onSubmit}>
           <Stack spacing={1} alignItems={"flex-start"} direction={"column"}>
-            <FilterGroupCollapse
-              title={t("metadataFilters")}
-              defaultCollapsed={false}
-            >
-              <Stack
-                direction={{
-                  sm: "column",
-                  md: "row",
-                }}
-              >
-                <MetadataSelect
-                  metadataFields={params.metadataFields}
-                  metadataQuery={params.metadataQuery}
-                />
-                <CorpusSelect
-                  corpus={params.corpus}
-                  corpusOptions={availableCorpuses}
-                />
-              </Stack>
-            </FilterGroupCollapse>
-            <FilterGroupCollapse title={t("basicFilters")}>
-              <Grid container spacing={1}>
-                <Grid item xs="auto">
-                  <KeySelect
-                    keyValue={params.key}
-                    alternativeKeys={params.alternativeKeys}
-                  />
-                </Grid>
-                <Grid item xs={12} sm="auto">
-                  <TimeSignatureSelect
-                    availableTimeSignatures={availableTimeSignatures}
-                    timeSignature={params.timeSignature}
-                  />
-                </Grid>
-                <Grid item xs="auto" md={12}>
-                  <TempoSlider
-                    tempoFrom={params.tempoFrom}
-                    tempoTo={params.tempoTo}
-                    useTempo={params.useTempo}
-                  />
-                </Grid>
-              </Grid>
-            </FilterGroupCollapse>
-            <FilterGroupCollapse title={t("ambitusFilters")}>
-              <Stack direction="column" spacing={1}>
-                <NoteRangeSlider
-                  noteFrom={params.noteHighestFrom}
-                  noteTo={params.noteHighestTo}
-                  label={t("highestNote")}
-                  nameFrom="noteHighestFrom"
-                  nameTo="noteHighestTo"
-                />
-                <NoteRangeSlider
-                  noteFrom={params.noteLowestFrom}
-                  noteTo={params.noteLowestTo}
-                  label={t("lowestNote")}
-                  nameFrom="noteLowestFrom"
-                  nameTo="noteLowestTo"
-                />
-                <AmbitusSlider
-                  ambitusFrom={params.ambitusFrom}
-                  ambitusTo={params.ambitusTo}
-                />
-              </Stack>
-            </FilterGroupCollapse>
-            <FilterGroupCollapse title={t("patternFilters")}>
-              <Stack
-                direction={{
-                  xs: "column",
-                  md: "row",
-                }}
-                spacing={1}
-              >
-                <RhythmNgramSearch rhythmNgram={params.rhythmNgram} />
-                <MelodicNgramSearch
-                  melodicNgram={params.melodicNgram}
-                  melodicNgramRelative={params.melodicNgramRelative}
-                />
-              </Stack>
-            </FilterGroupCollapse>
-            <Stack spacing={1} direction="row">
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  py: 1,
-                  px: 3,
-                  boxShadow: "none",
-                }}
-              >
-                {t("search")}
-              </Button>
-              <Button
-                sx={{
-                  py: 1,
-                  px: 3,
-                  boxShadow: "none",
-                }}
-                variant="outlined"
-                onClick={resetFields}
-              >
-                {t("reset")}
-              </Button>
-            </Stack>
+            <SearchFilters
+              params={params}
+              corpusOptions={availableCorpuses}
+              availableTimeSignatures={availableTimeSignatures}
+            />
           </Stack>
         </Form>
         <ResultList
