@@ -1,34 +1,23 @@
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Grid,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Grid, Link, Typography } from "@mui/material";
 import { Trans, useTranslation } from "react-i18next";
-import { MetaFunction, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { InfoCard } from "~/components/InfoCard";
-import { LoaderFunction, LoaderFunctionArgs } from "@remix-run/server-runtime";
+import { LoaderFunction } from "@remix-run/server-runtime";
 import { elastic } from "~/services/Elastic";
-import {
-  AggregationsStringTermsAggregate,
-  AggregationsTermsAggregation,
-} from "@elastic/elasticsearch/lib/api/typesWithBodyKey";
+import { AggregationsStringTermsAggregate } from "@elastic/elasticsearch/lib/api/typesWithBodyKey";
 import {
   AggregationsCardinalityAggregate,
   AggregationsStatsAggregate,
   AggregationsStringTermsBucket,
 } from "@elastic/elasticsearch/lib/api/types";
-import { CorpusAccordion } from "./index/CorpusAccordion";
-import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
+import { CorpusAccordionXML } from "./index/CorpusAccordionXML";
 import { MAccordion } from "~/components/MAccordion";
 
 export const handle = {
   i18n: "index",
 };
 
-const aggregateCorpus = async (corpusId: string) => {
+const aggregateCorpusXML = async (corpusId: string) => {
   const corpusCount = elastic.count({
     index: "songs",
     query: {
@@ -70,7 +59,7 @@ const aggregateCorpus = async (corpusId: string) => {
     },
   });
 
-  const corpusName = (
+  const corpusNameHits = (
     await elastic.search<{ corpus_name: string }>({
       index: "corpuses",
       query: {
@@ -79,7 +68,8 @@ const aggregateCorpus = async (corpusId: string) => {
         },
       },
     })
-  ).hits.hits[0]._source!.corpus_name;
+  ).hits.hits[0];
+  const corpusName = corpusNameHits._source?.corpus_name;
   const aggregations = (await corpus).aggregations;
   const corpusCountValue = (await corpusCount).count;
 
@@ -99,14 +89,17 @@ const aggregateCorpus = async (corpusId: string) => {
   };
 };
 
-export type CorpusAggregate = Awaited<ReturnType<typeof aggregateCorpus>>;
+export type CorpusAggregateXML = Awaited<ReturnType<typeof aggregateCorpusXML>>;
 
-export const loader: LoaderFunction = async ({
-  request,
-}: LoaderFunctionArgs) => {
-  const allDocumentsCount = await elastic.count({
+export const loader: LoaderFunction = async () => {
+  const xmlCount = await elastic.count({
     index: "songs",
   });
+  const audioCount = await elastic.count({
+    index: "audio",
+  });
+
+  const allDocumentsCount = xmlCount.count + audioCount.count;
 
   const allCorpusesCount = await elastic.count({
     index: "corpuses",
@@ -129,11 +122,11 @@ export const loader: LoaderFunction = async ({
 
   const allCorpusIds = perCorpusAggregate.map((x) => x.key);
   const corpusAggregates = await Promise.all<
-    ReturnType<typeof aggregateCorpus>
-  >(allCorpusIds.map((corpusId) => aggregateCorpus(corpusId)));
+    ReturnType<typeof aggregateCorpusXML>
+  >(allCorpusIds.map((corpusId) => aggregateCorpusXML(corpusId)));
 
   return {
-    allSongsCount: allDocumentsCount.count,
+    allSongsCount: allDocumentsCount,
     allCorpusesCount: allCorpusesCount.count,
     perCorpusCount: perCorpusAggregate,
     corpusAggregates,
@@ -141,7 +134,7 @@ export const loader: LoaderFunction = async ({
 };
 
 export default function Index() {
-  const { allSongsCount, allCorpusesCount, perCorpusCount, corpusAggregates } =
+  const { allSongsCount, allCorpusesCount, corpusAggregates } =
     useLoaderData<typeof loader>();
   const { t } = useTranslation("index");
 
@@ -177,8 +170,8 @@ export default function Index() {
           </Grid>
         </Grid>
       </MAccordion>
-      {corpusAggregates.map((corpus: CorpusAggregate) => (
-        <CorpusAccordion corpus={corpus} />
+      {corpusAggregates.map((corpus: CorpusAggregateXML) => (
+        <CorpusAccordionXML key={corpus.corpusId} corpus={corpus} />
       ))}
     </>
   );

@@ -1,13 +1,6 @@
-import {
-  Accordion,
-  AccordionSummary,
-  Typography,
-  Grid,
-  AccordionDetails,
-} from "@mui/material";
-import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
+import { Typography, Grid } from "@mui/material";
 import { InfoCard } from "~/components/InfoCard";
-import { CorpusAggregate } from "../_index";
+import { CorpusAggregateXML } from "../_index";
 import { useTranslation } from "react-i18next";
 import {
   Chart as ChartJS,
@@ -22,7 +15,6 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { t } from "i18next";
 import { MAccordion } from "~/components/MAccordion";
 import { useKeyTranslate } from "~/utils/notes";
 
@@ -33,11 +25,11 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Colors
+  Colors,
 );
 
 interface CorpusAccordionProps {
-  corpus: CorpusAggregate;
+  corpus: CorpusAggregateXML;
 }
 
 const getColor = (index: number) => {
@@ -52,7 +44,9 @@ const getColor = (index: number) => {
   return vibrantColors[index % vibrantColors.length];
 };
 
-export const CorpusAccordion: React.FC<CorpusAccordionProps> = ({ corpus }) => {
+export const CorpusAccordionXML: React.FC<CorpusAccordionProps> = ({
+  corpus,
+}) => {
   const { t } = useTranslation("index");
 
   const metrumDatasets: ChartData<"bar"> = {
@@ -117,7 +111,7 @@ export const CorpusAccordion: React.FC<CorpusAccordionProps> = ({ corpus }) => {
   };
 
   return (
-    <MAccordion title={corpus.corpusName}>
+    <MAccordion title={corpus.corpusName ?? t("unknownName")}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <Typography variant="h6">{t("corpusStatsTitle")}</Typography>

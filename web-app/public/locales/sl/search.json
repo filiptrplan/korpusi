@@ -34,5 +34,7 @@
     "basicFilters": "Osnovni filtri",
     "ambitusFilters": "Ambitus",
     "patternFilters": "Vzorci in n-grami",
-    "metrumNone": "Brez"
+    "metrumNone": "Brez",
+    "switchToAudio": "Išči po zvočnih posnetkih",
+    "switchToXML": "Išči po notnih zapisih"
 }

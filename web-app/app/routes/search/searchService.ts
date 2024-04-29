@@ -5,7 +5,7 @@ import {
 import { elastic } from "~/services/Elastic";
 import { noteToMidi } from "~/utils/notes";
 
-export const constructQuery = (
+export const constructQueryXML = (
   params: Record<string, string>,
 ): QueryDslQueryContainer => {
   const queries: QueryDslQueryContainer[] = [];
@@ -173,6 +173,23 @@ export const constructQuery = (
   return {
     bool: {
       must: queries,
+    },
+  };
+};
+
+export const constructQueryAudio = (
+  params: Record<string, string>,
+): QueryDslQueryContainer => {
+  console.log(params);
+  return {
+    bool: {
+      must_not: {
+        match_phrase: {
+          params: {
+            query: "test",
+          },
+        },
+      },
     },
   };
 };

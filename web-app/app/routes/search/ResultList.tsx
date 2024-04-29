@@ -13,9 +13,6 @@ import {
 } from "@mui/material";
 import { useNavigate, useNavigation, useSearchParams } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
-import { SongResult } from "~/src/DataTypes";
-import { ResultRow } from "./ResultRow";
-import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 interface ResultListProps {
   pagination: {
     current: number;
@@ -23,14 +20,12 @@ interface ResultListProps {
     totalHits: number;
     pageSize: number;
   };
-  songHits: SearchHit<SongResult>[];
-  availableCorpuses?: { value: string; label: string }[];
+  resultRows: JSX.Element[];
 }
 
 export const ResultList: React.FC<ResultListProps> = ({
   pagination,
-  songHits,
-  availableCorpuses,
+  resultRows,
 }) => {
   const { t } = useTranslation("search");
   const navigation = useNavigation();
@@ -38,16 +33,6 @@ export const ResultList: React.FC<ResultListProps> = ({
   const navigate = useNavigate();
 
   const [params] = useSearchParams();
-
-  const resultComponents = songHits.map((song) => {
-    return (
-      <ResultRow
-        songHit={song}
-        key={song._id}
-        corpusOptions={availableCorpuses}
-      />
-    );
-  });
 
   return (
     <>
@@ -99,7 +84,7 @@ export const ResultList: React.FC<ResultListProps> = ({
             minHeight: "5rem",
           }}
         >
-          {resultComponents}
+          {resultRows}
         </Stack>
       </Box>
       <Stack

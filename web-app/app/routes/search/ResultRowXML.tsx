@@ -23,7 +23,7 @@ export interface ResultRowProps {
   corpusOptions?: { value: string; label: string }[];
 }
 
-export const ResultRow: React.FC<ResultRowProps> = ({
+export const ResultRowXML: React.FC<ResultRowProps> = ({
   songHit,
   corpusOptions,
 }) => {
@@ -38,8 +38,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
     const blob = new Blob([JSON.stringify(song)], {
       type: "application/json",
     });
-    const url = URL.createObjectURL(blob);
-    return url;
+    return URL.createObjectURL(blob);
   };
 
   const onAddToComparison = () => {

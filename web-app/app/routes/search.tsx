@@ -4,40 +4,39 @@ import {
   ClickAwayListener,
   Collapse,
   Container,
-  Grid,
   Paper,
   Slide,
   Stack,
 } from "@mui/material";
-import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
+import {
+  Form,
+  useLoaderData,
+  useNavigate,
+  useSearchParams,
+  useSubmit,
+} from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { elastic } from "~/services/Elastic";
-import { SongResult } from "~/src/DataTypes";
+import { AudioResult, SongResult } from "~/src/DataTypes";
 import {
   SearchHit,
+  SearchResponse,
   SearchTotalHits,
 } from "@elastic/elasticsearch/lib/api/types";
 import { useTranslation } from "react-i18next";
-import { MetadataSelect } from "./search/MetadataSelect";
-import { KeySelect } from "./search/KeySelect";
-import { TimeSignatureSelect } from "./search/TimeSignatureSelect";
-import { TempoSlider } from "./search/TempoSlider";
-import { NoteRangeSlider } from "./search/NoteRangeSlider";
-import { AmbitusSlider } from "./search/AmbitusSlider";
-import { RhythmNgramSearch } from "./search/RhythmNgramSearch";
-import { MelodicNgramSearch } from "./search/MelodicNgramSearch";
-import { CorpusSelect } from "./search/CorpusSelect";
-import { FilterGroupCollapse } from "./search/FilterGroupCollapse";
 import { ResultList } from "./search/ResultList";
 import { CompareOverlay } from "./compare/CompareOverlay";
 import {
-  constructQuery,
-  getAvailableTimeSignatures,
+  constructQueryAudio,
+  constructQueryXML,
   getAvailableCorpuses,
+  getAvailableTimeSignatures,
 } from "./search/searchService";
 import { CompareList } from "./compare/CompareList";
 import { useUpdateQueryStringValueWithoutNavigation } from "~/utils/misc";
+import { ResultRowXML } from "~/routes/search/ResultRowXML";
+import { SearchFiltersXML } from "~/routes/search/SearchFiltersXML";
 
 export const handle = {
   i18n: ["search", "compare"],
@@ -46,6 +45,7 @@ export const handle = {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const params = Object.fromEntries(url.searchParams);
+
   let pageSize = 10;
   let page = 1;
   if ("pageSize" in params) {
@@ -55,16 +55,33 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     page = parseInt(params.page);
   }
 
+  // search type
+  const searchType = stringToSearchType(params.searchType);
+
   // Search data fetching
-  const data = await elastic.search<SongResult>({
+  const xmlHits = await elastic.search<SongResult>({
     index: "songs",
     from: (page - 1) * pageSize,
     size: pageSize,
-    query: constructQuery(params),
+    query: constructQueryXML(params),
   });
 
-  const totalPages =
-    Math.ceil((data.hits.total as SearchTotalHits)?.value / pageSize) ?? 0;
+  const audioHits = await elastic.search<AudioResult>({
+    index: "audio",
+    from: (page - 1) * pageSize,
+    size: pageSize,
+    query: constructQueryAudio(params),
+  });
+
+  const getTotalHits = (data: SearchResponse<unknown>) =>
+    (data.hits.total as SearchTotalHits)?.value;
+  const getTotalPages = (data: SearchResponse<unknown>) =>
+    Math.ceil(getTotalHits(data) / pageSize) ?? 0;
+  const totalPages = getTotalPages(
+    searchType == SearchType.XML ? xmlHits : audioHits,
+  );
+  const totalHits =
+    getTotalHits(searchType == SearchType.XML ? xmlHits : audioHits) ?? 0;
 
   // Compare song fetching
   let compareIds: string[] = [];
@@ -85,15 +102,17 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 
   return {
-    data: data.hits.hits,
-    compareData: compareData.hits.hits,
+    xmlData: {
+      hits: xmlHits.hits.hits,
+      compareHits: compareData.hits.hits,
+      availableTimeSignatures: await getAvailableTimeSignatures(),
+    },
     params,
-    availableTimeSignatures: await getAvailableTimeSignatures(),
     availableCorpuses: await getAvailableCorpuses(),
     pagination: {
       total: totalPages,
       pageSize: pageSize,
-      totalHits: (data.hits.total as SearchTotalHits)?.value ?? 0,
+      totalHits: totalHits,
       current: Math.min(page, totalPages),
     },
   };
@@ -158,138 +177,37 @@ export const CompareCollapseAndList: React.FC<{
   );
 };
 
-function SearchFilters(props: {
-  params: Record<string, string>;
-  corpusOptions: { value: string; label: string }[] | undefined;
-  availableTimeSignatures: string[] | undefined;
-}) {
-  const { t } = useTranslation("search");
-  const navigate = useNavigate();
-  const resetFields = () => {
-    localStorage.removeItem("searchParams");
-    navigate("/search");
-  };
-  return (
-    <>
-      <FilterGroupCollapse
-        title={t("metadataFilters")}
-        defaultCollapsed={false}
-      >
-        <Stack
-          direction={{
-            sm: "column",
-            md: "row",
-          }}
-        >
-          <MetadataSelect
-            metadataFields={props.params.metadataFields}
-            metadataQuery={props.params.metadataQuery}
-          />
-          <CorpusSelect
-            corpus={props.params.corpus}
-            corpusOptions={props.corpusOptions}
-          />
-        </Stack>
-      </FilterGroupCollapse>
-      <FilterGroupCollapse title={t("basicFilters")}>
-        <Grid container spacing={1}>
-          <Grid item xs="auto">
-            <KeySelect
-              keyValue={props.params.key}
-              alternativeKeys={props.params.alternativeKeys}
-            />
-          </Grid>
-          <Grid item xs={12} sm="auto">
-            <TimeSignatureSelect
-              availableTimeSignatures={props.availableTimeSignatures}
-              timeSignature={props.params.timeSignature}
-            />
-          </Grid>
-          <Grid item xs="auto" md={12}>
-            <TempoSlider
-              tempoFrom={props.params.tempoFrom}
-              tempoTo={props.params.tempoTo}
-              useTempo={props.params.useTempo}
-            />
-          </Grid>
-        </Grid>
-      </FilterGroupCollapse>
-      <FilterGroupCollapse title={t("ambitusFilters")}>
-        <Stack direction="column" spacing={1}>
-          <NoteRangeSlider
-            noteFrom={props.params.noteHighestFrom}
-            noteTo={props.params.noteHighestTo}
-            label={t("highestNote")}
-            nameFrom="noteHighestFrom"
-            nameTo="noteHighestTo"
-          />
-          <NoteRangeSlider
-            noteFrom={props.params.noteLowestFrom}
-            noteTo={props.params.noteLowestTo}
-            label={t("lowestNote")}
-            nameFrom="noteLowestFrom"
-            nameTo="noteLowestTo"
-          />
-          <AmbitusSlider
-            ambitusFrom={props.params.ambitusFrom}
-            ambitusTo={props.params.ambitusTo}
-          />
-        </Stack>
-      </FilterGroupCollapse>
-      <FilterGroupCollapse title={t("patternFilters")}>
-        <Stack
-          direction={{
-            xs: "column",
-            md: "row",
-          }}
-          spacing={1}
-        >
-          <RhythmNgramSearch rhythmNgram={props.params.rhythmNgram} />
-          <MelodicNgramSearch
-            melodicNgram={props.params.melodicNgram}
-            melodicNgramRelative={props.params.melodicNgramRelative}
-          />
-        </Stack>
-      </FilterGroupCollapse>
-      <Stack spacing={1} direction="row">
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{
-            py: 1,
-            px: 3,
-            boxShadow: "none",
-          }}
-        >
-          {t("search")}
-        </Button>
-        <Button
-          sx={{
-            py: 1,
-            px: 3,
-            boxShadow: "none",
-          }}
-          variant="outlined"
-          onClick={resetFields}
-        >
-          {t("reset")}
-        </Button>
-      </Stack>
-    </>
-  );
+enum SearchType {
+  Audio,
+  XML,
 }
 
+const searchTypeToString = (type: SearchType) => {
+  switch (type) {
+    case SearchType.Audio:
+      return "switchToXML";
+    case SearchType.XML:
+      return "switchToAudio";
+  }
+};
+
+const stringToSearchType = (str: string): SearchType => {
+  return isNaN(parseInt(str)) ? SearchType.XML : parseInt(str);
+};
+
 export default function Search() {
+  const { xmlData, params, pagination, availableCorpuses } =
+    useLoaderData<typeof loader>();
+
   const {
-    data,
-    params,
-    pagination,
+    hits: xmlHits,
+    compareHits: xmlCompareHits,
     availableTimeSignatures,
-    availableCorpuses,
-    compareData,
-  } = useLoaderData<typeof loader>();
+  } = xmlData;
+
+  const searchType: SearchType = stringToSearchType(params.searchType);
   const navigate = useNavigate();
-  const { t } = useTranslation("search");
+  const [, setSearchParams] = useSearchParams();
 
   // load the last search params from local storage
   useEffect(() => {
@@ -334,7 +252,8 @@ export default function Search() {
       }
     }
     // keep compare data
-    formData.set("compareIds", params.compareIds);
+    if (params.compareIds) formData.set("compareIds", params.compareIds);
+    if (params.searchType) formData.set("searchType", params.searchType);
     submit(formData);
   };
 
@@ -357,6 +276,25 @@ export default function Search() {
     }
   }, [showCompareList]);
 
+  const resetFields = () => {
+    localStorage.removeItem("searchParams");
+    navigate("/search");
+  };
+
+  const resultRowsXML = xmlHits.map((song) => {
+    return (
+      <ResultRowXML
+        songHit={song}
+        key={song._id}
+        corpusOptions={availableCorpuses}
+      />
+    );
+  });
+
+  const resultRowsAudio: JSX.Element[] = [];
+
+  const { t } = useTranslation("search");
+
   return (
     <>
       <CompareCollapseAndList
@@ -365,7 +303,7 @@ export default function Search() {
         }}
         showCompareList={showCompareList}
         compareRef={compareRef}
-        compareSongs={compareData}
+        compareSongs={xmlCompareHits}
         onCompareClick={() => {
           setShowCompareList(true);
         }}
@@ -393,17 +331,69 @@ export default function Search() {
       >
         <Form onSubmit={onSubmit}>
           <Stack spacing={1} alignItems={"flex-start"} direction={"column"}>
-            <SearchFilters
-              params={params}
-              corpusOptions={availableCorpuses}
-              availableTimeSignatures={availableTimeSignatures}
-            />
+            {searchType == SearchType.XML ? (
+              <SearchFiltersXML
+                params={params}
+                corpusOptions={availableCorpuses}
+                availableTimeSignatures={availableTimeSignatures}
+              />
+            ) : (
+              <></>
+            )}
+            <Stack spacing={1} direction="row">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  py: 1,
+                  px: 3,
+                  boxShadow: "none",
+                }}
+              >
+                {t("search")}
+              </Button>
+              <Button
+                sx={{
+                  py: 1,
+                  px: 3,
+                  boxShadow: "none",
+                }}
+                variant="outlined"
+                onClick={resetFields}
+              >
+                {t("reset")}
+              </Button>
+              <Button
+                sx={{
+                  py: 1,
+                  px: 3,
+                  boxShadow: "none",
+                }}
+                variant="outlined"
+                onClick={() => {
+                  if (searchType == SearchType.Audio) {
+                    setSearchParams((prev) => {
+                      prev.set("searchType", SearchType.XML.toString());
+                      return prev;
+                    });
+                  } else {
+                    setSearchParams((prev) => {
+                      prev.set("searchType", SearchType.Audio.toString());
+                      return prev;
+                    });
+                  }
+                }}
+              >
+                {t(searchTypeToString(searchType))}
+              </Button>
+            </Stack>
           </Stack>
         </Form>
         <ResultList
           pagination={pagination}
-          songHits={data}
-          availableCorpuses={availableCorpuses}
+          resultRows={
+            searchType == SearchType.XML ? resultRowsXML : resultRowsAudio
+          }
         />
       </Box>
     </>

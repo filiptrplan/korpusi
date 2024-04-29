@@ -78,3 +78,64 @@ export interface SongResult extends Record<string, unknown> {
    */
   original_file: string;
 }
+
+/**
+ * K - union type of string that are already known algorithms
+ * T - type of the data point
+ */
+type AudioFeature<K extends string, T> = Record<K | string, T>;
+
+export interface AudioResult extends Record<string, unknown> {
+  corpus_id: string;
+  filename: string;
+  file_hash_sha256: string;
+  sample_rate: AudioFeature<
+    "file_info",
+    {
+      sample_rate: number;
+      duration: number;
+      /**
+       * Format like MP3 or WAV
+       */
+      encoding_subtype: string;
+    }
+  >;
+  bpm: AudioFeature<
+    "essentia_multifeature",
+    {
+      bpm: number;
+      /**
+       * Detected beat timestamps in seconds
+       */
+      beat_ticks: number[];
+    }
+  >;
+  pitch_contour: AudioFeature<
+    "pesto",
+    {
+      /**
+       * The pitch of the voice stem in HZ, starts at 0 seconds and steps in `time_step_ms` milliseconds
+       */
+      pitch_contour_hz_voice: number[];
+      /**
+       * Same as `pitch_contour_hz_voice` but for instrumentals
+       */
+      pitch_contour_hz_instrumental: number[];
+      /**
+       * Time step between data points in milliseconds
+       */
+      time_step_ms: number;
+    }
+  >;
+  chords: AudioFeature<
+    "autochord",
+    {
+      /**
+       * Start of chords in seconds
+       */
+      chord_start: number[];
+      chord_end: number[];
+      chord_name: string[];
+    }
+  >;
+}
