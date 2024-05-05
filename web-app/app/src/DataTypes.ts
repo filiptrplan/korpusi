@@ -138,4 +138,9 @@ export interface AudioResult extends Record<string, unknown> {
       chord_name: string[];
     }
   >;
+  metadata: {
+    title: string;
+    filename: string;
+    URL: string;
+  }
 }

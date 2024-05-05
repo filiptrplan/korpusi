@@ -38,6 +38,7 @@ import { useUpdateQueryStringValueWithoutNavigation } from "~/utils/misc";
 import { ResultRowXML } from "~/routes/search/ResultRowXML";
 import { SearchFiltersXML } from "~/routes/search/SearchFiltersXML";
 import { SearchFiltersAudio } from "~/routes/search/SearchFiltersAudio";
+import { ResultRowAudio } from "~/routes/search/ResultRowAudio";
 
 export const handle = {
   i18n: ["search", "compare"],
@@ -79,7 +80,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const getTotalPages = (data: SearchResponse<unknown>) =>
     Math.ceil(getTotalHits(data) / pageSize) ?? 0;
   const totalPages = getTotalPages(
-    searchType == SearchType.XML ? xmlHits : audioHits,
+    searchType == SearchType.XML ? xmlHits : audioHits
   );
   const totalHits =
     getTotalHits(searchType == SearchType.XML ? xmlHits : audioHits) ?? 0;
@@ -109,7 +110,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       availableTimeSignatures: await getAvailableTimeSignatures(),
     },
     audioData: {
-      hits: audioHits.hits.hits
+      hits: audioHits.hits.hits,
     },
     params,
     availableCorpuses: await getAvailableCorpuses(),
@@ -211,7 +212,7 @@ export default function Search() {
 
   const { hits: audioHits } = audioData;
   console.log(audioHits);
-  
+
   const searchType: SearchType = stringToSearchType(params.searchType);
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
@@ -265,11 +266,11 @@ export default function Search() {
   };
 
   const [showCompareList, setShowCompareList] = useState(
-    params.showCompareList === "1",
+    params.showCompareList === "1"
   );
   useUpdateQueryStringValueWithoutNavigation(
     "showCompareList",
-    showCompareList ? "1" : "0",
+    showCompareList ? "1" : "0"
   );
 
   const compareRef = useRef<HTMLDivElement>(null);
@@ -298,7 +299,15 @@ export default function Search() {
     );
   });
 
-  const resultRowsAudio: JSX.Element[] = [];
+  const resultRowsAudio = audioHits.map((song) => {
+    return (
+      <ResultRowAudio
+        audioHit={song}
+        key={song._id}
+        corpusOptions={availableCorpuses}
+      />
+    );
+  });
 
   const { t } = useTranslation("search");
 

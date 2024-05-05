@@ -6,12 +6,12 @@ import { midiToNote } from "~/utils/notes";
 import { SearchType } from "~/routes/search";
 import { ResultRow } from "~/routes/search/ResultRow";
 
-export interface ResultRowProps {
+export interface ResultRowXMLProps {
   songHit: SearchHit<SongResult>;
   corpusOptions?: { value: string; label: string }[];
 }
 
-export const ResultRowXML: React.FC<ResultRowProps> = ({
+export const ResultRowXML: React.FC<ResultRowXMLProps> = ({
   songHit,
   corpusOptions,
 }) => {

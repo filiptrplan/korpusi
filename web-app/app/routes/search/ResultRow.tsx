@@ -89,10 +89,23 @@ export const ResultRow: React.FC<ResultRowProps> = ({
                   paddingRight: 3,
                 }}
               >
-                <Typography variant="h6" fontSize={"1.15rem"}>
-                  {" "}
-                  {title ?? titleMissingMessage}
-                </Typography>
+                <Tooltip title={title ?? titleMissingMessage}>
+                  <Typography
+                    variant="h6"
+                    fontSize={"1.15rem"}
+                    sx={{
+                      maxWidth: {
+                        lg: 400,
+                        xs: 200
+                      },
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {title ?? titleMissingMessage}
+                  </Typography>
+                </Tooltip>
                 <Typography
                   variant="body2"
                   fontSize={"0.8rem"}
