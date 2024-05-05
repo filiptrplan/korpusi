@@ -286,7 +286,7 @@ export default function Search() {
 
   const resetFields = () => {
     localStorage.removeItem("searchParams");
-    navigate("/search");
+    navigate("/search?searchType="+searchType);
   };
 
   const resultRowsXML = xmlHits.map((song) => {

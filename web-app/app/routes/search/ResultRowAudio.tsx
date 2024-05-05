@@ -3,7 +3,6 @@ import { AudioResult, } from "~/src/DataTypes";
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { InfoCard } from "~/components/InfoCard";
 import { useTranslation } from "react-i18next";
-import { midiToNote } from "~/utils/notes";
 import { SearchType } from "~/routes/search";
 import { ResultRow } from "~/routes/search/ResultRow";
 
