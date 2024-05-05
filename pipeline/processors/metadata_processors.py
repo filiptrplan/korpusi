@@ -1,4 +1,5 @@
 import csv
+import os.path
 
 
 class CSVMetadataProcessor:
@@ -33,10 +34,11 @@ class CSVMetadataProcessor:
 
         return {"properties": properties_dict}
 
-    def process(self, filename: str):
+    def process(self, file_path: str):
         """
         Returns the metadata for the file.
         """
+        filename = os.path.basename(file_path)
         for row in self.csv_content:
             if row["filename"] == filename:
                 return row

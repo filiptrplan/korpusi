@@ -163,8 +163,10 @@ def process_file(
 
     results = {}
     metadata = process_metadata(in_file, csv_path)
+
     if "metadata" not in results:
         results["metadata"] = {}
+
     # add metadata to the metadata field because other processors might have a field with the same name
     results["metadata"].update(metadata)
 
@@ -193,6 +195,8 @@ def process_file(
         else:
             existing = existing_json[results["file_hash_sha256"]]
             results.update(existing)
+            if "metadata" in overwrite_features:
+                results["metadata"] = metadata
             # filter only if we have a match
             filtered_audio_processors = [
                 proc
