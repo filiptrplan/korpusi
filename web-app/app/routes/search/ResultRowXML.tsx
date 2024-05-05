@@ -1,22 +1,10 @@
-import {
-  Box,
-  Card,
-  CardActionArea,
-  CardActions,
-  CardContent,
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography,
-} from "@mui/material";
 import { SongResult } from "~/src/DataTypes";
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
-import { useNavigate, useSearchParams } from "@remix-run/react";
-import Difference from "@mui/icons-material/Difference";
-import FileDownload from "@mui/icons-material/FileDownload";
 import { InfoCard } from "~/components/InfoCard";
 import { useTranslation } from "react-i18next";
 import { midiToNote } from "~/utils/notes";
+import { SearchType } from "~/routes/search";
+import { ResultRow } from "~/routes/search/ResultRow";
 
 export interface ResultRowProps {
   songHit: SearchHit<SongResult>;
@@ -28,161 +16,70 @@ export const ResultRowXML: React.FC<ResultRowProps> = ({
   corpusOptions,
 }) => {
   const song = songHit._source!;
-  const navigate = useNavigate();
-  const [_params, setParams] = useSearchParams();
 
   const { t } = useTranslation("search");
   const { t: tKeys } = useTranslation("keys");
 
-  const createDownloadLink = () => {
-    const blob = new Blob([JSON.stringify(song)], {
-      type: "application/json",
-    });
-    return URL.createObjectURL(blob);
-  };
-
-  const onAddToComparison = () => {
-    setParams((params) => {
-      const compareIds = params.get("compareIds");
-      if (compareIds) {
-        params.set("compareIds", `${compareIds},${songHit._id}`);
-      } else {
-        params.set("compareIds", songHit._id);
-      }
-      return params;
-    });
-  };
-
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        display: "flex",
-      }}
+    <ResultRow
+      title={song.metadata.title}
+      subtitle={song.metadata.composer}
+      titleMissingMessage={t("noTitle")}
+      subtitleMissingMessage={t("noComposer")}
+      searchHit={songHit}
+      type={SearchType.XML}
+      corpusOptions={corpusOptions}
     >
-      <CardActionArea
-        onClick={() => {
-          navigate(`/song/${songHit._id}`);
+      <InfoCard
+        sx={{
+          display: {
+            xs: "none",
+            sm: "block",
+          },
         }}
-      >
-        <CardContent
-          sx={{
-            py: 2,
-          }}
-        >
-          <Stack direction={"row"} gap={0} alignContent={"space-between"}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Box
-                sx={{
-                  paddingRight: 3,
-                }}
-              >
-                <Typography variant="h6" fontSize={"1.15rem"}>
-                  {" "}
-                  {song.metadata.title ?? "Naslov ni znan"}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  fontSize={"0.8rem"}
-                  sx={{
-                    color: "text.secondary",
-                  }}
-                >
-                  {song.metadata.composer ?? "Skladatelj ni znan"}
-                </Typography>
-              </Box>
-              <InfoCard
-                sx={{
-                  display: {
-                    xs: "none",
-                    sm: "block",
-                  },
-                }}
-                title={t("corpus")}
-                value={
-                  corpusOptions?.find((x) => x.value === song.corpus_id)?.label
-                }
-              />
-              <InfoCard
-                sx={{
-                  display: {
-                    xs: "none",
-                    sm: "block",
-                  },
-                }}
-                title={t("key")}
-                value={tKeys(song.key.most_certain_key)}
-              />
-              <InfoCard
-                sx={{
-                  display: {
-                    xs: "none",
-                    sm: "block",
-                  },
-                }}
-                title={t("timeSignature")}
-                value={song.time_signature}
-              />
-              <InfoCard
-                title={t("tempoBPM")}
-                value={song.tempo}
-                sx={{
-                  display: {
-                    xs: "none",
-                    lg: "block",
-                  },
-                }}
-              />
-              <InfoCard
-                sx={{
-                  display: {
-                    xs: "none",
-                    md: "block",
-                  },
-                }}
-                title={t("highestNote")}
-                value={midiToNote(song.ambitus.max_note)}
-              />
-              <InfoCard
-                sx={{
-                  display: {
-                    xs: "none",
-                    md: "block",
-                  },
-                }}
-                title={t("lowestNote")}
-                value={midiToNote(song.ambitus.min_note)}
-              />
-            </Stack>
-          </Stack>
-        </CardContent>
-      </CardActionArea>
-      <CardActions>
-        <Tooltip title="Dodaj primerjavi">
-          <IconButton
-            sx={{
-              zIndex: 2,
-            }}
-            onClick={onAddToComparison}
-          >
-            <Difference
-              sx={{
-                color: "text.primary",
-              }}
-            />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Prenesi datoteko">
-          <IconButton
-            component="a"
-            href={createDownloadLink()}
-            download={`${song.metadata.title}.json`}
-            target="_blank"
-          >
-            <FileDownload sx={{ color: "text.primary" }} />
-          </IconButton>
-        </Tooltip>
-      </CardActions>
-    </Card>
+        title={t("key")}
+        value={tKeys(song.key.most_certain_key)}
+      />
+      <InfoCard
+        sx={{
+          display: {
+            xs: "none",
+            sm: "block",
+          },
+        }}
+        title={t("timeSignature")}
+        value={song.time_signature}
+      />
+      <InfoCard
+        title={t("tempoBPM")}
+        value={song.tempo}
+        sx={{
+          display: {
+            xs: "none",
+            lg: "block",
+          },
+        }}
+      />
+      <InfoCard
+        sx={{
+          display: {
+            xs: "none",
+            md: "block",
+          },
+        }}
+        title={t("highestNote")}
+        value={midiToNote(song.ambitus.max_note)}
+      />
+      <InfoCard
+        sx={{
+          display: {
+            xs: "none",
+            md: "block",
+          },
+        }}
+        title={t("lowestNote")}
+        value={midiToNote(song.ambitus.min_note)}
+      />
+    </ResultRow>
   );
 };
