@@ -6,26 +6,44 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useControlledState } from "./useControlledState";
 
 interface MetadataSelectProps {
+  /**
+   * Current fields that should be searched
+   */
   metadataFields?: string;
+  /**
+   * The text query
+   */
   metadataQuery?: string;
+  /**
+   * Available fields
+   */
+  metadataOptions?: { value: string; label: string }[];
 }
 
 export const MetadataSelect: React.FC<MetadataSelectProps> = ({
   metadataQuery,
   metadataFields,
+  metadataOptions,
 }) => {
   const { t } = useTranslation("search");
   const [metadataQueryState, setMetadataQueryState] = useControlledState(
     metadataQuery || "",
   );
   const [metadataFieldsState, setMetadataFieldsState] = useControlledState(
-    metadataFields?.split(",") ?? ["title", "composer", "lyricist"],
+    metadataFields?.split(",") ?? metadataOptions?.map((x) => x.value) ?? [],
   );
+
+  const menuItems = metadataOptions?.map((x) => (
+    <MenuItem key={x.value} value={x.value}>
+      {x.label}
+    </MenuItem>
+  ));
+
   return (
     <Stack
       spacing={1}
@@ -66,9 +84,7 @@ export const MetadataSelect: React.FC<MetadataSelectProps> = ({
           }}
           multiple
         >
-          <MenuItem value="title">{t("metadataTitle")}</MenuItem>
-          <MenuItem value="composer">{t("metadataComposer")}</MenuItem>
-          <MenuItem value="lyricist">{t("metadataLyricist")}</MenuItem>
+          {menuItems}
         </Select>
       </FormControl>
     </Stack>

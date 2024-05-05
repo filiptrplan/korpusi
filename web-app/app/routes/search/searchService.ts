@@ -10,30 +10,11 @@ export const constructQueryXML = (
 ): QueryDslQueryContainer => {
   const queries: QueryDslQueryContainer[] = [];
 
-  // CORPUS QUERY
-  if ("corpus" in params) {
-    queries.push({
-      terms: {
-        corpus_id: params.corpus.split(","),
-      },
-    });
-  }
-  // METADATA QUERY
-  if ("metadataQuery" in params) {
-    let metadataFields: string[] = [];
-    if ("metadataFields" in params) {
-      metadataFields = params.metadataFields.split(",");
-    }
-    queries.push({
-      query_string: {
-        query: `*${params.metadataQuery}*`,
-        fields:
-          metadataFields.length > 0
-            ? metadataFields.map((x) => `metadata.${x}`)
-            : ["metadata.*"],
-      },
-    });
-  }
+  const metadataQuery = constructMetadataQuery(params);
+  if (metadataQuery) queries.push(metadataQuery);
+
+  const corpusQuery = constructCorpusQuery(params);
+  if (corpusQuery) queries.push(corpusQuery);
 
   // KEY QUERY
   if ("key" in params && params.key !== "none") {
@@ -177,19 +158,50 @@ export const constructQueryXML = (
   };
 };
 
+const constructMetadataQuery = (params: Record<string, string>) => {
+  if ("metadataQuery" in params) {
+    let metadataFields: string[] = [];
+    if ("metadataFields" in params) {
+      metadataFields = params.metadataFields.split(",");
+    }
+    return {
+      query_string: {
+        query: `*${params.metadataQuery}*`,
+        fields:
+          metadataFields.length > 0
+            ? metadataFields.map((x) => `metadata.${x}`)
+            : ["metadata.*"],
+      },
+    };
+  }
+  return null;
+};
+
+const constructCorpusQuery = (params: Record<string, string>) => {
+  if ("corpus" in params) {
+    return {
+      terms: {
+        corpus_id: params.corpus.split(","),
+      },
+    };
+  }
+  return null;
+};
+
 export const constructQueryAudio = (
   params: Record<string, string>,
 ): QueryDslQueryContainer => {
-  console.log(params);
+  const queries: QueryDslQueryContainer[] = [];
+
+  const metadataQuery = constructMetadataQuery(params);
+  if (metadataQuery) queries.push(metadataQuery);
+
+  const corpusQuery = constructCorpusQuery(params);
+  if (corpusQuery) queries.push(corpusQuery);
+
   return {
     bool: {
-      must_not: {
-        match_phrase: {
-          params: {
-            query: "test",
-          },
-        },
-      },
+      must: queries,
     },
   };
 };

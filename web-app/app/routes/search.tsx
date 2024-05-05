@@ -37,6 +37,7 @@ import { CompareList } from "./compare/CompareList";
 import { useUpdateQueryStringValueWithoutNavigation } from "~/utils/misc";
 import { ResultRowXML } from "~/routes/search/ResultRowXML";
 import { SearchFiltersXML } from "~/routes/search/SearchFiltersXML";
+import { SearchFiltersAudio } from "~/routes/search/SearchFiltersAudio";
 
 export const handle = {
   i18n: ["search", "compare"],
@@ -106,6 +107,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       hits: xmlHits.hits.hits,
       compareHits: compareData.hits.hits,
       availableTimeSignatures: await getAvailableTimeSignatures(),
+    },
+    audioData: {
+      hits: audioHits.hits.hits
     },
     params,
     availableCorpuses: await getAvailableCorpuses(),
@@ -177,7 +181,7 @@ export const CompareCollapseAndList: React.FC<{
   );
 };
 
-enum SearchType {
+export enum SearchType {
   Audio,
   XML,
 }
@@ -196,7 +200,7 @@ const stringToSearchType = (str: string): SearchType => {
 };
 
 export default function Search() {
-  const { xmlData, params, pagination, availableCorpuses } =
+  const { audioData, xmlData, params, pagination, availableCorpuses } =
     useLoaderData<typeof loader>();
 
   const {
@@ -205,6 +209,9 @@ export default function Search() {
     availableTimeSignatures,
   } = xmlData;
 
+  const { hits: audioHits } = audioData;
+  console.log(audioHits);
+  
   const searchType: SearchType = stringToSearchType(params.searchType);
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
@@ -338,7 +345,10 @@ export default function Search() {
                 availableTimeSignatures={availableTimeSignatures}
               />
             ) : (
-              <></>
+              <SearchFiltersAudio
+                params={params}
+                corpusOptions={availableCorpuses}
+              />
             )}
             <Stack spacing={1} direction="row">
               <Button

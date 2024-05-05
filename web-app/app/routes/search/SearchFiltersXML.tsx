@@ -10,6 +10,7 @@ import { NoteRangeSlider } from "~/routes/search/NoteRangeSlider";
 import { AmbitusSlider } from "~/routes/search/AmbitusSlider";
 import { RhythmNgramSearch } from "~/routes/search/RhythmNgramSearch";
 import { MelodicNgramSearch } from "~/routes/search/MelodicNgramSearch";
+import { useMemo } from "react";
 
 interface SearchFiltersXMLProps {
   params: Record<string, string>;
@@ -23,6 +24,22 @@ export const SearchFiltersXML: React.FC<SearchFiltersXMLProps> = ({
   params,
 }) => {
   const { t } = useTranslation("search");
+  const metadataOptions = useMemo(() => {
+    return [
+      {
+        value: "title",
+        label: t("metadataTitle"),
+      },
+      {
+        value: "composer",
+        label: t("metadataComposer"),
+      },
+      {
+        value: "lyricist",
+        label: t("metadataLyricist"),
+      },
+    ];
+  }, [t]);
   return (
     <>
       <FilterGroupCollapse
@@ -38,6 +55,7 @@ export const SearchFiltersXML: React.FC<SearchFiltersXMLProps> = ({
           <MetadataSelect
             metadataFields={params.metadataFields}
             metadataQuery={params.metadataQuery}
+            metadataOptions={metadataOptions}
           />
           <CorpusSelect corpus={params.corpus} corpusOptions={corpusOptions} />
         </Stack>

@@ -14,6 +14,7 @@
     "metadataTitle": "Naslov",
     "metadataComposer": "Skladatelj",
     "metadataLyricist": "Pesnik",
+    "metadataURL": "URL",
     "search": "Išči",
     "key": "Ključ",
     "reset": "Ponastavi",
@@ -36,5 +37,7 @@
     "patternFilters": "Vzorci in n-grami",
     "metrumNone": "Brez",
     "switchToAudio": "Išči po zvočnih posnetkih",
-    "switchToXML": "Išči po notnih zapisih"
+    "switchToXML": "Išči po notnih zapisih",
+    "noTitle": "Neznan naslov",
+    "noComposer": "Neznan skladatelj"
 }
