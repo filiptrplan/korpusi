@@ -166,7 +166,7 @@ const constructMetadataQuery = (params: Record<string, string>) => {
     }
     return {
       query_string: {
-        query: `*${params.metadataQuery}*`,
+        query: `"${params.metadataQuery}"~`,
         fields:
           metadataFields.length > 0
             ? metadataFields.map((x) => `metadata.${x}`)
@@ -213,6 +213,19 @@ export const constructQueryAudio = (
       queries.push({
         query_string: {
           query: `bpm.\\*.bpm:(>=${tempoFrom} AND <=${tempoTo})`
+        }
+      });
+    }
+  }
+
+  // DURATION
+  if ("useDuration" in params && params.useDuration === "on") {
+    if ("durationFrom" in params && "durationTo" in params) {
+      const durationFrom = parseInt(params.durationFrom);
+      const durationTo = parseInt(params.durationTo);
+      queries.push({
+        query_string: {
+          query: `sample_rate.\\*.duration:(>=${durationFrom} AND <=${durationTo})`
         }
       });
     }

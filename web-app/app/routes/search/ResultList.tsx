@@ -76,7 +76,7 @@ export const ResultList: React.FC<ResultListProps> = ({
           }}
         />
         <Stack
-          spacing={1}
+          spacing={1.5}
           sx={{
             mt: 1,
             opacity: searching ? 0.5 : 1,
