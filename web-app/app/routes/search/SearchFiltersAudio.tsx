@@ -5,6 +5,7 @@ import { MetadataSelect } from "~/routes/search/MetadataSelect";
 import { CorpusSelect } from "~/routes/search/CorpusSelect";
 import { useMemo } from "react";
 import { TempoSlider } from "~/routes/search/TempoSlider";
+import { DurationSlider } from "~/routes/search/DurationSlider";
 
 interface SearchFiltersAudioProps {
   params: Record<string, string>;
@@ -24,8 +25,8 @@ export const SearchFiltersAudio: React.FC<SearchFiltersAudioProps> = ({
       },
       {
         value: "URL",
-        label: t("metadataURL")
-      }
+        label: t("metadataURL"),
+      },
     ];
   }, [t]);
   return (
@@ -55,6 +56,13 @@ export const SearchFiltersAudio: React.FC<SearchFiltersAudioProps> = ({
               tempoFrom={params.tempoFrom}
               tempoTo={params.tempoTo}
               useTempo={params.useTempo}
+            />
+          </Grid>
+          <Grid item xs="auto" md={12}>
+            <DurationSlider
+              durationFrom={params.durationFrom}
+              durationTo={params.durationTo}
+              useDuration={params.useDuration}
             />
           </Grid>
         </Grid>
