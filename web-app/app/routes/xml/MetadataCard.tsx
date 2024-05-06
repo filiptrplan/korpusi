@@ -2,12 +2,12 @@ import { Card, CardContent, CardHeader, Typography } from "@mui/material";
 import { useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SongResult } from "~/src/DataTypes";
-import { SongContext } from "../song.$id";
+import { SongContext } from "../xml.$id";
 
 export const MetadataCard: React.FC = () => {
   const song = useContext(SongContext);
   const { metadata } = song;
-  const { t } = useTranslation("song");
+  const { t } = useTranslation("xml");
 
   // The values are the translation keys
   const metadataLabels: Partial<Record<keyof SongResult["metadata"], string>> =

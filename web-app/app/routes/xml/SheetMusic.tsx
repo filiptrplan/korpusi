@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { SongContext } from "../song.$id";
+import { SongContext } from "../xml.$id";
 import {
   Box,
   Checkbox,
@@ -13,7 +13,7 @@ import { OSMDMeasures } from "~/components/OSMDMeasures";
 
 export const SheetMusic: React.FC = () => {
   const song = useContext(SongContext);
-  const { t } = useTranslation("song");
+  const { t } = useTranslation("xml");
   const [range, setRange] = useState<[number, number]>([
     1,
     song.duration.measures,

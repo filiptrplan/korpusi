@@ -3,18 +3,18 @@ import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { elastic } from "~/services/Elastic";
 import { SongResult } from "~/src/DataTypes";
-import { MetadataCard } from "./song/MetadataCard";
+import { MetadataCard } from "./xml/MetadataCard";
 import { MAccordion } from "~/components/MAccordion";
 import { Grid, Stack } from "@mui/material";
-import { OutsideLinksCard } from "./song/OutsideLinksCard";
-import { BasicDataCard } from "./song/BasicDataCard";
+import { OutsideLinksCard } from "./xml/OutsideLinksCard";
+import { BasicDataCard } from "./xml/BasicDataCard";
 import { createContext } from "react";
 import { useTranslation } from "react-i18next";
-import { SheetMusic } from "./song/SheetMusic";
+import { SheetMusic } from "./xml/SheetMusic";
 import { ContourGraph } from "~/components/ContourGraph";
 
 export const handle = {
-  i18n: ["song"],
+  i18n: ["xml"],
 };
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -43,7 +43,7 @@ export const SongContext = createContext<SongResult>({} as SongResult);
 export default function Song() {
   const data = useLoaderData<typeof loader>();
   const song = data._source!;
-  const { t } = useTranslation("song");
+  const { t } = useTranslation("xml");
 
   return (
     <>

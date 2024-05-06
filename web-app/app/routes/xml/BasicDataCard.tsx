@@ -3,11 +3,11 @@ import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { InfoCard } from "~/components/InfoCard";
 import { useKeyTranslate } from "~/utils/notes";
-import { SongContext } from "../song.$id";
+import { SongContext } from "../xml.$id";
 
 export const BasicDataCard: React.FC = () => {
   const song = useContext(SongContext);
-  const { t } = useTranslation("song");
+  const { t } = useTranslation("xml");
   const key = useKeyTranslate();
   return (
     <Card

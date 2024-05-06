@@ -17,7 +17,7 @@ export const CompareTitle: React.FC<Props> = ({ song }) => {
         py: 1,
       }}
       onClick={() => {
-        navigate(`/song/${song._id}`);
+        navigate(`/xml/${song._id}`);
       }}
     >
       <Typography>{song._source!.metadata.title}</Typography>

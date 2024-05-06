@@ -85,7 +85,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
       <CardActionArea
         onClick={() => {
           navigate(
-            `/${type == SearchType.Audio ? "audio" : "song"}/${searchHit._id}`
+            `/${type == SearchType.Audio ? "audio" : "xml"}/${searchHit._id}`
           );
         }}
       >

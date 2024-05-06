@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 export const OutsideLinksCard: React.FC = () => {
-  const { t } = useTranslation("song");
+  const { t } = useTranslation("xml");
   return (
     <Card
       sx={{
