@@ -284,9 +284,9 @@ export default function Search() {
     }
   }, [showCompareList]);
 
-  const resetFields = () => {
+  const resetFields = (newSearchType?: SearchType) => {
     localStorage.removeItem("searchParams");
-    navigate("/search?searchType="+searchType);
+    navigate("/search?searchType=" + newSearchType ?? searchType);
   };
 
   const resultRowsXML = xmlHits.map((song) => {
@@ -391,15 +391,9 @@ export default function Search() {
                 variant="outlined"
                 onClick={() => {
                   if (searchType == SearchType.Audio) {
-                    setSearchParams((prev) => {
-                      prev.set("searchType", SearchType.XML.toString());
-                      return prev;
-                    });
+                    resetFields(SearchType.XML);
                   } else {
-                    setSearchParams((prev) => {
-                      prev.set("searchType", SearchType.Audio.toString());
-                      return prev;
-                    });
+                    resetFields(SearchType.Audio);
                   }
                 }}
               >
