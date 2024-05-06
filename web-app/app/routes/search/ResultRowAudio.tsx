@@ -11,6 +11,10 @@ export interface ResultRowAudioProps {
   corpusOptions?: { value: string; label: string }[];
 }
 
+const secondsToString = (num: number) => {
+  return `${Math.floor(num / 60)}:${Math.floor(num) % 60}`
+}
+
 export const ResultRowAudio: React.FC<ResultRowAudioProps> = ({
   audioHit,
   corpusOptions,
@@ -29,14 +33,12 @@ export const ResultRowAudio: React.FC<ResultRowAudioProps> = ({
       corpusOptions={corpusOptions}
     >
       <InfoCard
+        title={t("duration")}
+        value={secondsToString(song.sample_rate.file_info.duration)}
+        />
+      <InfoCard
         title={t("tempoBPM")}
         value={song.bpm.essentia_multifeature.bpm}
-        sx={{
-          display: {
-            xs: "none",
-            lg: "block",
-          },
-        }}
       />
     </ResultRow>
   );
