@@ -43,7 +43,7 @@ export const FilterGroupCollapse: React.FC<FilterGroupCollapseProps> = ({
         width: "100%",
         overflow: "hidden",
       }}
-      expanded={!isCollapsed}
+      expanded={isCollapsed == null ? !defaultCollapsed : !isCollapsed}
       onChange={() => {
         setIsCollapsed(!isCollapsed);
       }}
