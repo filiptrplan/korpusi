@@ -83,7 +83,7 @@ export interface SongResult extends Record<string, unknown> {
  * K - union type of string that are already known algorithms
  * T - type of the data point
  */
-type AudioFeature<K extends string, T> = Record<K | string, T>;
+type AudioFeature<K extends string, T> = Record<K, T>;
 
 export interface AudioResult extends Record<string, unknown> {
   corpus_id: string;
