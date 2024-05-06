@@ -12,7 +12,7 @@ export interface ResultRowAudioProps {
 }
 
 const secondsToString = (num: number) => {
-  return `${Math.floor(num / 60)}:${Math.floor(num) % 60}`
+  return `${Math.floor(num / 60)}:${(Math.floor(num) % 60).toString().padStart(2, '0')}`
 }
 
 export const ResultRowAudio: React.FC<ResultRowAudioProps> = ({
