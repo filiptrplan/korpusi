@@ -6,7 +6,7 @@ import { elastic } from "~/services/Elastic";
 import { noteToMidi } from "~/utils/notes";
 
 export const constructQueryXML = (
-  params: Record<string, string>,
+  params: Record<string, string>
 ): QueryDslQueryContainer => {
   const queries: QueryDslQueryContainer[] = [];
 
@@ -189,15 +189,34 @@ const constructCorpusQuery = (params: Record<string, string>) => {
 };
 
 export const constructQueryAudio = (
-  params: Record<string, string>,
+  params: Record<string, string>
 ): QueryDslQueryContainer => {
   const queries: QueryDslQueryContainer[] = [];
 
+  // METADATA
   const metadataQuery = constructMetadataQuery(params);
   if (metadataQuery) queries.push(metadataQuery);
 
+  // CORPUS
   const corpusQuery = constructCorpusQuery(params);
   if (corpusQuery) queries.push(corpusQuery);
+
+  /*
+  Note: in these queries we must use the query_string query because we may add new algorithms
+  in the future and want to match ALL the possible subkeys without changing the code
+   */
+  // TEMPO
+  if ("useTempo" in params && params.useTempo === "on") {
+    if ("tempoFrom" in params && "tempoTo" in params) {
+      const tempoFrom = parseInt(params.tempoFrom);
+      const tempoTo = parseInt(params.tempoTo);
+      queries.push({
+        query_string: {
+          query: `bpm.\\*.bpm:(>=${tempoFrom} AND <=${tempoTo})`
+        }
+      });
+    }
+  }
 
   return {
     bool: {

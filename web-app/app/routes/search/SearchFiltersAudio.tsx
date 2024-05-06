@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { FilterGroupCollapse } from "~/routes/search/FilterGroupCollapse";
-import { Stack } from "@mui/material";
+import { Grid, Stack } from "@mui/material";
 import { MetadataSelect } from "~/routes/search/MetadataSelect";
 import { CorpusSelect } from "~/routes/search/CorpusSelect";
 import { useMemo } from "react";
+import { TempoSlider } from "~/routes/search/TempoSlider";
 
 interface SearchFiltersAudioProps {
   params: Record<string, string>;
@@ -46,6 +47,17 @@ export const SearchFiltersAudio: React.FC<SearchFiltersAudioProps> = ({
           />
           <CorpusSelect corpus={params.corpus} corpusOptions={corpusOptions} />
         </Stack>
+      </FilterGroupCollapse>
+      <FilterGroupCollapse title={t("basicFilters")}>
+        <Grid container spacing={1}>
+          <Grid item xs="auto" md={12}>
+            <TempoSlider
+              tempoFrom={params.tempoFrom}
+              tempoTo={params.tempoTo}
+              useTempo={params.useTempo}
+            />
+          </Grid>
+        </Grid>
       </FilterGroupCollapse>
     </>
   );
