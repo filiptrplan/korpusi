@@ -39,5 +39,8 @@
     "switchToAudio": "Išči po zvočnih posnetkih",
     "switchToXML": "Išči po notnih zapisih",
     "noTitle": "Neznan naslov",
-    "noComposer": "Neznan skladatelj"
+    "noComposer": "Neznan skladatelj",
+    "durationSliderLabel": "Dolžina (sekunde)",
+    "useDuration": "Upoštevaj dolžino",
+    "duration": "Dolžina"
 }
