@@ -378,7 +378,7 @@ export default function Search() {
                   boxShadow: "none",
                 }}
                 variant="outlined"
-                onClick={resetFields}
+                onClick={() => resetFields()}
               >
                 {t("reset")}
               </Button>
