@@ -17,7 +17,6 @@ import { InfoCard } from "~/components/InfoCard";
 import { useTranslation } from "react-i18next";
 import { SearchType } from "~/routes/search";
 import { ReactNode } from "react";
-import { songsContext } from "~/routes/compare/CompareList";
 
 export interface ResultRowProps {
   searchHit: SearchHit<{ corpus_id: string } & unknown>;
@@ -72,16 +71,22 @@ export const ResultRow: React.FC<ResultRowProps> = ({
         overflow: "visible",
       }}
     >
-      <Box sx={{
-        marginTop:  -1,
-        marginLeft: 1,
-        position: "absolute",
-        backgroundColor: "background.paper",
-        paddingLeft: 1,
-        paddingRight: 1,
-      }}>
-        <Typography display="block" variant="caption">{searchHit._score?.toFixed(2)}</Typography>
-      </Box>
+      <Tooltip title={t("relevanceScore")}>
+        <Box
+          sx={{
+            marginTop: -1,
+            marginLeft: 1,
+            position: "absolute",
+            backgroundColor: "background.paper",
+            paddingLeft: 1,
+            paddingRight: 1,
+          }}
+        >
+          <Typography display="block" variant="caption">
+            {searchHit._score?.toFixed(2)}
+          </Typography>
+        </Box>
+      </Tooltip>
       <CardActionArea
         onClick={() => {
           navigate(

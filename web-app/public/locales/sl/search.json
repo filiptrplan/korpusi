@@ -42,5 +42,6 @@
     "noComposer": "Neznan skladatelj",
     "durationSliderLabel": "Dolžina (sekunde)",
     "useDuration": "Upoštevaj dolžino",
-    "duration": "Dolžina"
+    "duration": "Dolžina",
+    "relevanceScore": "Relevantnost poizvedbi"
 }
