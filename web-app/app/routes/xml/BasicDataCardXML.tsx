@@ -5,7 +5,7 @@ import { InfoCard } from "~/components/InfoCard";
 import { useKeyTranslate } from "~/utils/notes";
 import { SongContext } from "../xml.$id";
 
-export const BasicDataCard: React.FC = () => {
+export const BasicDataCardXML: React.FC = () => {
   const song = useContext(SongContext);
   const { t } = useTranslation("xml");
   const key = useKeyTranslate();
