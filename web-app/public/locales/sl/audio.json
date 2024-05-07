@@ -1,0 +1,11 @@
+{
+    "metadataCard": {
+        "title": "Metapodatki",
+        "titleSong": "Naslov",
+        "URL": "URL"
+    },
+    "basicDataCard": {
+        "title": "Osnovni podatki",
+        "duration": "Dolžina pesmi"
+    }
+}

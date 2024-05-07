@@ -3,18 +3,17 @@ import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { elastic } from "~/services/Elastic";
 import { AudioResult, SongResult } from "~/src/DataTypes";
-import { MetadataCardXML } from "./xml/MetadataCardXML";
 import { MAccordion } from "~/components/MAccordion";
 import { Grid, Stack } from "@mui/material";
-import { OutsideLinksCardXML } from "./xml/OutsideLinksCardXML";
-import { BasicDataCardXML } from "./xml/BasicDataCardXML";
 import { createContext } from "react";
 import { useTranslation } from "react-i18next";
 import { SheetMusic } from "./xml/SheetMusic";
 import { ContourGraph } from "~/components/ContourGraph";
+import { MetadataCardAudio } from "~/routes/audio/MetadataCardAudio";
+import { BasicDataCardAudio } from "~/routes/audio/BasicDataCardAudio";
 
 export const handle = {
-  i18n: ["xml"],
+  i18n: ["audio"],
 };
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -42,14 +41,18 @@ export const AudioContext = createContext<AudioResult>({} as AudioResult);
 
 export default function Song() {
   const data = useLoaderData<typeof loader>();
-  const song = data._source!;
-  const { t } = useTranslation("xml");
+  const audio = data._source!;
+  const { t } = useTranslation("audio");
 
   return (
     <>
-      <AudioContext.Provider value={song}>
+      <AudioContext.Provider value={audio}>
         <Grid container spacing={1}>
           <Grid item xs={12} md={6}>
+            <MetadataCardAudio />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <BasicDataCardAudio />
           </Grid>
         </Grid>
       </AudioContext.Provider>
