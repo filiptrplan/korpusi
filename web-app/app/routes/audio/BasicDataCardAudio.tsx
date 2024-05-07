@@ -23,6 +23,12 @@ export const BasicDataCardAudio: React.FC = () => {
               value={secondsToString(audio.sample_rate.file_info.duration)}
             />
           </Grid>
+          <Grid item>
+            <InfoCard
+              title={t("basicDataCard.tempo")}
+              value={audio.bpm.essentia_multifeature.bpm}
+            />
+          </Grid>
         </Grid>
       </CardContent>
     </Card>

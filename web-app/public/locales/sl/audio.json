@@ -6,6 +6,7 @@
     },
     "basicDataCard": {
         "title": "Osnovni podatki",
-        "duration": "Dolžina pesmi"
+        "duration": "Dolžina pesmi",
+        "tempo": "Tempo (dobe/min)"
     }
 }
