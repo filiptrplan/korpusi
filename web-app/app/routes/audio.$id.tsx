@@ -11,6 +11,7 @@ import { SheetMusic } from "./xml/SheetMusic";
 import { ContourGraph } from "~/components/ContourGraph";
 import { MetadataCardAudio } from "~/routes/audio/MetadataCardAudio";
 import { BasicDataCardAudio } from "~/routes/audio/BasicDataCardAudio";
+import { GraphAudio } from "~/routes/audio/GraphAudio";
 
 export const handle = {
   i18n: ["audio"],
@@ -53,6 +54,9 @@ export default function Song() {
           </Grid>
           <Grid item xs={12} md={6}>
             <BasicDataCardAudio />
+          </Grid>
+          <Grid item xs={12}>
+            <GraphAudio/>
           </Grid>
         </Grid>
       </AudioContext.Provider>

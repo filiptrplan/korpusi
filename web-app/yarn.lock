@@ -2700,6 +2700,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chartjs-plugin-annotation@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "chartjs-plugin-annotation@npm:3.0.1"
+  peerDependencies:
+    chart.js: ">=4.0.0"
+  checksum: 10/638550f92c6cc948205822f8b8fcfde20769d923a9bff26edd07f58ccfc6f48a456d8307f8cb837f16a7fe86a9c3646914649c77144337ea12d70e99916c9248
+  languageName: node
+  linkType: hard
+
 "chokidar@npm:^3.5.1, chokidar@npm:^3.5.3":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
@@ -5699,6 +5708,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^7.4.0"
     "@typescript-eslint/parser": "npm:^7.4.0"
     chart.js: "npm:^4.4.1"
+    chartjs-plugin-annotation: "npm:^3.0.1"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-react: "npm:^7.34.1"
