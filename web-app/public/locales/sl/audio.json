@@ -11,5 +11,10 @@
     },
     "displayBeatTicks": "Prikaži zaznane dobe",
     "displayChords": "Prikaži ocenjene akorde",
-    "spanInSeconds": "Razpon grafa (sekunde)"
+    "spanInSeconds": "Razpon grafa (sekunde)",
+    "unknownChord": "Neznano",
+    "voiceContour": "Tonska kontura glasu",
+    "instrumentalContour": "Tonska kontura spremljave",
+    "timeLabel": "Čas (min:sek)",
+    "hzLabel": "Višina tona (Hz)"
 }
