@@ -56,7 +56,9 @@ export default function Song() {
             <BasicDataCardAudio />
           </Grid>
           <Grid item xs={12}>
-            <GraphAudio/>
+            <MAccordion title={t("graphAudio.title")}>
+              <GraphAudio />
+            </MAccordion>
           </Grid>
         </Grid>
       </AudioContext.Provider>

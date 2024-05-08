@@ -102,7 +102,7 @@ export const GraphAudio: React.FC = () => {
         xMax: chord.end,
         backgroundColor: colorFromChordName(chord.name, 0.15),
         label: {
-          content: chord.name == "N" ? t("unknownChord") : chord.name,
+          content: chord.name == "N" ? t("graphAudio.unknownChord") : chord.name,
           display:
             // Display the label if the chord is big enough depending on the zoom
             (chord.end - chord.start) / (xRange[1] - xRange[0]) >= 0.03
@@ -134,11 +134,11 @@ export const GraphAudio: React.FC = () => {
     return [
       makePitchContourDataset(
         pesto.pitch_contour_hz_voice,
-        `${audio.metadata.title} - ${t("voiceContour")}`
+        `${audio.metadata.title} - ${t("graphAudio.voiceContour")}`
       ),
       makePitchContourDataset(
         pesto.pitch_contour_hz_instrumental,
-        `${audio.metadata.title} - ${t("instrumentalContour")}`
+        `${audio.metadata.title} - ${t("graphAudio.instrumentalContour")}`
       ),
     ];
   }, [audio.pitch_contour.pesto, t]);
@@ -157,7 +157,7 @@ export const GraphAudio: React.FC = () => {
     <>
       <FormGroup row>
         <FormControlLabel
-          label={t("displayBeatTicks")}
+          label={t("graphAudio.displayBeatTicks")}
           control={
             <Checkbox
               value={enableBeatTicks}
@@ -168,7 +168,7 @@ export const GraphAudio: React.FC = () => {
           }
         />
         <FormControlLabel
-          label={t("displayChords")}
+          label={t("graphAudio.displayChords")}
           control={
             <Checkbox
               value={enableChords}
@@ -181,7 +181,7 @@ export const GraphAudio: React.FC = () => {
       </FormGroup>
       <Stack direction="row" spacing={3} alignItems="center">
         <Typography id="span-seconds"noWrap flexShrink={0}>
-          {t("spanInSeconds")}
+          {t("graphAudio.spanInSeconds")}
         </Typography>
         <Slider
           value={xRange}
@@ -218,13 +218,13 @@ export const GraphAudio: React.FC = () => {
             y: {
               title: {
                 display: true,
-                text: t("hzLabel"),
+                text: t("graphAudio.hzLabel"),
               },
             },
             x: {
               title: {
                 display: true,
-                text: t("timeLabel"),
+                text: t("graphAudio.timeLabel"),
               },
               ticks: {
                 maxTicksLimit: 20,
