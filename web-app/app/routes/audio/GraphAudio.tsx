@@ -21,7 +21,14 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { chartColorsRGB, secondsToString } from "~/src/helpers";
-import { Checkbox, Slider, Stack, Typography } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Slider,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { CheckBox } from "@mui/icons-material";
 
 Chart.register(annotationPlugin);
@@ -141,35 +148,46 @@ export const GraphAudio: React.FC = () => {
 
   const makeAnnotations = () => {
     const annotations = [];
-    if(enableBeatTicks) annotations.push(...beatTickAnnotations);
-    if(enableChords) annotations.push(...chordAnnotations);
+    if (enableBeatTicks) annotations.push(...beatTickAnnotations);
+    if (enableChords) annotations.push(...chordAnnotations);
     return annotations;
-  }
+  };
 
   return (
     <>
-      <Stack direction="row" alignItems="center" spacing={2}>
-        <Stack direction="row" alignItems="center" spacing={0}>
-          <Typography>{t("displayBeatTicks")}</Typography>
-          <Checkbox value={enableBeatTicks} onChange={(e) => {
-            setEnableBeatTicks(e.target.checked)
-          }}/>
-        </Stack>
-        <Stack direction="row" alignItems="center" spacing={0}>
-          <Typography>{t("displayChords")}</Typography>
-          <Checkbox value={enableChords} onChange={(e) => {
-            setEnableChords(e.target.checked)
-          }}/>
-        </Stack>
-      </Stack>
+      <FormGroup row>
+        <FormControlLabel
+          label={t("displayBeatTicks")}
+          control={
+            <Checkbox
+              value={enableBeatTicks}
+              onChange={(e) => {
+                setEnableBeatTicks(e.target.checked);
+              }}
+            />
+          }
+        />
+        <FormControlLabel
+          label={t("displayChords")}
+          control={
+            <Checkbox
+              value={enableChords}
+              onChange={(e) => {
+                setEnableChords(e.target.checked);
+              }}
+            />
+          }
+        />
+      </FormGroup>
       <Stack direction="row" spacing={3} alignItems="center">
-        <Typography noWrap flexShrink={0}>
+        <Typography id="span-seconds"noWrap flexShrink={0}>
           {t("spanInSeconds")}
         </Typography>
         <Slider
           value={xRange}
           onChange={(_, v) => setXRange(v as number[])}
           valueLabelDisplay="auto"
+          aria-labelledby="span-seconds"
           min={0}
           max={duration}
         />
@@ -188,7 +206,7 @@ export const GraphAudio: React.FC = () => {
               enabled: true,
             },
             annotation: {
-              annotations: makeAnnotations()
+              annotations: makeAnnotations(),
             },
             decimation: {
               enabled: true,
