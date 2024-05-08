@@ -8,5 +8,8 @@
         "title": "Osnovni podatki",
         "duration": "Dolžina pesmi",
         "tempo": "Tempo (dobe/min)"
-    }
+    },
+    "displayBeatTicks": "Prikaži zaznane dobe",
+    "displayChords": "Prikaži ocenjene akorde",
+    "spanInSeconds": "Razpon grafa (sekunde)"
 }
