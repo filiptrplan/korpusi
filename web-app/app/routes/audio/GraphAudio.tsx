@@ -268,7 +268,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
     <>
       {audioResults.length > 1 && (
         <Stack direction="row" alignItems="center">
-          <Typography>Prikazane pesmi:</Typography>
+          <Typography>{t("graphAudio.selectedSongs")}</Typography>
           <FormGroup row>
             {audioResults.map((result, i) => {
               return (

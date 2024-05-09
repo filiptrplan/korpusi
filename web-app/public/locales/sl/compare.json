@@ -14,5 +14,7 @@
     "measureWidth": "Širina taktov",
     "contour": "Tonska kontura",
     "beat": "Zaporedna št. note",
-    "contourRange": "Razpon grafa"
+    "contourRange": "Razpon grafa",
+    "duration": "Dolžina",
+    "graphs": "Analiza"
 }

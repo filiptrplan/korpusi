@@ -18,6 +18,7 @@
         "voiceContour": "Tonska kontura glasu",
         "instrumentalContour": "Tonska kontura spremljave",
         "timeLabel": "Čas (min:sek)",
-        "hzLabel": "Višina tona (Hz)"
+        "hzLabel": "Višina tona (Hz)",
+        "selectedSongs": "Prikazane pesmi:"
     }
 }
