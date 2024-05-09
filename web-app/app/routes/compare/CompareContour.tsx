@@ -1,10 +1,10 @@
 import { useContext } from "react";
-import { songsContext } from "./CompareList";
 import { ContourGraph } from "~/components/ContourGraph";
 import { Box } from "@mui/material";
+import { CompareContext } from "~/routes/search";
 
 export const CompareContour: React.FC = () => {
-  const songs = useContext(songsContext);
+  const {xmlHits: songs} = useContext(CompareContext);
   return (
     <Box
       sx={{

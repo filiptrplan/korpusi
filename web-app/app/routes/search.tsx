@@ -16,7 +16,14 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import {
+  FormEvent,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { elastic } from "~/services/Elastic";
 import { AudioResult, SongResult } from "~/src/DataTypes";
 import {
@@ -43,6 +50,21 @@ import { ResultRowAudio } from "~/routes/search/ResultRowAudio";
 export const handle = {
   i18n: ["search", "compare"],
 };
+
+export enum SearchType {
+  Audio,
+  XML,
+}
+
+export const SearchTypeContext = createContext<SearchType>(SearchType.Audio);
+
+export const CompareContext = createContext<{
+  xmlHits: SearchHit<SongResult>[];
+  audioHits: SearchHit<AudioResult>[];
+}>({
+  audioHits: [],
+  xmlHits: [],
+});
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -90,14 +112,27 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if ("compareIds" in params) {
     compareIds = params.compareIds.split(",");
   }
-  const compareData = await elastic.search<SongResult>({
-    index: "songs",
-    query: {
-      ids: {
-        values: compareIds,
+
+  let compareData: SearchResponse<unknown>;
+  if (searchType == SearchType.Audio) {
+    compareData = await elastic.search<AudioResult>({
+      index: "audio",
+      query: {
+        ids: {
+          values: compareIds,
+        },
       },
-    },
-  });
+    });
+  } else {
+    compareData = await elastic.search<SongResult>({
+      index: "songs",
+      query: {
+        ids: {
+          values: compareIds,
+        },
+      },
+    });
+  }
 
   if ((compareData.hits.total as SearchTotalHits).value !== compareIds.length) {
     throw new Error("Not all ids found");
@@ -113,6 +148,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       hits: audioHits.hits.hits,
     },
     params,
+    compareData: {
+      xmlHits:
+        searchType == SearchType.XML
+          ? (compareData.hits.hits as unknown as SearchHit<SongResult>[])
+          : [],
+      audioHits:
+        searchType == SearchType.Audio
+          ? (compareData.hits.hits as unknown as SearchHit<AudioResult>[])
+          : [],
+    },
     availableCorpuses: await getAvailableCorpuses(),
     pagination: {
       total: totalPages,
@@ -127,65 +172,68 @@ export const CompareCollapseAndList: React.FC<{
   onClickAway: () => void;
   showCompareList: boolean;
   compareRef: React.MutableRefObject<HTMLDivElement | null>;
-  compareSongs: SearchHit<SongResult>[];
   onCompareClick: () => void;
+  compareData: {
+    xmlHits: SearchHit<SongResult>[];
+    audioHits: SearchHit<AudioResult>[];
+  };
 }> = ({
   compareRef,
-  compareSongs,
+  compareData,
   onClickAway,
   onCompareClick,
   showCompareList,
 }) => {
-  const showCompare = compareSongs.length > 0 && !showCompareList;
+  const searchType = useContext(SearchTypeContext);
+  const dataLength =
+    searchType == SearchType.Audio
+      ? compareData.audioHits.length
+      : compareData.xmlHits.length;
+  const showCompare = dataLength > 0 && !showCompareList;
+
   return (
-    <ClickAwayListener onClickAway={onClickAway}>
-      <Slide direction="up" in={showCompare || showCompareList}>
-        <Paper
-          sx={{
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 100,
-            px: {
-              xs: 0,
-              md: 3,
-            },
-            py: 2,
-          }}
-          elevation={3}
-        >
-          <Collapse in={showCompare} mountOnEnter timeout={700}>
-            <Box>
-              <Box ref={compareRef}>
-                <CompareOverlay
-                  songs={compareSongs}
-                  onCompareClick={onCompareClick}
-                />
+    <CompareContext.Provider value={compareData}>
+      <ClickAwayListener onClickAway={onClickAway}>
+        <Slide direction="up" in={showCompare || showCompareList}>
+          <Paper
+            sx={{
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 100,
+              px: {
+                xs: 0,
+                md: 3,
+              },
+              py: 2,
+            }}
+            elevation={3}
+          >
+            <Collapse in={showCompare} mountOnEnter timeout={700}>
+              <Box>
+                <Box ref={compareRef}>
+                  <CompareOverlay onCompareClick={onCompareClick} />
+                </Box>
               </Box>
-            </Box>
-          </Collapse>
-          <Collapse in={showCompareList} mountOnEnter timeout={700}>
-            <Container
-              sx={{
-                height: "calc(100vh - 64px - 10vh)",
-                overflowY: "auto",
-              }}
-              maxWidth="xl"
-            >
-              <CompareList songs={compareSongs} />
-            </Container>
-          </Collapse>
-        </Paper>
-      </Slide>
-    </ClickAwayListener>
+            </Collapse>
+            <Collapse in={showCompareList} mountOnEnter timeout={700}>
+              <Container
+                sx={{
+                  height: "calc(100vh - 64px - 10vh)",
+                  overflowY: "auto",
+                }}
+                maxWidth="xl"
+              >
+                <CompareList />
+              </Container>
+            </Collapse>
+          </Paper>
+        </Slide>
+      </ClickAwayListener>
+    </CompareContext.Provider>
   );
 };
-
-export enum SearchType {
-  Audio,
-  XML,
-}
 
 const searchTypeToString = (type: SearchType) => {
   switch (type) {
@@ -201,21 +249,21 @@ const stringToSearchType = (str: string): SearchType => {
 };
 
 export default function Search() {
-  const { audioData, xmlData, params, pagination, availableCorpuses } =
-    useLoaderData<typeof loader>();
-
   const {
-    hits: xmlHits,
-    compareHits: xmlCompareHits,
-    availableTimeSignatures,
-  } = xmlData;
+    audioData,
+    xmlData,
+    params,
+    pagination,
+    availableCorpuses,
+    compareData,
+  } = useLoaderData<typeof loader>();
+
+  const { hits: xmlHits, availableTimeSignatures } = xmlData;
 
   const { hits: audioHits } = audioData;
-  console.log(audioHits);
 
   const searchType: SearchType = stringToSearchType(params.searchType);
   const navigate = useNavigate();
-  const [, setSearchParams] = useSearchParams();
 
   // load the last search params from local storage
   useEffect(() => {
@@ -312,14 +360,14 @@ export default function Search() {
   const { t } = useTranslation("search");
 
   return (
-    <>
+    <SearchTypeContext.Provider value={searchType}>
       <CompareCollapseAndList
         onClickAway={() => {
           setShowCompareList(false);
         }}
         showCompareList={showCompareList}
         compareRef={compareRef}
-        compareSongs={xmlCompareHits}
+        compareData={compareData}
         onCompareClick={() => {
           setShowCompareList(true);
         }}
@@ -409,6 +457,6 @@ export default function Search() {
           }
         />
       </Box>
-    </>
+    </SearchTypeContext.Provider>
   );
 }

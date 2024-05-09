@@ -1,4 +1,4 @@
-import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
+import { SearchHit, SearchType } from "@elastic/elasticsearch/lib/api/types";
 import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
 import React, {
   createContext,
@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { SongResult } from "~/src/DataTypes";
+import { AudioResult, SongResult } from "~/src/DataTypes";
 import {
   CompareAmbitus,
   CompareKey,
@@ -19,25 +19,49 @@ import {
 } from "./BasicCompareRows";
 import { CompareSheetMusic } from "./CompareSheetMusic";
 import { CompareContour } from "./CompareContour";
+import { CompareContext } from "~/routes/search";
 
-export const songsContext = createContext<SearchHit<SongResult>[]>([]);
-
-interface CompareListProps {
-  songs: SearchHit<SongResult>[];
-}
-
-const CompareRow: React.FC<{
+const CompareRowXML: React.FC<{
   title: string;
   Component: React.FC<{ song: SearchHit<SongResult> }>;
 }> = ({ title, Component }) => {
-  const titleWidth = 2;
-  const songs = useContext(songsContext);
+  const { xmlHits } = useContext(CompareContext);
 
-  const songsComponents = songs.map((song) => {
+  const songsComponents = xmlHits.map((song) => {
     return <Component key={song._id} song={song} />;
   });
 
-  const width = Math.max(2, (12 - titleWidth) / songs.length);
+  return (
+    <CompareRow title={title} hitLength={xmlHits.length}>
+      {songsComponents}
+    </CompareRow>
+  );
+};
+
+const CompareRowAudio: React.FC<{
+  title: string;
+  Component: React.FC<{ audio: SearchHit<AudioResult> }>;
+}> = ({ title, Component }) => {
+  const { audioHits } = useContext(CompareContext);
+
+  const songsComponents = audioHits.map((song) => {
+    return <Component key={song._id} audio={song} />;
+  });
+
+  return (
+    <CompareRow title={title} hitLength={audioHits.length}>
+      {songsComponents}
+    </CompareRow>
+  );
+};
+
+const CompareRow: React.FC<{
+  title: string;
+  children: JSX.Element[];
+  hitLength: number;
+}> = ({ title, hitLength, children }) => {
+  const titleWidth = 2;
+  const width = Math.max(2, (12 - titleWidth) / hitLength);
 
   return (
     <Grid
@@ -59,12 +83,13 @@ const CompareRow: React.FC<{
           {title}
         </Typography>
       </Grid>
-      {songsComponents.map((component) => {
+      {children.map((component) => {
+        if (!component) return;
         return (
           <Grid
             item
             xs={width}
-            key={component.key}
+            key={component.key ?? "1"}
             sx={{
               minWidth: "200px",
             }}
@@ -118,7 +143,7 @@ const GridDivider: React.FC = () => {
   );
 };
 
-export const CompareList: React.FC<CompareListProps> = ({ songs }) => {
+export const CompareList: React.FC = () => {
   const { t } = useTranslation("compare");
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -146,45 +171,43 @@ export const CompareList: React.FC<CompareListProps> = ({ songs }) => {
         pt: 1,
       }}
     >
-      <songsContext.Provider value={songs}>
-        <scrollWidthContext.Provider value={scrollWidth}>
-          <Box
-            ref={scrollRef}
+      <scrollWidthContext.Provider value={scrollWidth}>
+        <Box
+          ref={scrollRef}
+          sx={{
+            overflowX: "auto",
+          }}
+        >
+          <Grid
             sx={{
-              overflowX: "auto",
+              width: "100%",
             }}
+            container
+            alignItems={"center"}
           >
-            <Grid
-              sx={{
-                width: "100%",
-              }}
-              container
-              alignItems={"center"}
-            >
-              <CompareRow title={t("songTitle")} Component={CompareTitle} />
-              <GridDivider />
-              <CompareRow title={t("tempo")} Component={CompareTempo} />
-              <GridDivider />
-              <CompareRow title={t("key")} Component={CompareKey} />
-              <GridDivider />
-              <CompareRow
-                title={t("timeSignature")}
-                Component={CompareTimeSignature}
-              />
-              <GridDivider />
-              <CompareRow title={t("ambitus")} Component={CompareAmbitus} />
-              <GridDivider />
-              <CompareRowCustom title={t("contour")}>
-                <CompareContour />
-              </CompareRowCustom>
-              <GridDivider />
-              <CompareRowCustom title={t("sheetMusic")}>
-                <CompareSheetMusic />
-              </CompareRowCustom>
-            </Grid>
-          </Box>
-        </scrollWidthContext.Provider>
-      </songsContext.Provider>
+            <CompareRowXML title={t("songTitle")} Component={CompareTitle} />
+            <GridDivider />
+            <CompareRowXML title={t("tempo")} Component={CompareTempo} />
+            <GridDivider />
+            <CompareRowXML title={t("key")} Component={CompareKey} />
+            <GridDivider />
+            <CompareRowXML
+              title={t("timeSignature")}
+              Component={CompareTimeSignature}
+            />
+            <GridDivider />
+            <CompareRowXML title={t("ambitus")} Component={CompareAmbitus} />
+            <GridDivider />
+            <CompareRowCustom title={t("contour")}>
+              <CompareContour />
+            </CompareRowCustom>
+            <GridDivider />
+            <CompareRowCustom title={t("sheetMusic")}>
+              <CompareSheetMusic />
+            </CompareRowCustom>
+          </Grid>
+        </Box>
+      </scrollWidthContext.Provider>
     </Stack>
   );
 };

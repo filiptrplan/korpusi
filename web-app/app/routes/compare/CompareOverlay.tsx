@@ -1,18 +1,23 @@
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { Button, Chip, Stack, Typography } from "@mui/material";
 import { useSearchParams } from "@remix-run/react";
+import { useContext } from "react";
 import { useTranslation } from "react-i18next";
-import { SongResult } from "~/src/DataTypes";
+import { CompareContext, SearchType, SearchTypeContext } from "~/routes/search";
 
 interface CompareOverlayProps {
   onCompareClick: () => void;
-  songs: SearchHit<SongResult>[];
 }
 
 export const CompareOverlay: React.FC<CompareOverlayProps> = ({
   onCompareClick,
-  songs,
 }) => {
+  const {xmlHits, audioHits} = useContext(CompareContext);
+  const searchType = useContext(SearchTypeContext);
+
+  const hits: SearchHit<{metadata: {title: string}} & unknown>[] = searchType == SearchType.Audio ? 
+    audioHits : xmlHits;
+
   const { t } = useTranslation("search");
   const [params, setParams] = useSearchParams();
   const compareIds = params.get("compareIds")?.split(",") || [];
@@ -24,12 +29,12 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
     });
   };
 
-  const onSongDelete = (song: SearchHit<SongResult>) => {
+  const onSongDelete = (song: SearchHit<{metadata: {title: string}} & unknown>) => {
     setParams((params) => {
       params.delete("compareIds");
       params.append(
         "compareIds",
-        compareIds.filter((id) => id !== song._id).join(","),
+        compareIds.filter((id) => id !== song._id).join(",")
       );
       return params;
     });
@@ -69,7 +74,7 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
         >
           {t("youHaveAddedNItemsToCompare", { count: compareIds.length })}
         </Typography>
-        {songs.map((song) => {
+        {hits.map((song) => {
           const title = song._source!.metadata.title;
           return (
             <Chip

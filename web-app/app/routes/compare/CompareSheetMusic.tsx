@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import { songsContext } from "./CompareList";
+import { CompareContext } from "~/routes/search";
 import { OSMDMeasures } from "~/components/OSMDMeasures";
 import { Grid, Slider, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 export const CompareSheetMusic: React.FC = () => {
-  const songs = useContext(songsContext);
+  const { xmlHits: songs } = useContext(CompareContext);
   const { t } = useTranslation("compare");
 
   const maxMeasures = songs.reduce((min, song) => {
