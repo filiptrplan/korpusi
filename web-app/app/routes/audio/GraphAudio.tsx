@@ -66,7 +66,20 @@ const colorFromChordName = (chordName: string, opacity: number) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-const getRGB = (i: number) => chartColorsRGB[i % chartColorsRGB.length];
+const calculateMovingAverage = (data: number[], windowSize: number): number[] => {
+  let index = windowSize - 1;
+  const length = data.length + 1;
+  const results = [];
+
+  while (index < length) {
+    index = index + 1;
+    const intervalSlice = data.slice(index - windowSize, index);
+    const sum = intervalSlice.reduce((prev, curr) => prev + curr, 0);
+    results.push(sum / windowSize);
+  }
+
+  return results;
+};
 
 interface GraphAudioProps {
   audioResults: AudioResult[];
@@ -121,6 +134,8 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
     });
   };
 
+  const [smoothing, setSmoothing] = useState(0);
+
   const makePitchContourData = (audio: AudioResult) => {
     const pesto = audio.pitch_contour.pesto;
     const timestep = pesto.time_step_ms;
@@ -128,9 +143,10 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
       datapoints: number[],
       title: string
     ): ChartDataset<"line"> => {
+      const datapointsSmoothed = calculateMovingAverage(datapoints, smoothing + 1);
       return {
         label: title,
-        data: datapoints.map((val, i) => {
+        data: datapointsSmoothed.map((val, i) => {
           return {
             x: i * (timestep / 1000),
             y: val,
@@ -181,8 +197,9 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
 
   const pitchContour = useMemo(
     () => audioResults.map(makePitchContourData),
-    [audioResults]
+    [audioResults, smoothing]
   );
+
 
   const charts = useMemo(() => {
     return selectedResultIndexes.map((ind) => {
@@ -216,7 +233,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
               decimation: {
                 enabled: true,
                 algorithm: "lttb",
-                threshold: 500,
+                threshold: 100,
                 samples: 500,
               },
             },
@@ -262,6 +279,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
     chordAnnotations,
     beatTickAnnotations,
     pitchContour,
+    smoothing,
   ]);
 
   return (
@@ -321,12 +339,27 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
           onChange={(_, v) => {
             const min = (v as number[])[0];
             const max = (v as number[])[1];
-            setXRange([min, Math.max(max, min+5)])
+            setXRange([min, Math.max(max, min + 5)]);
           }}
           valueLabelDisplay="auto"
           aria-labelledby="span-seconds"
           min={0}
           max={duration}
+        />
+      </Stack>
+      <Stack direction="row" spacing={3} alignItems="center">
+        <Typography id="smoothing" noWrap flexShrink={0}>
+          {t("graphAudio.smoothing")}
+        </Typography>
+        <Slider
+          value={smoothing}
+          onChange={(_, v) => {
+            setSmoothing(v as number);
+          }}
+          valueLabelDisplay="auto"
+          aria-labelledby="smoothing"
+          min={0}
+          max={100}
         />
       </Stack>
       {charts}
