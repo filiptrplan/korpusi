@@ -8,7 +8,7 @@ interface Props {
   song: SearchHit<SongResult>;
 }
 
-export const CompareTitle: React.FC<Props> = ({ song }) => {
+export const CompareTitleXML: React.FC<Props> = ({ song }) => {
   const navigate = useNavigate();
   return (
     <CardActionArea
@@ -25,24 +25,24 @@ export const CompareTitle: React.FC<Props> = ({ song }) => {
   );
 };
 
-export const CompareTempo: React.FC<Props> = ({ song }) => {
+export const CompareTempoXML: React.FC<Props> = ({ song }) => {
   const tempo = song._source!.tempo;
   return <Typography>{tempo ?? "-"}</Typography>;
 };
 
-export const CompareKey: React.FC<Props> = ({ song }) => {
+export const CompareKeyXML: React.FC<Props> = ({ song }) => {
   const { t } = useTranslation("search");
   const key = song._source!.key.most_certain_key;
   const keyString = t(key);
   return <Typography>{key ? keyString : "-"}</Typography>;
 };
 
-export const CompareTimeSignature: React.FC<Props> = ({ song }) => {
+export const CompareTimeSignatureXML: React.FC<Props> = ({ song }) => {
   const timeSignature = song._source!.time_signature;
   return <Typography>{timeSignature ?? "-"}</Typography>;
 };
 
-export const CompareAmbitus: React.FC<Props> = ({ song }) => {
+export const CompareAmbitusXML: React.FC<Props> = ({ song }) => {
   const ambitus = song._source!.ambitus.ambitus_semitones;
   return <Typography>{ambitus ?? "-"}</Typography>;
 };

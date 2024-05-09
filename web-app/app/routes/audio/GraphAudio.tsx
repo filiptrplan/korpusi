@@ -1,14 +1,10 @@
 import { useContext, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AudioContext } from "~/routes/audio.$id";
-import annotationPlugin, {
-  AnnotationOptions,
-  AnnotationPluginOptions,
-} from "chartjs-plugin-annotation";
+import annotationPlugin, { AnnotationOptions } from "chartjs-plugin-annotation";
 import {
   CategoryScale,
   Chart,
-  ChartData,
   ChartDataset,
   Colors,
   Decimation,
@@ -25,11 +21,13 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  MenuItem,
+  Select,
   Slider,
   Stack,
   Typography,
 } from "@mui/material";
-import { CheckBox } from "@mui/icons-material";
+import { AudioResult } from "~/src/DataTypes";
 
 Chart.register(annotationPlugin);
 Chart.register(
@@ -68,26 +66,34 @@ const colorFromChordName = (chordName: string, opacity: number) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-export const GraphAudio: React.FC = () => {
-  const audio = useContext(AudioContext);
-  const duration = audio.sample_rate.file_info.duration;
+const getRGB = (i: number) => chartColorsRGB[i % chartColorsRGB.length];
+
+interface GraphAudioProps {
+  audioResults: AudioResult[];
+}
+export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
+  // get longest duration
+  const duration = audioResults
+    .map((x) => x.sample_rate.file_info.duration)
+    .reduce((prev, curr) => Math.max(prev, curr));
+
   const { t } = useTranslation("audio");
   const [xRange, setXRange] = useState([0, duration]);
 
-  const beatTickAnnotations = useMemo<AnnotationOptions[]>(() => {
+  const makeBeatTickAnnotations = (audio: AudioResult): AnnotationOptions[] => {
     const beatTicks = audio.bpm.essentia_multifeature.beat_ticks;
     return beatTicks.map((tick) => {
       return {
         type: "line",
         xMin: tick,
         xMax: tick,
-        borderColor: "rgba(255,0,0,0.3)",
-        borderWidth: 1,
+        borderColor: "rgba(255, 0, 0, 0.2)",
+        borderWidth: 2,
       };
     });
-  }, [audio.bpm.essentia_multifeature.beat_ticks]);
+  };
 
-  const chordAnnotations = useMemo<AnnotationOptions[]>(() => {
+  const makeChordAnnotations = (audio: AudioResult): AnnotationOptions[] => {
     const chords = audio.chords.autochord.chord_start.map((start, i) => {
       return {
         start,
@@ -102,7 +108,8 @@ export const GraphAudio: React.FC = () => {
         xMax: chord.end,
         backgroundColor: colorFromChordName(chord.name, 0.15),
         label: {
-          content: chord.name == "N" ? t("graphAudio.unknownChord") : chord.name,
+          content:
+            chord.name == "N" ? t("graphAudio.unknownChord") : chord.name,
           display:
             // Display the label if the chord is big enough depending on the zoom
             (chord.end - chord.start) / (xRange[1] - xRange[0]) >= 0.03
@@ -112,9 +119,9 @@ export const GraphAudio: React.FC = () => {
         },
       };
     });
-  }, [audio.chords.autochord, xRange, t]);
+  };
 
-  const pitchContourData = useMemo<ChartDataset<"line">[]>(() => {
+  const makePitchContourData = (audio: AudioResult) => {
     const pesto = audio.pitch_contour.pesto;
     const timestep = pesto.time_step_ms;
     const makePitchContourDataset = (
@@ -141,20 +148,146 @@ export const GraphAudio: React.FC = () => {
         `${audio.metadata.title} - ${t("graphAudio.instrumentalContour")}`
       ),
     ];
-  }, [audio.pitch_contour.pesto, t]);
+  };
 
   const [enableBeatTicks, setEnableBeatTicks] = useState(false);
   const [enableChords, setEnableChords] = useState(false);
 
-  const makeAnnotations = () => {
-    const annotations = [];
-    if (enableBeatTicks) annotations.push(...beatTickAnnotations);
-    if (enableChords) annotations.push(...chordAnnotations);
-    return annotations;
+  const [selectedResultIndexes, setSelectedResultIndexes] = useState<number[]>(
+    Array.from({ length: audioResults.length }).map((_, i) => i)
+  );
+
+  const toggleIndex = (i: number, checked: boolean) => {
+    if (checked) {
+      setSelectedResultIndexes((prev) => [...prev, i]);
+    } else {
+      setSelectedResultIndexes((prev) => {
+        const newSet = [...new Set(prev)];
+        newSet.splice(newSet.indexOf(i), 1);
+        return newSet;
+      });
+    }
   };
+
+  const beatTickAnnotations = useMemo(
+    () => audioResults.map(makeBeatTickAnnotations),
+    [audioResults]
+  );
+
+  const chordAnnotations = useMemo(
+    () => audioResults.map(makeChordAnnotations),
+    [audioResults]
+  );
+
+  const pitchContour = useMemo(
+    () => audioResults.map(makePitchContourData),
+    [audioResults]
+  );
+
+  const charts = useMemo(() => {
+    return selectedResultIndexes.map((ind) => {
+      const annotations: AnnotationOptions[] = [];
+
+      if (enableBeatTicks) {
+        annotations.push(...beatTickAnnotations[ind]);
+      }
+      if (enableChords) {
+        annotations.push(...chordAnnotations[ind]);
+      }
+
+      return (
+        <Line
+          key={ind}
+          data={{
+            datasets: pitchContour[ind],
+          }}
+          options={{
+            parsing: false,
+            plugins: {
+              legend: {
+                position: "top" as const,
+              },
+              colors: {
+                enabled: true,
+              },
+              annotation: {
+                annotations: annotations,
+              },
+              decimation: {
+                enabled: true,
+                algorithm: "lttb",
+                threshold: 500,
+                samples: 500,
+              },
+            },
+            indexAxis: "x",
+            scales: {
+              y: {
+                title: {
+                  display: true,
+                  text: t("graphAudio.hzLabel"),
+                },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: t("graphAudio.timeLabel"),
+                },
+                ticks: {
+                  maxTicksLimit: 20,
+                  autoSkip: true,
+                  callback: (x) => {
+                    if (typeof x === "string") {
+                      return x;
+                    } else {
+                      return secondsToString(x);
+                    }
+                  },
+                },
+                type: "linear",
+                min: xRange[0],
+                max: xRange[1],
+              },
+            },
+          }}
+        />
+      );
+    });
+  }, [
+    enableBeatTicks,
+    enableChords,
+    selectedResultIndexes,
+    xRange,
+    setXRange,
+    chordAnnotations,
+    beatTickAnnotations,
+    pitchContour,
+  ]);
 
   return (
     <>
+      {audioResults.length > 1 && (
+        <Stack direction="row" alignItems="center">
+          <Typography>Prikazane pesmi:</Typography>
+          <FormGroup row>
+            {audioResults.map((result, i) => {
+              return (
+                <FormControlLabel
+                  key={i}
+                  label={result.metadata.title}
+                  control={
+                    <Checkbox
+                      defaultChecked={true}
+                      value={i in selectedResultIndexes}
+                      onChange={(e) => toggleIndex(i, e.target.checked)}
+                    />
+                  }
+                />
+              );
+            })}
+          </FormGroup>
+        </Stack>
+      )}
       <FormGroup row>
         <FormControlLabel
           label={t("graphAudio.displayBeatTicks")}
@@ -180,70 +313,23 @@ export const GraphAudio: React.FC = () => {
         />
       </FormGroup>
       <Stack direction="row" spacing={3} alignItems="center">
-        <Typography id="span-seconds"noWrap flexShrink={0}>
+        <Typography id="span-seconds" noWrap flexShrink={0}>
           {t("graphAudio.spanInSeconds")}
         </Typography>
         <Slider
           value={xRange}
-          onChange={(_, v) => setXRange(v as number[])}
+          onChange={(_, v) => {
+            const min = (v as number[])[0];
+            const max = (v as number[])[1];
+            setXRange([min, Math.max(max, min+5)])
+          }}
           valueLabelDisplay="auto"
           aria-labelledby="span-seconds"
           min={0}
           max={duration}
         />
       </Stack>
-      <Line
-        data={{
-          datasets: [...pitchContourData],
-        }}
-        options={{
-          parsing: false,
-          plugins: {
-            legend: {
-              position: "top" as const,
-            },
-            colors: {
-              enabled: true,
-            },
-            annotation: {
-              annotations: makeAnnotations(),
-            },
-            decimation: {
-              enabled: true,
-              algorithm: "lttb",
-              threshold: 500,
-            },
-          },
-          scales: {
-            y: {
-              title: {
-                display: true,
-                text: t("graphAudio.hzLabel"),
-              },
-            },
-            x: {
-              title: {
-                display: true,
-                text: t("graphAudio.timeLabel"),
-              },
-              ticks: {
-                maxTicksLimit: 20,
-                autoSkip: true,
-                callback: (x) => {
-                  if (typeof x === "string") {
-                    return x;
-                  } else {
-                    return secondsToString(x);
-                  }
-                },
-              },
-              type: "linear",
-              min: xRange[0],
-              max: xRange[1],
-            },
-          },
-        }}
-      />
+      {charts}
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
-import { Button, Chip, Stack, Typography } from "@mui/material";
+import { Alert, Button, Chip, Stack, Tooltip, Typography } from "@mui/material";
 import { useSearchParams } from "@remix-run/react";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,11 +12,11 @@ interface CompareOverlayProps {
 export const CompareOverlay: React.FC<CompareOverlayProps> = ({
   onCompareClick,
 }) => {
-  const {xmlHits, audioHits} = useContext(CompareContext);
+  const { xmlHits, audioHits } = useContext(CompareContext);
   const searchType = useContext(SearchTypeContext);
 
-  const hits: SearchHit<{metadata: {title: string}} & unknown>[] = searchType == SearchType.Audio ? 
-    audioHits : xmlHits;
+  const hits: SearchHit<{ metadata: { title: string } } & unknown>[] =
+    searchType == SearchType.Audio ? audioHits : xmlHits;
 
   const { t } = useTranslation("search");
   const [params, setParams] = useSearchParams();
@@ -29,7 +29,9 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
     });
   };
 
-  const onSongDelete = (song: SearchHit<{metadata: {title: string}} & unknown>) => {
+  const onSongDelete = (
+    song: SearchHit<{ metadata: { title: string } } & unknown>
+  ) => {
     setParams((params) => {
       params.delete("compareIds");
       params.append(
@@ -39,6 +41,9 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
       return params;
     });
   };
+
+  const compareDisabled =
+    compareIds.length < 2 || compareIds.length !== hits.length;
 
   return (
     <Stack
@@ -76,13 +81,16 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
         </Typography>
         {hits.map((song) => {
           const title = song._source!.metadata.title;
+          const truncated =
+            title.length < 20 ? title : title.substring(0, 20) + "...";
           return (
-            <Chip
-              key={title}
-              label={title}
-              variant="outlined"
-              onDelete={() => onSongDelete(song)}
-            />
+            <Tooltip key={title} title={title.length > 20 ? title : ""}>
+              <Chip
+                label={truncated}
+                variant="outlined"
+                onDelete={() => onSongDelete(song)}
+              />
+            </Tooltip>
           );
         })}
       </Stack>
@@ -102,7 +110,7 @@ export const CompareOverlay: React.FC<CompareOverlayProps> = ({
         <Button
           variant="contained"
           onClick={onCompareClick}
-          disabled={compareIds.length < 2}
+          disabled={compareDisabled}
         >
           {t("compare")}
         </Button>

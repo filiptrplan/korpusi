@@ -1,4 +1,4 @@
-import { SearchHit, SearchType } from "@elastic/elasticsearch/lib/api/types";
+import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
 import React, {
   createContext,
@@ -11,15 +11,17 @@ import React, {
 import { useTranslation } from "react-i18next";
 import { AudioResult, SongResult } from "~/src/DataTypes";
 import {
-  CompareAmbitus,
-  CompareKey,
-  CompareTempo,
-  CompareTimeSignature,
-  CompareTitle,
-} from "./BasicCompareRows";
+  CompareAmbitusXML,
+  CompareKeyXML,
+  CompareTempoXML,
+  CompareTimeSignatureXML,
+  CompareTitleXML,
+} from "./BasicCompareRowsXML";
 import { CompareSheetMusic } from "./CompareSheetMusic";
 import { CompareContour } from "./CompareContour";
-import { CompareContext } from "~/routes/search";
+import { CompareContext, SearchType, SearchTypeContext } from "~/routes/search";
+import { CompareDurationAudio, CompareTempoAudio, CompareTitleAudio } from "~/routes/compare/BasicCompareRowsAudio";
+import { CompareAudioGraph } from "~/routes/compare/CompareAudioGraph";
 
 const CompareRowXML: React.FC<{
   title: string;
@@ -143,11 +145,53 @@ const GridDivider: React.FC = () => {
   );
 };
 
-export const CompareList: React.FC = () => {
+const CompareRowListXML: React.FC = () => {
   const { t } = useTranslation("compare");
+  return (
+    <>
+      <CompareRowXML title={t("songTitle")} Component={CompareTitleXML} />
+      <GridDivider />
+      <CompareRowXML title={t("tempo")} Component={CompareTempoXML} />
+      <GridDivider />
+      <CompareRowXML title={t("key")} Component={CompareKeyXML} />
+      <GridDivider />
+      <CompareRowXML
+        title={t("timeSignature")}
+        Component={CompareTimeSignatureXML}
+      />
+      <GridDivider />
+      <CompareRowXML title={t("ambitus")} Component={CompareAmbitusXML} />
+      <GridDivider />
+      <CompareRowCustom title={t("contour")}>
+        <CompareContour />
+      </CompareRowCustom>
+      <GridDivider />
+      <CompareRowCustom title={t("sheetMusic")}>
+        <CompareSheetMusic />
+      </CompareRowCustom>
+    </>
+  );
+};
 
+const CompareRowListAudio: React.FC = () => {
+  const {t } = useTranslation("compare");
+  return <>
+    <CompareRowAudio title={t("songTitle")} Component={CompareTitleAudio}/>
+    <GridDivider/>
+    <CompareRowAudio title={t("tempo")} Component={CompareTempoAudio}/>
+    <GridDivider/>
+    <CompareRowAudio title={t("duration")} Component={CompareDurationAudio}/>
+    <GridDivider/>
+    <CompareRowCustom title={t("graphs")}>
+      <CompareAudioGraph />
+    </CompareRowCustom>
+  </>;
+}
+
+export const CompareList: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollWidth, setScrollWidth] = useState<number | string>("100%");
+  const searchType = useContext(SearchTypeContext);
 
   // These are here so the divider resize properly on resize of the window
   useEffect(() => {
@@ -185,26 +229,7 @@ export const CompareList: React.FC = () => {
             container
             alignItems={"center"}
           >
-            <CompareRowXML title={t("songTitle")} Component={CompareTitle} />
-            <GridDivider />
-            <CompareRowXML title={t("tempo")} Component={CompareTempo} />
-            <GridDivider />
-            <CompareRowXML title={t("key")} Component={CompareKey} />
-            <GridDivider />
-            <CompareRowXML
-              title={t("timeSignature")}
-              Component={CompareTimeSignature}
-            />
-            <GridDivider />
-            <CompareRowXML title={t("ambitus")} Component={CompareAmbitus} />
-            <GridDivider />
-            <CompareRowCustom title={t("contour")}>
-              <CompareContour />
-            </CompareRowCustom>
-            <GridDivider />
-            <CompareRowCustom title={t("sheetMusic")}>
-              <CompareSheetMusic />
-            </CompareRowCustom>
+            {searchType == SearchType.Audio ? <CompareRowListAudio /> : <CompareRowListXML />}
           </Grid>
         </Box>
       </scrollWidthContext.Provider>

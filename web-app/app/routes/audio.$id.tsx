@@ -2,13 +2,11 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { elastic } from "~/services/Elastic";
-import { AudioResult, SongResult } from "~/src/DataTypes";
+import { AudioResult } from "~/src/DataTypes";
 import { MAccordion } from "~/components/MAccordion";
-import { Grid, Stack } from "@mui/material";
+import { Grid } from "@mui/material";
 import { createContext } from "react";
 import { useTranslation } from "react-i18next";
-import { SheetMusic } from "./xml/SheetMusic";
-import { ContourGraph } from "~/components/ContourGraph";
 import { MetadataCardAudio } from "~/routes/audio/MetadataCardAudio";
 import { BasicDataCardAudio } from "~/routes/audio/BasicDataCardAudio";
 import { GraphAudio } from "~/routes/audio/GraphAudio";
@@ -57,7 +55,7 @@ export default function Song() {
           </Grid>
           <Grid item xs={12}>
             <MAccordion title={t("graphAudio.title")}>
-              <GraphAudio />
+              <GraphAudio audioResults={[audio]}/>
             </MAccordion>
           </Grid>
         </Grid>
