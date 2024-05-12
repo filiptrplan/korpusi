@@ -192,7 +192,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
 
   const chordAnnotations = useMemo(
     () => audioResults.map(makeChordAnnotations),
-    [audioResults]
+    [audioResults, xRange]
   );
 
   const pitchContour = useMemo(
