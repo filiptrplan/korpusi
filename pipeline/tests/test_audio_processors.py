@@ -5,6 +5,7 @@ from processors.audio_processors import (
     AudioBPMProcessor,
     AudioPitchContourProcessor,
     AudioChordProcessor,
+    AudioRMSProcessor,
 )
 
 
@@ -30,4 +31,8 @@ class TestAudioProcessors:
 
     def test_audio_chord_processor(self, snapshot):
         audio_chord_processor = AudioChordProcessor(song())
+        assert audio_chord_processor.process() == snapshot
+
+    def test_audio_rms_processor(self, snapshot):
+        audio_chord_processor = AudioRMSProcessor(song())
         assert audio_chord_processor.process() == snapshot

@@ -180,6 +180,60 @@ class AudioChordProcessor(AudioProcessor):
         }
 
 
+class AudioRMSProcessor(AudioProcessor):
+    def __init__(self, song: any):
+        super().__init__(song, "rms", "loudness")
+        self.mapping = {
+            "properties": {
+                "loudness_total": {"type": "float"},
+                "loudness_vocals": {"type": "float"},
+                "loudness_instrumental": {"type": "float"},
+                "timestep_seconds": {"type": "float"},
+            }
+        }
+
+    def rms(self, song):
+        import essentia.standard as es
+        import soundfile
+
+        file = soundfile.SoundFile(song)
+
+        frame_size = 2048
+        hop_size = 1024
+        sample_rate = file.samplerate
+
+        loader = es.MonoLoader(filename=song, sampleRate=sample_rate)
+        audio = loader()
+
+        rms = es.RMS()
+        rms_values = []
+
+        for frame in es.FrameGenerator(audio, frameSize=frame_size, hopSize=hop_size):
+            rms_values.append(rms(frame))
+
+        rms_timestep_seconds = hop_size / sample_rate
+
+        return (rms_values, rms_timestep_seconds)
+
+    def process(self):
+        file_extension = self.song.split(".")[-1]
+        rest_of_path = self.song[: -len(file_extension) - 1]
+
+        voice_path = rest_of_path + ".vocals.mp3"
+        instrumental_path = rest_of_path + ".accompaniment.mp3"
+
+        (rms_values_total, timestep) = self.rms(self.song)
+        (rms_values_vocals, _) = self.rms(voice_path)
+        (rms_values_instrumental, _) = self.rms(instrumental_path)
+
+        return {
+            "loudness_total": rms_values_total,
+            "loudness_vocals": rms_values_vocals,
+            "loudness_instrumental": rms_values_instrumental,
+            "timestep_seconds": timestep,
+        }
+
+
 def round_floats(o):
     if isinstance(o, float):
         return round(o, 2)
