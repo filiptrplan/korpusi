@@ -1,4 +1,4 @@
-import { AppBar, Button, Stack, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Stack, Toolbar } from "@mui/material";
 import { Link } from "@remix-run/react";
 
 export default function Navigation() {
