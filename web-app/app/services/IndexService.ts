@@ -1,5 +1,7 @@
 import {
   AggregationsCardinalityAggregate,
+  AggregationsHistogramAggregate,
+  AggregationsHistogramBucket,
   AggregationsStatsAggregate,
   AggregationsStringTermsAggregate,
   AggregationsStringTermsBucket,
@@ -31,6 +33,25 @@ const getCorpusName = async (corpusId: string): Promise<string> => {
 
   const corpusName = corpusNameHits._source?.corpus_name;
   return corpusName ?? "";
+};
+
+export const getCorpusIdsFromIndex = async (index: "audio" | "songs") => {
+  const corpuses = await elastic.search({
+    index: index,
+    aggs: {
+      per_corpus: {
+        terms: {
+          field: "corpus_id",
+        },
+      },
+    },
+  });
+
+  const aggregates = (
+    corpuses.aggregations?.per_corpus as AggregationsStringTermsAggregate
+  ).buckets as AggregationsStringTermsBucket[];
+
+  return aggregates.map((x) => x.key);
 };
 
 export const aggregateCorpusXML = async (corpusId: string) => {
@@ -87,4 +108,36 @@ export const aggregateCorpusXML = async (corpusId: string) => {
   };
 };
 
+export const aggregateCorpusAudio = async (corpusId: string) => {
+  const corpus = await elastic.search({
+    index: "audio",
+    size: 0,
+    aggs: {
+      tempo_buckets: {
+        histogram: {
+          field: "bpm.essentia_multifeature.bpm",
+          interval: 5,
+          min_doc_count: 5,
+          extended_bounds: {
+            min: 50,
+            max: 200,
+          },
+        },
+      },
+    },
+  });
+
+  return {
+    corpusId,
+    corpusName: await getCorpusName(corpusId),
+    songCount: (await getCorpusCount(corpusId, "audio")).count,
+    tempoBuckets: (
+      corpus.aggregations?.tempo_buckets as AggregationsHistogramAggregate
+    ).buckets as AggregationsHistogramBucket[]
+  };
+};
+
 export type CorpusAggregateXML = Awaited<ReturnType<typeof aggregateCorpusXML>>;
+export type CorpusAggregateAudio = Awaited<
+  ReturnType<typeof aggregateCorpusAudio>
+>;

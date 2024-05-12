@@ -29,11 +29,11 @@ ChartJS.register(
   Colors,
 );
 
-interface CorpusAccordionProps {
+interface CorpusAccordionXMLProps {
   corpus: CorpusAggregateXML;
 }
 
-export const CorpusAccordionXML: React.FC<CorpusAccordionProps> = ({
+export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
   corpus,
 }) => {
   const { t } = useTranslation("index");

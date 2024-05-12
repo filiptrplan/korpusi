@@ -1,17 +1,19 @@
-import { Grid, Link, Typography } from "@mui/material";
+import { Grid, Link, Stack, Typography } from "@mui/material";
 import { Trans, useTranslation } from "react-i18next";
 import { useLoaderData } from "@remix-run/react";
 import { InfoCard } from "~/components/InfoCard";
 import { LoaderFunction } from "@remix-run/server-runtime";
 import { elastic } from "~/services/Elastic";
-import { AggregationsStringTermsAggregate } from "@elastic/elasticsearch/lib/api/typesWithBodyKey";
-import { AggregationsStringTermsBucket } from "@elastic/elasticsearch/lib/api/types";
 import { CorpusAccordionXML } from "./index/CorpusAccordionXML";
 import { MAccordion } from "~/components/MAccordion";
 import {
+  CorpusAggregateAudio,
   CorpusAggregateXML,
+  aggregateCorpusAudio,
   aggregateCorpusXML,
+  getCorpusIdsFromIndex,
 } from "~/services/IndexService";
+import { CorpusAccordionAudio } from "~/routes/index/CorpusAccordionAudio";
 
 export const handle = {
   i18n: "index",
@@ -31,42 +33,45 @@ export const loader: LoaderFunction = async () => {
     index: "corpuses",
   });
 
-  const perCorpusCount = await elastic.search({
-    index: "songs",
-    aggs: {
-      per_corpus: {
-        terms: {
-          field: "corpus_id",
-        },
-      },
-    },
-  });
+  const songCorpusIds = await getCorpusIdsFromIndex("songs");
+  const audioCorpusIds = await getCorpusIdsFromIndex("audio");
 
-  const perCorpusAggregate = (
-    perCorpusCount.aggregations?.per_corpus as AggregationsStringTermsAggregate
-  ).buckets as AggregationsStringTermsBucket[];
-
-  const allCorpusIds = perCorpusAggregate.map((x) => x.key);
-  const corpusAggregates = await Promise.all<
+  const corpusAggregatesXML = await Promise.all<
     ReturnType<typeof aggregateCorpusXML>
-  >(allCorpusIds.map((corpusId) => aggregateCorpusXML(corpusId)));
+  >(songCorpusIds.map((corpusId) => aggregateCorpusXML(corpusId)));
+
+  const corpusAggregatesAudio = await Promise.all<
+    ReturnType<typeof aggregateCorpusAudio>
+  >(audioCorpusIds.map((corpusId) => aggregateCorpusAudio(corpusId)));
 
   return {
     allSongsCount: allDocumentsCount,
     allCorpusesCount: allCorpusesCount.count,
-    perCorpusCount: perCorpusAggregate,
-    corpusAggregates,
+    corpusAggregatesXML,
+    corpusAggregatesAudio,
   };
 };
 
 export default function Index() {
-  const { allSongsCount, allCorpusesCount, corpusAggregates } =
-    useLoaderData<typeof loader>();
+  const {
+    allSongsCount,
+    allCorpusesCount,
+    corpusAggregatesXML,
+    corpusAggregatesAudio,
+  } = useLoaderData<typeof loader>();
   const { t } = useTranslation("index");
 
-  const xmlAggregates = corpusAggregates.map((corpus: CorpusAggregateXML) => (
-    <CorpusAccordionXML key={corpus.corpusId} corpus={corpus} />
-  ));
+  const xmlAggregates = corpusAggregatesXML.map(
+    (corpus: CorpusAggregateXML) => (
+      <CorpusAccordionXML key={corpus.corpusId} corpus={corpus} />
+    )
+  );
+
+  const audioAggregates = corpusAggregatesAudio.map(
+    (corpus: CorpusAggregateAudio) => (
+      <CorpusAccordionAudio key={corpus.corpusId} corpus={corpus} />
+    )
+  );
 
   return (
     <>
@@ -100,7 +105,10 @@ export default function Index() {
           </Grid>
         </Grid>
       </MAccordion>
-      {xmlAggregates}
+      <Stack>
+        {xmlAggregates}
+        {audioAggregates}
+      </Stack>
     </>
   );
 }

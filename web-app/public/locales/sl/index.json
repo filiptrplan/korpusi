@@ -18,5 +18,8 @@
     "ambitusAvg": "Povprečni obseg",
     "corpusStatsTitle": "Osnovni podatki o korpusu",
     "allStatsTitle": "Agregirani podatki o korpusih",
-    "unknownName": "Neznano ime"
+    "unknownName": "Neznano ime",
+    "tempoXLabel": "Tempo (dobe/min)",
+    "numberOfWorks": "Število del",
+    "histogramTempoTitle": "Porazdelitev tempov"
 }
