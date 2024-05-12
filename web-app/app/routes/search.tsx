@@ -12,7 +12,6 @@ import {
   Form,
   useLoaderData,
   useNavigate,
-  useSearchParams,
   useSubmit,
 } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
@@ -334,7 +333,7 @@ export default function Search() {
 
   const resetFields = (newSearchType?: SearchType) => {
     localStorage.removeItem("searchParams");
-    navigate("/search?searchType=" + newSearchType ?? searchType);
+    navigate("/search?searchType=" + (newSearchType ?? searchType));
   };
 
   const resultRowsXML = xmlHits.map((song) => {
