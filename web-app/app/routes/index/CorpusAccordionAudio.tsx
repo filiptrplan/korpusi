@@ -91,11 +91,13 @@ export const CorpusAccordionAudio: React.FC<CorpusAccordionAudioProps> = ({
                 x: {
                   title: {
                     text: t("numberOfWorks"),
+                    display: true
                   },
                 },
                 y: {
                   title: {
-                    text: t("tempoXLabel")
+                    text: t("tempoXLabel"),
+                    display: true
                   }
                 }
               },
