@@ -27,3 +27,5 @@ export const hexToRGB = (hex: string) => {
 }
 
 export const chartColorsRGB = chartColorsHex.map(hexToRGB);
+
+export const getColorHex = (i: number) => chartColorsHex[i % chartColorsHex.length];

@@ -39,7 +39,7 @@ import {
   constructQueryXML,
   getAvailableCorpuses,
   getAvailableTimeSignatures,
-} from "./search/searchService";
+} from "../services/SearchService";
 import { CompareList } from "./compare/CompareList";
 import { useUpdateQueryStringValueWithoutNavigation } from "~/utils/misc";
 import { ResultRowXML } from "~/routes/search/ResultRowXML";

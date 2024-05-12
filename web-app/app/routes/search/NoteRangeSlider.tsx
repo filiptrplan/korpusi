@@ -5,7 +5,7 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { useControlledState } from "./useControlledState";
+import { useControlledState } from "../../utils/useControlledState";
 import { useTranslation } from "react-i18next";
 import { allNotes, midiToNote, noteToMidi } from "~/utils/notes";
 

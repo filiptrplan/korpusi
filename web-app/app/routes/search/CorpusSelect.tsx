@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useControlledState } from "./useControlledState";
+import { useControlledState } from "../../utils/useControlledState";
 
 interface CorpusSelectProps {
   corpus?: string;

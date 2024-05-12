@@ -3,7 +3,7 @@ import { CardActionArea, Typography } from "@mui/material";
 import { useNavigate } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import { AudioResult, SongResult } from "~/src/DataTypes";
-import { secondsToString } from "~/src/helpers";
+import { secondsToString } from "~/utils/helpers";
 
 interface Props {
   audio: SearchHit<AudioResult>;

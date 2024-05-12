@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useControlledState } from "./useControlledState";
+import { useControlledState } from "../../utils/useControlledState";
 
 interface MetadataSelectProps {
   /**

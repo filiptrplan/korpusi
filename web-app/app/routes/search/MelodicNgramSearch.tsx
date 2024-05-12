@@ -1,6 +1,6 @@
 import { Checkbox, FormControlLabel, Stack, TextField } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useControlledState } from "./useControlledState";
+import { useControlledState } from "../../utils/useControlledState";
 
 interface MelodicNgramSearchProps {
   melodicNgram?: string;

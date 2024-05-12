@@ -1,6 +1,6 @@
 import { FormLabel, Slider, Stack, TextField } from "@mui/material";
 import React from "react";
-import { useControlledState } from "./useControlledState";
+import { useControlledState } from "../../utils/useControlledState";
 import { useTranslation } from "react-i18next";
 
 interface AmbitusSliderProps {

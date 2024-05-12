@@ -1,6 +1,5 @@
 import { Typography, Grid } from "@mui/material";
 import { InfoCard } from "~/components/InfoCard";
-import { CorpusAggregateXML } from "../_index";
 import { useTranslation } from "react-i18next";
 import {
   Chart as ChartJS,
@@ -17,6 +16,8 @@ import {
 import { Bar } from "react-chartjs-2";
 import { MAccordion } from "~/components/MAccordion";
 import { useKeyTranslate } from "~/utils/notes";
+import { getColorHex } from "~/utils/helpers";
+import { CorpusAggregateXML } from "~/services/IndexService";
 
 ChartJS.register(
   CategoryScale,
@@ -32,18 +33,6 @@ interface CorpusAccordionProps {
   corpus: CorpusAggregateXML;
 }
 
-const getColor = (index: number) => {
-  const vibrantColors = [
-    "#74c0ff",
-    "#ff857c",
-    "#a1ffa4",
-    "#ffbb56",
-    "#ca7aff",
-    "#fff172",
-  ];
-  return vibrantColors[index % vibrantColors.length];
-};
-
 export const CorpusAccordionXML: React.FC<CorpusAccordionProps> = ({
   corpus,
 }) => {
@@ -53,7 +42,7 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionProps> = ({
     datasets: [
       {
         data: corpus.metrumBuckets.map((bucket) => bucket.doc_count),
-        backgroundColor: corpus.metrumBuckets.map((_, i) => getColor(i)),
+        backgroundColor: corpus.metrumBuckets.map((_, i) => getColorHex(i)),
       },
     ],
     labels: corpus.metrumBuckets.map((bucket) => bucket.key),
@@ -84,7 +73,7 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionProps> = ({
     datasets: [
       {
         data: corpus.keysBuckets.map((bucket) => bucket.doc_count),
-        backgroundColor: corpus.keysBuckets.map((_, i) => getColor(i)),
+        backgroundColor: corpus.keysBuckets.map((_, i) => getColorHex(i)),
       },
     ],
     labels: corpus.keysBuckets.map((bucket) => tKeys(bucket.key)),

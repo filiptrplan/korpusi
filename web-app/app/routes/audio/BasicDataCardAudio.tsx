@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { InfoCard } from "~/components/InfoCard";
 import { AudioContext } from "~/routes/audio.$id";
-import { secondsToString } from "~/src/helpers";
+import { secondsToString } from "~/utils/helpers";
 
 export const BasicDataCardAudio: React.FC = () => {
   const audio = useContext(AudioContext);

@@ -5,7 +5,7 @@ import { InfoCard } from "~/components/InfoCard";
 import { useTranslation } from "react-i18next";
 import { SearchType } from "~/routes/search";
 import { ResultRow } from "~/routes/search/ResultRow";
-import { secondsToString } from "~/src/helpers";
+import { secondsToString } from "~/utils/helpers";
 
 export interface ResultRowAudioProps {
   audioHit: SearchHit<AudioResult>;

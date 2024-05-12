@@ -16,7 +16,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { chartColorsRGB, secondsToString } from "~/src/helpers";
+import { chartColorsRGB, secondsToString } from "~/utils/helpers";
 import {
   Checkbox,
   FormControlLabel,

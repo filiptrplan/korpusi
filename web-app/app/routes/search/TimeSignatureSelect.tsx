@@ -1,7 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useControlledState } from "./useControlledState";
+import { useControlledState } from "../../utils/useControlledState";
 
 interface TimeSignatureProps {
   availableTimeSignatures?: string[];

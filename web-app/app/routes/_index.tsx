@@ -5,91 +5,17 @@ import { InfoCard } from "~/components/InfoCard";
 import { LoaderFunction } from "@remix-run/server-runtime";
 import { elastic } from "~/services/Elastic";
 import { AggregationsStringTermsAggregate } from "@elastic/elasticsearch/lib/api/typesWithBodyKey";
-import {
-  AggregationsCardinalityAggregate,
-  AggregationsStatsAggregate,
-  AggregationsStringTermsBucket,
-} from "@elastic/elasticsearch/lib/api/types";
+import { AggregationsStringTermsBucket } from "@elastic/elasticsearch/lib/api/types";
 import { CorpusAccordionXML } from "./index/CorpusAccordionXML";
 import { MAccordion } from "~/components/MAccordion";
+import {
+  CorpusAggregateXML,
+  aggregateCorpusXML,
+} from "~/services/IndexService";
 
 export const handle = {
   i18n: "index",
 };
-
-const aggregateCorpusXML = async (corpusId: string) => {
-  const corpusCount = elastic.count({
-    index: "songs",
-    query: {
-      term: {
-        corpus_id: corpusId,
-      },
-    },
-  });
-  const corpus = elastic.search({
-    index: "songs",
-    size: 0,
-    query: {
-      term: {
-        corpus_id: corpusId,
-      },
-    },
-    aggs: {
-      composersCount: {
-        cardinality: {
-          field: "metadata.composer.keyword",
-        },
-      },
-      metrumBuckets: {
-        terms: {
-          field: "time_signature",
-        },
-      },
-
-      keysBuckets: {
-        terms: {
-          field: "key.most_certain_key",
-        },
-      },
-      ambitus: {
-        stats: {
-          field: "ambitus.ambitus_semitones",
-        },
-      },
-    },
-  });
-
-  const corpusNameHits = (
-    await elastic.search<{ corpus_name: string }>({
-      index: "corpuses",
-      query: {
-        term: {
-          _id: corpusId,
-        },
-      },
-    })
-  ).hits.hits[0];
-  const corpusName = corpusNameHits._source?.corpus_name;
-  const aggregations = (await corpus).aggregations;
-  const corpusCountValue = (await corpusCount).count;
-
-  return {
-    corpusName,
-    corpusId,
-    songCount: corpusCountValue,
-    composersCount: (
-      aggregations?.composersCount as AggregationsCardinalityAggregate
-    ).value,
-    metrumBuckets: (
-      aggregations?.metrumBuckets as AggregationsStringTermsAggregate
-    ).buckets as AggregationsStringTermsBucket[],
-    keysBuckets: (aggregations?.keysBuckets as AggregationsStringTermsAggregate)
-      .buckets as AggregationsStringTermsBucket[],
-    ambitusStats: aggregations?.ambitus as AggregationsStatsAggregate,
-  };
-};
-
-export type CorpusAggregateXML = Awaited<ReturnType<typeof aggregateCorpusXML>>;
 
 export const loader: LoaderFunction = async () => {
   const xmlCount = await elastic.count({
@@ -138,6 +64,10 @@ export default function Index() {
     useLoaderData<typeof loader>();
   const { t } = useTranslation("index");
 
+  const xmlAggregates = corpusAggregates.map((corpus: CorpusAggregateXML) => (
+    <CorpusAccordionXML key={corpus.corpusId} corpus={corpus} />
+  ));
+
   return (
     <>
       <Typography
@@ -170,9 +100,7 @@ export default function Index() {
           </Grid>
         </Grid>
       </MAccordion>
-      {corpusAggregates.map((corpus: CorpusAggregateXML) => (
-        <CorpusAccordionXML key={corpus.corpusId} corpus={corpus} />
-      ))}
+      {xmlAggregates}
     </>
   );
 }
