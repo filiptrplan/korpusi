@@ -6,19 +6,10 @@ export default function Navigation() {
     <AppBar position="sticky" elevation={0} variant="outlined">
       <Toolbar>
         <Stack direction={"row"} gap={1}>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{
-              mr: 2,
-            }}
-          >
-            Mladinska glasba
-          </Typography>
           {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
           {/* @ts-expect-error */}
           <Button LinkComponent={Link} color="inherit" to="/">
-            Domov
+            Mladinska glasba
           </Button>
           {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
           {/* @ts-ignore */}
