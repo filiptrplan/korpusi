@@ -20,6 +20,10 @@
         "timeLabel": "Čas (min:sek)",
         "hzLabel": "Višina tona (Hz)",
         "selectedSongs": "Prikazane pesmi:",
-        "smoothing": "Drseče povprečje:"
+        "smoothing": "Drseče povprečje:",
+        "loudnessTotal": "RMS glasnosti celotne pesmi",
+        "loudnessVocals": "RMS glasnosti vokalov",
+        "loudnessInstrumental": "RMS glasnosti spremljave",
+        "RMSlabel": "Glasnost"
     }
 }

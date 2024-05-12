@@ -66,7 +66,10 @@ const colorFromChordName = (chordName: string, opacity: number) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-const calculateMovingAverage = (data: number[], windowSize: number): number[] => {
+const calculateMovingAverage = (
+  data: number[],
+  windowSize: number
+): number[] => {
   let index = windowSize - 1;
   const length = data.length + 1;
   const results = [];
@@ -139,11 +142,15 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
   const makePitchContourData = (audio: AudioResult) => {
     const pesto = audio.pitch_contour.pesto;
     const timestep = pesto.time_step_ms;
+
     const makePitchContourDataset = (
       datapoints: number[],
       title: string
     ): ChartDataset<"line"> => {
-      const datapointsSmoothed = calculateMovingAverage(datapoints, smoothing + 1);
+      const datapointsSmoothed = calculateMovingAverage(
+        datapoints,
+        smoothing + 1
+      );
       return {
         label: title,
         data: datapointsSmoothed.map((val, i) => {
@@ -154,14 +161,45 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
         }),
       };
     };
+
     return [
       makePitchContourDataset(
         pesto.pitch_contour_hz_voice,
-        `${audio.metadata.title} - ${t("graphAudio.voiceContour")}`
+        t("graphAudio.voiceContour")
       ),
       makePitchContourDataset(
         pesto.pitch_contour_hz_instrumental,
-        `${audio.metadata.title} - ${t("graphAudio.instrumentalContour")}`
+        t("graphAudio.instrumentalContour")
+      ),
+    ];
+  };
+
+  const makeLoudnessData = (audio: AudioResult): ChartDataset<"line">[] => {
+    const rms = audio.loudness.rms;
+
+    const makeLoudnessDataset = (
+      data: number[],
+      title: string
+    ): ChartDataset<"line"> => {
+      return {
+        label: title,
+        hidden: true,
+        yAxisID: "y2",
+        data: data.map((val, i) => {
+          return {
+            y: val,
+            x: i * rms.timestep_seconds,
+          };
+        }),
+      };
+    };
+
+    return [
+      makeLoudnessDataset(rms.loudness_total, t("graphAudio.loudnessTotal")),
+      makeLoudnessDataset(rms.loudness_vocals, t("graphAudio.loudnessVocals")),
+      makeLoudnessDataset(
+        rms.loudness_instrumental,
+        t("graphAudio.loudnessInstrumental")
       ),
     ];
   };
@@ -195,11 +233,13 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
     [audioResults, xRange]
   );
 
-  const pitchContour = useMemo(
-    () => audioResults.map(makePitchContourData),
+  const datasets = useMemo(
+    () =>
+      audioResults.map((audio) => {
+        return [...makePitchContourData(audio), ...makeLoudnessData(audio)];
+      }),
     [audioResults, smoothing]
   );
-
 
   const charts = useMemo(() => {
     return selectedResultIndexes.map((ind) => {
@@ -216,7 +256,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
         <Line
           key={ind}
           data={{
-            datasets: pitchContour[ind],
+            datasets: datasets[ind],
           }}
           options={{
             parsing: false,
@@ -244,6 +284,13 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
                   display: true,
                   text: t("graphAudio.hzLabel"),
                 },
+              },
+              y2: {
+                title: {
+                  display: true,
+                  text: t("graphAudio.RMSlabel")
+                },
+                position: "right"
               },
               x: {
                 title: {
@@ -278,7 +325,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
     setXRange,
     chordAnnotations,
     beatTickAnnotations,
-    pitchContour,
+    datasets,
     smoothing,
   ]);
 

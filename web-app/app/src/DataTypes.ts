@@ -138,6 +138,24 @@ export interface AudioResult extends Record<string, unknown> {
       chord_name: string[];
     }
   >;
+  loudness: AudioFeature<"rms", {
+    /**
+     * Loudness of the original file
+     */
+    loudness_total: number[];
+    /**
+     * Loudness of the extracted vocals 
+     */
+    loudness_vocals: number[];
+    /**
+     * Loudness of the extracted instrumental
+     */
+    loudness_instrumental: number[];
+    /**
+     * Time step between data points in seconds 
+     */
+    timestep_seconds: number;
+  }>;
   metadata: {
     title: string;
     filename: string;
