@@ -7,7 +7,8 @@
     "basicDataCard": {
         "title": "Osnovni podatki",
         "duration": "Dolžina pesmi",
-        "tempo": "Tempo (dobe/min)"
+        "tempo": "Tempo (dobe/min)",
+        "key": "Ključ"
     },
     "graphAudio": {
         "title": "Analiza zvočnega posnetka",

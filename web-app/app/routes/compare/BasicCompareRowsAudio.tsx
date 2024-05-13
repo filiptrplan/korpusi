@@ -35,3 +35,9 @@ export const CompareTempoAudio: React.FC<Props> = ({ audio}) => {
   const tempo = audio._source!.bpm.essentia_multifeature.bpm.toFixed(2);
   return <Typography>{tempo ?? "-"}</Typography>;
 };
+
+export const CompareKeyAudio: React.FC<Props> = ({ audio}) => {
+  const keyExtract = audio._source?.key.essentia_key_extractor;
+  const str = keyExtract ? keyExtract.key + " " + keyExtract.scale : "-"
+  return <Typography>{str}</Typography>;
+};

@@ -20,7 +20,7 @@ import {
 import { CompareSheetMusic } from "./CompareSheetMusic";
 import { CompareContour } from "./CompareContour";
 import { CompareContext, SearchType, SearchTypeContext } from "~/routes/search";
-import { CompareDurationAudio, CompareTempoAudio, CompareTitleAudio } from "~/routes/compare/BasicCompareRowsAudio";
+import { CompareDurationAudio, CompareKeyAudio, CompareTempoAudio, CompareTitleAudio } from "~/routes/compare/BasicCompareRowsAudio";
 import { CompareAudioGraph } from "~/routes/compare/CompareAudioGraph";
 
 const CompareRowXML: React.FC<{
@@ -181,6 +181,8 @@ const CompareRowListAudio: React.FC = () => {
     <CompareRowAudio title={t("tempo")} Component={CompareTempoAudio}/>
     <GridDivider/>
     <CompareRowAudio title={t("duration")} Component={CompareDurationAudio}/>
+    <GridDivider/>
+    <CompareRowAudio title={t("key")} Component={CompareKeyAudio}/>
     <GridDivider/>
     <CompareRowCustom title={t("graphs")}>
       <CompareAudioGraph />

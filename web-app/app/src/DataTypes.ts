@@ -156,6 +156,20 @@ export interface AudioResult extends Record<string, unknown> {
      */
     timestep_seconds: number;
   }>;
+  key: AudioFeature<"essentia_key_extractor", {
+    /**
+     * The extracted key
+     */
+    key: string;
+    /**
+     * Scale: major or minor of the key
+     */
+    scale: "major" | "minor";
+    /**
+     * Confidence of the algorithm in the result
+     */
+    confidence: number;
+  }>;
   metadata: {
     title: string;
     filename: string;

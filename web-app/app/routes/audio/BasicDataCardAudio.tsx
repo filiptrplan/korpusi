@@ -29,6 +29,12 @@ export const BasicDataCardAudio: React.FC = () => {
               value={audio.bpm.essentia_multifeature.bpm}
             />
           </Grid>
+          <Grid item>
+            <InfoCard
+              title={t("basicDataCard.key")}
+              value={audio.key.essentia_key_extractor.key + " "  + audio.key.essentia_key_extractor.scale}
+            />
+          </Grid>
         </Grid>
       </CardContent>
     </Card>
