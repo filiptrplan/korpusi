@@ -81,6 +81,8 @@ class AudioBPMProcessor(AudioProcessor):
     def process(self):
         import essentia.standard
 
+        # let the loader resample here! if we include the original sample rate it ruins the accuracy
+        # of the algorithm
         loader = essentia.standard.MonoLoader(filename=self.song)
         audio = loader()
 
@@ -194,13 +196,10 @@ class AudioRMSProcessor(AudioProcessor):
 
     def rms(self, song):
         import essentia.standard as es
-        import soundfile
 
-        file = soundfile.SoundFile(song)
-
-        frame_size = 2048
-        hop_size = 1024
-        sample_rate = file.samplerate
+        sample_rate = get_sample_rate(song)
+        frame_size = int(sample_rate / 16)
+        hop_size = int(frame_size / 2)
 
         loader = es.MonoLoader(filename=song, sampleRate=sample_rate)
         audio = loader()
@@ -234,6 +233,29 @@ class AudioRMSProcessor(AudioProcessor):
         }
 
 
+class AudioKeyExtractProcessor(AudioProcessor):
+    def __init__(self, song: any):
+        super().__init__(song, "essentia_key_extractor", "key")
+        self.mapping = {
+            "properties": {
+                "key": {"type": "keyword"},
+                "scale": {"type": "keyword"},
+                "confidence": {"type": "float"},
+            }
+        }
+
+    def process(self):
+        import essentia.standard as es
+
+        loader = es.MonoLoader(filename=self.song)
+        audio = loader()
+        key_extract = es.KeyExtractor()
+
+        (key, scale, confidence) = key_extract(audio)
+
+        return {"key": key, "scale": scale, "confidence": confidence}
+
+
 def round_floats(o):
     if isinstance(o, float):
         return round(o, 2)
@@ -242,3 +264,10 @@ def round_floats(o):
     if isinstance(o, (list, tuple)):
         return [round_floats(x) for x in o]
     return o
+
+
+def get_sample_rate(song):
+    import soundfile
+
+    file = soundfile.SoundFile(song)
+    return file.samplerate

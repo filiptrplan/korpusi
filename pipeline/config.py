@@ -23,4 +23,5 @@ audio_processors = [
     audio_processors.AudioPitchContourProcessor,
     audio_processors.AudioChordProcessor,
     audio_processors.AudioRMSProcessor,
+    audio_processors.AudioKeyExtractProcessor,
 ]

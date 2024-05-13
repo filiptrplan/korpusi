@@ -35,4 +35,5 @@ class TestAudioProcessors:
 
     def test_audio_rms_processor(self, snapshot):
         audio_chord_processor = AudioRMSProcessor(song())
+        print(audio_chord_processor.process())
         assert audio_chord_processor.process() == snapshot
