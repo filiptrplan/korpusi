@@ -1,0 +1,9 @@
+.cache
+.vscode
+.yarn
+public
+build
+node_modules
+remix.env.d.ts
+remix.config.js
+.eslintrc.js

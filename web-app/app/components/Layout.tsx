@@ -6,9 +6,9 @@ import Navigation from "./Navigation";
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      {/* <Navigation /> */}
-      <Container maxWidth="lg">
-        <Box sx={{ my: 4 }}>{children}</Box>
+      <Navigation />
+      <Container maxWidth="xl">
+        <Box sx={{ my: 2 }}>{children}</Box>
       </Container>
     </>
   );

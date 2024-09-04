@@ -1,0 +1,7 @@
+.env
+certs/
+.vercel
+.idea/
+.vscode/
+*.mp3
+backup.sh

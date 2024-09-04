@@ -1,109 +1,113 @@
+import { Grid, Link, Stack, Typography } from "@mui/material";
+import { Trans, useTranslation } from "react-i18next";
+import { useLoaderData } from "@remix-run/react";
+import { InfoCard } from "~/components/InfoCard";
+import { LoaderFunction } from "@remix-run/server-runtime";
+import { elastic } from "~/services/Elastic";
+import { CorpusAccordionXML } from "./index/CorpusAccordionXML";
+import { MAccordion } from "~/components/MAccordion";
 import {
-  Card,
-  CardContent,
-  InputLabel,
-  Slider,
-  Stack,
-  TextField,
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import { OSMD } from "~/components/OSMD";
-import { FormControl } from "@mui/base";
+  CorpusAggregateAudio,
+  CorpusAggregateXML,
+  aggregateCorpusAudio,
+  aggregateCorpusXML,
+  getCorpusIdsFromIndex,
+} from "~/services/IndexService";
+import { CorpusAccordionAudio } from "~/routes/index/CorpusAccordionAudio";
+
+export const handle = {
+  i18n: "index",
+};
+
+export const loader: LoaderFunction = async () => {
+  const xmlCount = await elastic.count({
+    index: "songs",
+  });
+  const audioCount = await elastic.count({
+    index: "audio",
+  });
+
+  const allDocumentsCount = xmlCount.count + audioCount.count;
+
+  const allCorpusesCount = await elastic.count({
+    index: "corpuses",
+  });
+
+  const songCorpusIds = await getCorpusIdsFromIndex("songs");
+  const audioCorpusIds = await getCorpusIdsFromIndex("audio");
+
+  const corpusAggregatesXML = await Promise.all<
+    ReturnType<typeof aggregateCorpusXML>
+  >(songCorpusIds.map((corpusId) => aggregateCorpusXML(corpusId)));
+
+  const corpusAggregatesAudio = await Promise.all<
+    ReturnType<typeof aggregateCorpusAudio>
+  >(audioCorpusIds.map((corpusId) => aggregateCorpusAudio(corpusId)));
+
+  return {
+    allSongsCount: allDocumentsCount,
+    allCorpusesCount: allCorpusesCount.count,
+    corpusAggregatesXML,
+    corpusAggregatesAudio,
+  };
+};
 
 export default function Index() {
-  const [xml, setXml] = useState("");
+  const {
+    allSongsCount,
+    allCorpusesCount,
+    corpusAggregatesXML,
+    corpusAggregatesAudio,
+  } = useLoaderData<typeof loader>();
+  const { t } = useTranslation("index");
 
-  const [firstNNotes, setFirstNNotes] = useState(8);
-  const [lastNNotes, setLastNNotes] = useState(8);
+  const xmlAggregates = corpusAggregatesXML.map(
+    (corpus: CorpusAggregateXML) => (
+      <CorpusAccordionXML key={corpus.corpusId} corpus={corpus} />
+    )
+  );
 
-  useEffect(() => {
-    fetch("/sample.xml").then(async (response) => {
-      const text = await response.text();
-      setXml(text);
-    });
-  }, []);
+  const audioAggregates = corpusAggregatesAudio.map(
+    (corpus: CorpusAggregateAudio) => (
+      <CorpusAccordionAudio key={corpus.corpusId} corpus={corpus} />
+    )
+  );
 
   return (
     <>
-      <Stack spacing={2}>
-        <Card variant="outlined">
-          <CardContent>
-            <FormControl>
-              <InputLabel htmlFor="first-n-notes">
-                Prikaži prvih N not
-              </InputLabel>
-              <Stack
-                direction="row"
-                spacing={2}
-                alignItems="center"
-                id="first-n-notes"
-              >
-                <TextField
-                  variant="standard"
-                  size="small"
-                  sx={{
-                    width: "3rem",
-                  }}
-                  type="number"
-                  value={firstNNotes}
-                  onChange={(e) => {
-                    setFirstNNotes(parseInt(e.target.value));
-                  }}
-                />
-                <Slider
-                  min={3}
-                  max={20}
-                  value={firstNNotes ?? 0}
-                  marks={true}
-                  step={1}
-                  onChange={(e, num) => {
-                    setFirstNNotes(num as number);
-                  }}
-                />
-              </Stack>
-            </FormControl>
-            <OSMD xml={xml} displayFirstNNotes={firstNNotes} />
-          </CardContent>
-        </Card>
-        <Card variant="outlined">
-          <CardContent>
-            <FormControl>
-              <InputLabel htmlFor="last-n-notes">
-                Prikaži zadnjih N not
-              </InputLabel>
-              <Stack
-                direction="row"
-                spacing={2}
-                alignItems="center"
-                id="last-n-notes"
-              >
-                <TextField
-                  variant="standard"
-                  size="small"
-                  sx={{
-                    width: "3rem",
-                  }}
-                  type="number"
-                  value={lastNNotes}
-                  onChange={(e) => {
-                    setLastNNotes(parseInt(e.target.value));
-                  }}
-                />
-                <Slider
-                  min={3}
-                  max={20}
-                  value={lastNNotes ?? 0}
-                  marks={true}
-                  step={1}
-                  onChange={(e, num) => {
-                    setLastNNotes(num as number);
-                  }}
-                />
-              </Stack>
-            </FormControl>
-            <OSMD xml={xml} displayLastNNotes={lastNNotes} />
-          </CardContent>
-        </Card>
+      <Typography
+        variant="h3"
+        textAlign="center"
+        fontWeight="600"
+        lineHeight="6rem"
+      >
+        {t("heroTitle")}
+      </Typography>
+      <Typography variant="h4">{t("projectDescriptionTitle")}</Typography>
+      <Typography
+        variant="body1"
+        sx={{
+          mb: 1,
+        }}
+      >
+        <Trans t={t} i18nKey="projectDescription">
+          Opis
+          <Link href="http://muzikologijaff.si/gmgm/"></Link>
+        </Trans>
+      </Typography>
+      <MAccordion title={t("allStatsTitle")}>
+        <Grid container spacing={1}>
+          <Grid item xs="auto">
+            <InfoCard title={t("totalSongs")} value={allSongsCount} />
+          </Grid>
+          <Grid item xs="auto">
+            <InfoCard title={t("totalCorpuses")} value={allCorpusesCount} />
+          </Grid>
+        </Grid>
+      </MAccordion>
+      <Stack>
+        {xmlAggregates}
+        {audioAggregates}
       </Stack>
     </>
   );

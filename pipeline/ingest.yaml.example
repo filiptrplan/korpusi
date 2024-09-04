@@ -1,0 +1,4 @@
+in_dir: xmls/
+include_original: true
+corpus_id: 
+single_output: true

@@ -4,4 +4,10 @@ node_modules
 /build
 /public/build
 .env
+.vercel/
 .vercel
+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+.pnp.*

@@ -1,0 +1,30 @@
+{
+    "metadataCard": {
+        "title": "Metapodatki",
+        "titleSong": "Naslov",
+        "URL": "URL"
+    },
+    "basicDataCard": {
+        "title": "Osnovni podatki",
+        "duration": "Dolžina pesmi",
+        "tempo": "Tempo (dobe/min)",
+        "key": "Ključ"
+    },
+    "graphAudio": {
+        "title": "Analiza zvočnega posnetka",
+        "displayBeatTicks": "Prikaži zaznane dobe",
+        "displayChords": "Prikaži ocenjene akorde",
+        "spanInSeconds": "Razpon grafa (sekunde)",
+        "unknownChord": "Neznano",
+        "voiceContour": "Tonska kontura glasu",
+        "instrumentalContour": "Tonska kontura spremljave",
+        "timeLabel": "Čas (min:sek)",
+        "hzLabel": "Višina tona (Hz)",
+        "selectedSongs": "Prikazane pesmi:",
+        "smoothing": "Drseče povprečje:",
+        "loudnessTotal": "RMS glasnosti celotne pesmi",
+        "loudnessVocals": "RMS glasnosti vokalov",
+        "loudnessInstrumental": "RMS glasnosti spremljave",
+        "RMSlabel": "Glasnost"
+    }
+}

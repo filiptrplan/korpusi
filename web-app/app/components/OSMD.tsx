@@ -1,8 +1,5 @@
-import {
-  GraphicalMusicSheet,
-  OpenSheetMusicDisplay,
-} from "opensheetmusicdisplay";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
+import React, { useEffect, useMemo, useRef } from "react";
 
 export interface OSMDProps {
   xml?: string;
@@ -18,8 +15,6 @@ export const OSMD: React.FC<OSMDProps> = ({
   displayLyrics = false,
 }) => {
   const ref = useRef(null);
-  const [originalGraphicSheet, setOriginalGraphicSheet] =
-    useState<GraphicalMusicSheet>();
   const osmd = useMemo(() => {
     if (ref.current === null) return null;
     return new OpenSheetMusicDisplay(ref.current, {
@@ -74,7 +69,7 @@ export const OSMD: React.FC<OSMDProps> = ({
           staffEntry.graphicalVoiceEntries.forEach((voiceEntry) => {
             if (voiceEntry.notes) {
               const notes = voiceEntry.notes.filter(
-                (x) => !x.sourceNote.isRest()
+                (x) => !x.sourceNote.isRest(),
               );
               noteCounter += notes.length;
               if (noteCounter >= _displayFirstNNotes && measureNumber === -1) {
@@ -114,7 +109,7 @@ export const OSMD: React.FC<OSMDProps> = ({
           reversedVoiceEntries.forEach((voiceEntry) => {
             if (voiceEntry.notes) {
               const notes = voiceEntry.notes.filter(
-                (x) => !x.sourceNote.isRest()
+                (x) => !x.sourceNote.isRest(),
               );
               noteCounter += notes.length;
               if (noteCounter >= _displayLastNNotes && measureNumber === -1) {
