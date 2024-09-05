@@ -20,7 +20,6 @@ import "./i18n";
 import i18next from "./i18next.server";
 import { LoaderFunctionArgs, json } from "@remix-run/server-runtime";
 import { useChangeLanguage } from "remix-i18next";
-import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const locale = await i18next.getLocale(request);
@@ -109,7 +108,7 @@ const Document = withEmotionCache(
 
 // https://remix.run/docs/en/main/route/component
 // https://remix.run/docs/en/main/file-conventions/routes
-function App() {
+export default function App() {
   return (
     <Document>
       <Layout>
@@ -119,12 +118,9 @@ function App() {
   );
 }
 
-export default withSentry(App);
-
 // https://remix.run/docs/en/main/route/error-boundary
 export function ErrorBoundary() {
   const error = useRouteError();
-  captureRemixErrorBoundaryError(error);
 
   if (isRouteErrorResponse(error)) {
     let message;
@@ -169,7 +165,8 @@ export function ErrorBoundary() {
             <p>{error.message}</p>
             <hr />
             <p>
-              Unknown error, please contact the developer.
+              Hey, developer, you should replace this with what you want your
+              users to see.
             </p>
           </div>
         </Layout>
