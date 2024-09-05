@@ -15,7 +15,7 @@
 Please refer to [this link](https://python-poetry.org/docs/#installation) to install `poetry`. To install all the dependencies, run
 ```bash 
 poetry install
-source $(poetry env info --path)/bin/activate
+poetry shell
 sudo apt install ffmpeg
 pip wheel "vamp (==1.1.0)"
 pip install vamp==1.1.0 --no-binary :all:
@@ -54,6 +54,12 @@ in the root directory of the project.
 # Usage
 First you must configure the `.env` file. You can copy the `.env.example` file and fill in the values. 
 The `ELASTIC_HOST` specifies the URL of the ElasticSearch server. `ELASTIC_USER` and `ELASTIC_PASSWORD` are the credentials to access the server.
+
+After that you should activate the virtual environment by typing the following command:
+
+```bash
+poetry shell
+```
 
 ## Preprocessing
 If you are not working with audio files, you can skip this step. 
