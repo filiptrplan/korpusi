@@ -13,10 +13,38 @@ import { I18nextProvider, initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
 import { getInitialNamespaces } from "remix-i18next";
+import { useLocation, useMatches } from "@remix-run/react";
+import * as Sentry from "@sentry/remix";
+import { useEffect } from "react";
+
+Sentry.init({
+  dsn: "https://e85456d2e0576460d6fc134afdf2afdf@o4507901585391616.ingest.de.sentry.io/4507901587685456",
+  integrations: [
+    Sentry.browserTracingIntegration({
+      useEffect,
+      useLocation,
+      useMatches,
+    }),
+    // Replay is only available in the client
+    Sentry.replayIntegration(),
+  ],
+
+  tracesSampleRate: 0.1,
+
+  // Set `tracePropagationTargets` to control for which URLs distributed tracing should be enabled
+  tracePropagationTargets: ["localhost", "korpusi.musiclab.si"],
+
+  // Capture Replay for 10% of all sessions,
+  // plus for 100% of sessions with an error
+  replaysSessionSampleRate: 0.03,
+  replaysOnErrorSampleRate: 0.2,
+});
+
 
 interface ClientCacheProviderProps {
   children: React.ReactNode;
 }
+
 function ClientCacheProvider({ children }: ClientCacheProviderProps) {
   const [cache, setCache] = React.useState(createEmotionCache());
 

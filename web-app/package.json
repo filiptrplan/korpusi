@@ -3,9 +3,9 @@
   "version": "5.0.0",
   "private": true,
   "scripts": {
-    "build": "remix build",
-    "dev": "remix dev --manual",
-    "start": "remix-serve ./build/index.js",
+    "build": "NODE_OPTIONS='--import=./instrument.server.mjs' remix build --sourcemap && sentry-upload-sourcemaps --org mladinska-glasba --project mladinska-glasba",
+    "dev": "NODE_OPTIONS='--import=./instrument.server.mjs' remix dev --manual",
+    "start": "NODE_OPTIONS='--import=./instrument.server.mjs' remix-serve ./build/index.js",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "@remix-run/react": "latest",
     "@remix-run/serve": "latest",
     "@remix-run/server-runtime": "latest",
+    "@sentry/remix": "^8.28.0",
     "chart.js": "^4.4.1",
     "chartjs-plugin-annotation": "^3.0.1",
     "i18next": "^23.7.7",

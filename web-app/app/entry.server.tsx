@@ -1,5 +1,6 @@
 import * as ReactDOMServer from "react-dom/server";
 import { RemixServer } from "@remix-run/react";
+import * as Sentry from "@sentry/remix";
 import type { EntryContext } from "@remix-run/node";
 import createEmotionCache from "./src/createEmotionCache";
 import theme from "./src/theme";
@@ -80,3 +81,5 @@ export default async function handleRequest(
     headers: responseHeaders,
   });
 }
+
+export const handleError = Sentry.sentryHandleError;
