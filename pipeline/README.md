@@ -14,6 +14,8 @@
 ## Default installation
 Please refer to [this link](https://python-poetry.org/docs/#installation) to install `poetry`. To install all the dependencies, run
 ```bash 
+poetry install
+source $(poetry env info --path)/bin/activate
 sudo apt install ffmpeg
 pip wheel "vamp (==1.1.0)"
 pip install vamp==1.1.0 --no-binary :all:
