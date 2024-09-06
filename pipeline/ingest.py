@@ -195,6 +195,8 @@ def process_file(
         else:
             existing = existing_json[results["file_hash_sha256"]]
             results.update(existing)
+            # always overwrite the corpus_id
+            results["corpus_id"] = corpus_id
             if "metadata" in overwrite_features:
                 results["metadata"] = metadata
             # filter only if we have a match
