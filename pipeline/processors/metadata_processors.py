@@ -46,7 +46,11 @@ class CSVMetadataProcessor:
         Returns the metadata for the file.
         """
         filename = os.path.basename(file_path)
+        # Get only the file name without the extension
+        filename = os.path.splitext(filename)[0]
         for row in self.csv_content:
-            if row["filename"] == filename:
+            # Get the row filename without the extension
+            row_filename = os.path.splitext(row["filename"])[0]
+            if row_filename == filename:
                 return row
         return {}
