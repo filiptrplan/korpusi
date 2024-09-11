@@ -2691,12 +2691,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chart.js@npm:^4.4.1":
-  version: 4.4.1
-  resolution: "chart.js@npm:4.4.1"
+"chart.js@npm:^4.4.4":
+  version: 4.4.4
+  resolution: "chart.js@npm:4.4.4"
   dependencies:
     "@kurkle/color": "npm:^0.3.0"
-  checksum: 10/bb58247349ed04b6a38c4c4b45d953d87dab40ecd70dd796da302cbcebf866dfc1ecf7bd32d95ecb44b89dccf9a4cfc6ff84f74ba69b024be9b5bd19b2930fbc
+  checksum: 10/77221dce07606c67686b31b14c3e8c56d71fadc93a5d754ef1f0abc870160253c31751edd9962a0f5bd929824ca69458b914b6c90c8a0c1e9a547d276e9ca9b0
   languageName: node
   linkType: hard
 
@@ -5707,7 +5707,7 @@ __metadata:
     "@types/react-dom": "npm:latest"
     "@typescript-eslint/eslint-plugin": "npm:^7.4.0"
     "@typescript-eslint/parser": "npm:^7.4.0"
-    chart.js: "npm:^4.4.1"
+    chart.js: "npm:^4.4.4"
     chartjs-plugin-annotation: "npm:^3.0.1"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"

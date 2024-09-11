@@ -168,7 +168,36 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
 
   const [smoothing, setSmoothing] = useState(0);
 
-  const makePitchContourData = (audio: AudioResult) => {
+  const totalVoiceRMS = useMemo(() => {
+    const loudness = audioResults.map((audio) => {
+      return audio.loudness.rms.loudness_vocals;
+    });
+    const lengths = loudness.map((loud) => loud.length);
+    const squares = loudness.map((loud) => loud.map((val) => val ** 2));
+    const rms = squares.map((square, i) => {
+      const sum = square.reduce((prev, curr) => prev + curr, 0);
+      return Math.sqrt(sum / lengths[i]);
+    });
+    return rms;
+  }, [audioResults]);
+
+  const totalInstrumentalRMS = useMemo(() => {
+    const loudness = audioResults.map((audio) => {
+      return audio.loudness.rms.loudness_instrumental;
+    });
+    const lengths = loudness.map((loud) => loud.length);
+    const squares = loudness.map((loud) => loud.map((val) => val ** 2));
+    const rms = squares.map((square, i) => {
+      const sum = square.reduce((prev, curr) => prev + curr, 0);
+      return Math.sqrt(sum / lengths[i]);
+    });
+    return rms;
+  }, [audioResults]);
+
+  console.log(totalVoiceRMS, totalInstrumentalRMS);
+
+  const makePitchContourData = (audio: AudioResult, voiceRms: number, instrumentalRms: number) => {
+    const cullingRMSThreshold = 0.3;
     const pesto = audio.pitch_contour.pesto;
     const timestep = pesto.time_step_ms;
 
@@ -191,10 +220,13 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
         // Find the closest RMS value of the datapoint
         const rms = audio.loudness.rms;
         const rmsIndex = Math.round(data.x / rms.timestep_seconds);
-        const rmsValue = type == "voice" ? rms.loudness_vocals[rmsIndex] : rms.loudness_instrumental[rmsIndex];
+        const rmsValue =
+          type == "voice"
+            ? rms.loudness_vocals[rmsIndex]
+            : rms.loudness_instrumental[rmsIndex];
         return {
           x: data.x,
-          y: rmsValue > 0.1 ? data.y : Number.NaN,
+          y: rmsValue > cullingRMSThreshold * (type == "voice" ? voiceRms : instrumentalRms) ? data.y : Number.NaN,
         };
       });
       return {
@@ -279,8 +311,8 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
 
   const datasets = useMemo(
     () =>
-      audioResults.map((audio) => {
-        return [...makePitchContourData(audio), ...makeLoudnessData(audio)];
+      audioResults.map((audio, i) => {
+        return [...makePitchContourData(audio, totalVoiceRMS[i], totalInstrumentalRMS[i]), ...makeLoudnessData(audio)];
       }),
     [audioResults, smoothing]
   );
@@ -316,22 +348,23 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
               },
               decimation: {
                 enabled: true,
-                algorithm: "lttb",
+                algorithm: "min-max",
                 threshold: 100,
-                samples: 500,
               },
             },
             elements: {
               line: {
-                spanGaps: false
-              }
+                spanGaps: 0.1,
+              },
             },
             indexAxis: "x",
             scales: {
               y: {
                 title: {
                   display: true,
-                  text: enableMidiAxis ? t("graphAudio.midiLabel") : t("graphAudio.hzLabel"),
+                  text: enableMidiAxis
+                    ? t("graphAudio.midiLabel")
+                    : t("graphAudio.hzLabel"),
                 },
                 ticks: {
                   display: true,
@@ -348,7 +381,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
                   },
                 },
                 afterBuildTicks: (scale) => {
-                  if(!enableMidiAxis) return;
+                  if (!enableMidiAxis) return;
                   scale.ticks = midiData
                     .filter((midi) => midi.frequency > 100)
                     .map((midi) => {
