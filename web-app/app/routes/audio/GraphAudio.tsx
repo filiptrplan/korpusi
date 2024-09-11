@@ -1,6 +1,5 @@
-import { useContext, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AudioContext } from "~/routes/audio.$id";
 import annotationPlugin, { AnnotationOptions } from "chartjs-plugin-annotation";
 import {
   CategoryScale,
@@ -11,6 +10,7 @@ import {
   Legend,
   LineElement,
   LinearScale,
+  LogarithmicScale,
   PointElement,
   Title,
   Tooltip,
@@ -28,6 +28,7 @@ import {
   Typography,
 } from "@mui/material";
 import { AudioResult } from "~/src/DataTypes";
+import { midiData } from "~/routes/audio/MidiData";
 
 Chart.register(annotationPlugin);
 Chart.register(
@@ -39,7 +40,8 @@ Chart.register(
   Tooltip,
   Legend,
   Colors,
-  Decimation
+  Decimation,
+  LogarithmicScale
 );
 
 const colorFromChordName = (chordName: string, opacity: number) => {
@@ -206,6 +208,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
 
   const [enableBeatTicks, setEnableBeatTicks] = useState(false);
   const [enableChords, setEnableChords] = useState(false);
+  const [enableMidiAxis, setEnableMidiAxis] = useState(false);
 
   const [selectedResultIndexes, setSelectedResultIndexes] = useState<number[]>(
     Array.from({ length: audioResults.length }).map((_, i) => i)
@@ -282,7 +285,32 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
               y: {
                 title: {
                   display: true,
-                  text: t("graphAudio.hzLabel"),
+                  text: enableMidiAxis ? t("graphAudio.midiLabel") : t("graphAudio.hzLabel"),
+                },
+                ticks: {
+                  display: true,
+                  callback: (value) => {
+                    if (!enableMidiAxis) return value;
+                    const note = midiData.find(
+                      (midi) => midi.frequency == value
+                    );
+                    if (note) {
+                      return note.note;
+                    } else {
+                      return value;
+                    }
+                  },
+                },
+                afterBuildTicks: (scale) => {
+                  if(!enableMidiAxis) return;
+                  scale.ticks = midiData
+                    .filter((midi) => midi.frequency > 100)
+                    .map((midi) => {
+                      return {
+                        value: midi.frequency,
+                        label: midi.note,
+                      };
+                    });
                 },
               },
               y2: {
@@ -291,7 +319,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
                   text: t("graphAudio.RMSlabel"),
                 },
                 ticks: {
-                  callback: (value, index, ticks) => {
+                  callback: (value) => {
                     if (typeof value == "string") {
                       return value;
                     } else {
@@ -328,6 +356,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
     });
   }, [
     enableBeatTicks,
+    enableMidiAxis,
     enableChords,
     selectedResultIndexes,
     xRange,
@@ -381,6 +410,17 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
               value={enableChords}
               onChange={(e) => {
                 setEnableChords(e.target.checked);
+              }}
+            />
+          }
+        />
+        <FormControlLabel
+          label={t("graphAudio.useMidiAxis")}
+          control={
+            <Checkbox
+              value={enableMidiAxis}
+              onChange={(e) => {
+                setEnableMidiAxis(e.target.checked);
               }}
             />
           }
