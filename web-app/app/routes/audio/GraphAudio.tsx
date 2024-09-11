@@ -174,31 +174,45 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
 
     const makePitchContourDataset = (
       datapoints: number[],
-      title: string
+      title: string,
+      type: "instrumental" | "voice"
     ): ChartDataset<"line"> => {
       const datapointsSmoothed = calculateMovingMedian(
         datapoints,
         smoothing + 1
       );
+      const dataPointsWithTime = datapointsSmoothed.map((val, i) => {
+        return {
+          x: i * (timestep / 1000),
+          y: val,
+        };
+      });
+      const datapointFilteredRMS = dataPointsWithTime.map((data, i) => {
+        // Find the closest RMS value of the datapoint
+        const rms = audio.loudness.rms;
+        const rmsIndex = Math.round(data.x / rms.timestep_seconds);
+        const rmsValue = type == "voice" ? rms.loudness_vocals[rmsIndex] : rms.loudness_instrumental[rmsIndex];
+        return {
+          x: data.x,
+          y: rmsValue > 0.1 ? data.y : Number.NaN,
+        };
+      });
       return {
         label: title,
-        data: datapointsSmoothed.map((val, i) => {
-          return {
-            x: i * (timestep / 1000),
-            y: val,
-          };
-        }),
+        data: datapointFilteredRMS,
       };
     };
 
     return [
       makePitchContourDataset(
         pesto.pitch_contour_hz_voice,
-        t("graphAudio.voiceContour")
+        t("graphAudio.voiceContour"),
+        "voice"
       ),
       makePitchContourDataset(
         pesto.pitch_contour_hz_instrumental,
-        t("graphAudio.instrumentalContour")
+        t("graphAudio.instrumentalContour"),
+        "instrumental"
       ),
     ];
   };
@@ -306,6 +320,11 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
                 threshold: 100,
                 samples: 500,
               },
+            },
+            elements: {
+              line: {
+                spanGaps: false
+              }
             },
             indexAxis: "x",
             scales: {
