@@ -12,7 +12,7 @@ export const MAccordion = (
   props: AccordionProps & {
     title: string;
     titleTypographyProps?: TypographyProps;
-  },
+  }
 ) => {
   const { title, sx, titleTypographyProps, ...rest } = props;
   return (
@@ -25,6 +25,9 @@ export const MAccordion = (
         borderRadius: 1,
         my: 1,
         ...sx,
+        "&:before": {
+          display: "none",
+        },
       }}
       {...rest}
     >
