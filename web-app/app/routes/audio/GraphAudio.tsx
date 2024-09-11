@@ -68,6 +68,33 @@ const colorFromChordName = (chordName: string, opacity: number) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
+const calculateMovingMedian = (
+  data: number[],
+  windowSize: number
+): number[] => {
+  let index = windowSize - 1;
+  const length = data.length + 1;
+  const results = [];
+
+  while (index < length) {
+    index = index + 1;
+    const intervalSlice = data.slice(index - windowSize, index);
+    intervalSlice.sort((a, b) => a - b);
+    const middle = Math.floor(intervalSlice.length / 2);
+
+    let median;
+    if (intervalSlice.length % 2 === 0) {
+      median = (intervalSlice[middle - 1] + intervalSlice[middle]) / 2;
+    } else {
+      median = intervalSlice[middle];
+    }
+
+    results.push(median);
+  }
+
+  return results;
+};
+
 const calculateMovingAverage = (
   data: number[],
   windowSize: number
@@ -149,7 +176,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
       datapoints: number[],
       title: string
     ): ChartDataset<"line"> => {
-      const datapointsSmoothed = calculateMovingAverage(
+      const datapointsSmoothed = calculateMovingMedian(
         datapoints,
         smoothing + 1
       );
