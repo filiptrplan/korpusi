@@ -288,9 +288,18 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
               y2: {
                 title: {
                   display: true,
-                  text: t("graphAudio.RMSlabel")
+                  text: t("graphAudio.RMSlabel"),
                 },
-                position: "right"
+                ticks: {
+                  callback: (value, index, ticks) => {
+                    if (typeof value == "string") {
+                      return value;
+                    } else {
+                      return `${Math.round((value - 1) * 60)} dB`;
+                    }
+                  },
+                },
+                position: "right",
               },
               x: {
                 title: {
