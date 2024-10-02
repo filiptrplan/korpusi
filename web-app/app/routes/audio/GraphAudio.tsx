@@ -1,6 +1,5 @@
-import { useContext, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AudioContext } from "~/routes/audio.$id";
 import annotationPlugin, { AnnotationOptions } from "chartjs-plugin-annotation";
 import {
   CategoryScale,
@@ -11,6 +10,7 @@ import {
   Legend,
   LineElement,
   LinearScale,
+  LogarithmicScale,
   PointElement,
   Title,
   Tooltip,
@@ -28,6 +28,7 @@ import {
   Typography,
 } from "@mui/material";
 import { AudioResult } from "~/src/DataTypes";
+import { midiData } from "~/routes/audio/MidiData";
 
 Chart.register(annotationPlugin);
 Chart.register(
@@ -39,7 +40,8 @@ Chart.register(
   Tooltip,
   Legend,
   Colors,
-  Decimation
+  Decimation,
+  LogarithmicScale
 );
 
 const colorFromChordName = (chordName: string, opacity: number) => {
@@ -64,6 +66,33 @@ const colorFromChordName = (chordName: string, opacity: number) => {
   const g = (intHash & 0x00ff00) >> 8;
   const b = intHash & 0x0000ff;
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+};
+
+const calculateMovingMedian = (
+  data: number[],
+  windowSize: number
+): number[] => {
+  let index = windowSize - 1;
+  const length = data.length + 1;
+  const results = [];
+
+  while (index < length) {
+    index = index + 1;
+    const intervalSlice = data.slice(index - windowSize, index);
+    intervalSlice.sort((a, b) => a - b);
+    const middle = Math.floor(intervalSlice.length / 2);
+
+    let median;
+    if (intervalSlice.length % 2 === 0) {
+      median = (intervalSlice[middle - 1] + intervalSlice[middle]) / 2;
+    } else {
+      median = intervalSlice[middle];
+    }
+
+    results.push(median);
+  }
+
+  return results;
 };
 
 const calculateMovingAverage = (
@@ -139,37 +168,83 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
 
   const [smoothing, setSmoothing] = useState(0);
 
-  const makePitchContourData = (audio: AudioResult) => {
+  const totalVoiceRMS = useMemo(() => {
+    const loudness = audioResults.map((audio) => {
+      return audio.loudness.rms.loudness_vocals;
+    });
+    const lengths = loudness.map((loud) => loud.length);
+    const squares = loudness.map((loud) => loud.map((val) => val ** 2));
+    const rms = squares.map((square, i) => {
+      const sum = square.reduce((prev, curr) => prev + curr, 0);
+      return Math.sqrt(sum / lengths[i]);
+    });
+    return rms;
+  }, [audioResults]);
+
+  const totalInstrumentalRMS = useMemo(() => {
+    const loudness = audioResults.map((audio) => {
+      return audio.loudness.rms.loudness_instrumental;
+    });
+    const lengths = loudness.map((loud) => loud.length);
+    const squares = loudness.map((loud) => loud.map((val) => val ** 2));
+    const rms = squares.map((square, i) => {
+      const sum = square.reduce((prev, curr) => prev + curr, 0);
+      return Math.sqrt(sum / lengths[i]);
+    });
+    return rms;
+  }, [audioResults]);
+
+  console.log(totalVoiceRMS, totalInstrumentalRMS);
+
+  const makePitchContourData = (audio: AudioResult, voiceRms: number, instrumentalRms: number) => {
+    const cullingRMSThreshold = 0.3;
     const pesto = audio.pitch_contour.pesto;
     const timestep = pesto.time_step_ms;
 
     const makePitchContourDataset = (
       datapoints: number[],
-      title: string
+      title: string,
+      type: "instrumental" | "voice"
     ): ChartDataset<"line"> => {
-      const datapointsSmoothed = calculateMovingAverage(
+      const datapointsSmoothed = calculateMovingMedian(
         datapoints,
         smoothing + 1
       );
+      const dataPointsWithTime = datapointsSmoothed.map((val, i) => {
+        return {
+          x: i * (timestep / 1000),
+          y: val,
+        };
+      });
+      const datapointFilteredRMS = dataPointsWithTime.map((data, i) => {
+        // Find the closest RMS value of the datapoint
+        const rms = audio.loudness.rms;
+        const rmsIndex = Math.round(data.x / rms.timestep_seconds);
+        const rmsValue =
+          type == "voice"
+            ? rms.loudness_vocals[rmsIndex]
+            : rms.loudness_instrumental[rmsIndex];
+        return {
+          x: data.x,
+          y: rmsValue > cullingRMSThreshold * (type == "voice" ? voiceRms : instrumentalRms) ? data.y : Number.NaN,
+        };
+      });
       return {
         label: title,
-        data: datapointsSmoothed.map((val, i) => {
-          return {
-            x: i * (timestep / 1000),
-            y: val,
-          };
-        }),
+        data: datapointFilteredRMS,
       };
     };
 
     return [
       makePitchContourDataset(
         pesto.pitch_contour_hz_voice,
-        t("graphAudio.voiceContour")
+        t("graphAudio.voiceContour"),
+        "voice"
       ),
       makePitchContourDataset(
         pesto.pitch_contour_hz_instrumental,
-        t("graphAudio.instrumentalContour")
+        t("graphAudio.instrumentalContour"),
+        "instrumental"
       ),
     ];
   };
@@ -206,6 +281,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
 
   const [enableBeatTicks, setEnableBeatTicks] = useState(false);
   const [enableChords, setEnableChords] = useState(false);
+  const [enableMidiAxis, setEnableMidiAxis] = useState(false);
 
   const [selectedResultIndexes, setSelectedResultIndexes] = useState<number[]>(
     Array.from({ length: audioResults.length }).map((_, i) => i)
@@ -235,8 +311,8 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
 
   const datasets = useMemo(
     () =>
-      audioResults.map((audio) => {
-        return [...makePitchContourData(audio), ...makeLoudnessData(audio)];
+      audioResults.map((audio, i) => {
+        return [...makePitchContourData(audio, totalVoiceRMS[i], totalInstrumentalRMS[i]), ...makeLoudnessData(audio)];
       }),
     [audioResults, smoothing]
   );
@@ -272,9 +348,13 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
               },
               decimation: {
                 enabled: true,
-                algorithm: "lttb",
+                algorithm: "min-max",
                 threshold: 100,
-                samples: 500,
+              },
+            },
+            elements: {
+              line: {
+                spanGaps: 0.1,
               },
             },
             indexAxis: "x",
@@ -282,15 +362,51 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
               y: {
                 title: {
                   display: true,
-                  text: t("graphAudio.hzLabel"),
+                  text: enableMidiAxis
+                    ? t("graphAudio.midiLabel")
+                    : t("graphAudio.hzLabel"),
+                },
+                ticks: {
+                  display: true,
+                  callback: (value) => {
+                    if (!enableMidiAxis) return value;
+                    const note = midiData.find(
+                      (midi) => midi.frequency == value
+                    );
+                    if (note) {
+                      return note.note;
+                    } else {
+                      return value;
+                    }
+                  },
+                },
+                afterBuildTicks: (scale) => {
+                  if (!enableMidiAxis) return;
+                  scale.ticks = midiData
+                    .filter((midi) => midi.frequency > 100)
+                    .map((midi) => {
+                      return {
+                        value: midi.frequency,
+                        label: midi.note,
+                      };
+                    });
                 },
               },
               y2: {
                 title: {
                   display: true,
-                  text: t("graphAudio.RMSlabel")
+                  text: t("graphAudio.RMSlabel"),
                 },
-                position: "right"
+                ticks: {
+                  callback: (value) => {
+                    if (typeof value == "string") {
+                      return value;
+                    } else {
+                      return `${Math.round((value - 1) * 60)} dB`;
+                    }
+                  },
+                },
+                position: "right",
               },
               x: {
                 title: {
@@ -319,6 +435,7 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
     });
   }, [
     enableBeatTicks,
+    enableMidiAxis,
     enableChords,
     selectedResultIndexes,
     xRange,
@@ -372,6 +489,17 @@ export const GraphAudio: React.FC<GraphAudioProps> = ({ audioResults }) => {
               value={enableChords}
               onChange={(e) => {
                 setEnableChords(e.target.checked);
+              }}
+            />
+          }
+        />
+        <FormControlLabel
+          label={t("graphAudio.useMidiAxis")}
+          control={
+            <Checkbox
+              value={enableMidiAxis}
+              onChange={(e) => {
+                setEnableMidiAxis(e.target.checked);
               }}
             />
           }

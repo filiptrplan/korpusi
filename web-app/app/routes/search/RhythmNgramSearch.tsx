@@ -12,7 +12,7 @@ export const RhythmNgramSearch: React.FC<RhythmNgramSearchProps> = ({
 }) => {
   const { t } = useTranslation("search");
   const [rhythmNgramState, setRhythmNgramState] = useControlledState(
-    rhythmNgram ?? "",
+    rhythmNgram ?? ""
   );
 
   const addNoteValue = (i: number) => {
@@ -49,14 +49,12 @@ export const RhythmNgramSearch: React.FC<RhythmNgramSearchProps> = ({
             visibility: helperOpacity === "1.0" ? "visible" : "hidden",
             position: "absolute",
             padding: "0.5rem",
-            zIndex: 20,
+            zIndex: 100,
             transition: "visibility 0.2s",
           }}
         >
           <Paper
             sx={{
-              // marginTop: "0.5rem",
-              // marginLeft: "0.5rem",
               opacity: helperOpacity,
               transition: "opacity 0.2s",
             }}

@@ -12,8 +12,15 @@ class CSVMetadataProcessor:
         header specifying different columns. This class will match the `filename` column and then output the other columns
         as metadata. Call the `process` function to get the metadata for a specific file.
         """
+        separator = ","
         with open(csv_file_path, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
+            first_line = f.readline()
+            if "," in first_line:
+                separator = ","
+            elif ";" in first_line:
+                separator = ";"
+        with open(csv_file_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter=separator)
             for row in reader:
                 self.csv_content.append(row)
             self.csv_header = reader.fieldnames
@@ -39,7 +46,11 @@ class CSVMetadataProcessor:
         Returns the metadata for the file.
         """
         filename = os.path.basename(file_path)
+        # Get only the file name without the extension
+        filename = os.path.splitext(filename)[0]
         for row in self.csv_content:
-            if row["filename"] == filename:
+            # Get the row filename without the extension
+            row_filename = os.path.splitext(row["filename"])[0]
+            if row_filename == filename:
                 return row
         return {}

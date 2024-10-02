@@ -41,7 +41,7 @@ export const FilterGroupCollapse: React.FC<FilterGroupCollapseProps> = ({
       title={title}
       sx={{
         width: "100%",
-        overflow: "hidden",
+        overflow: "visible"
       }}
       expanded={isCollapsed == null ? !defaultCollapsed : !isCollapsed}
       onChange={() => {
@@ -53,24 +53,5 @@ export const FilterGroupCollapse: React.FC<FilterGroupCollapseProps> = ({
     >
       {children || ""}
     </MAccordion>
-    // <Accordion
-    //   sx={{
-    //     width: "100%",
-    //     overflow: "hidden",
-    //     borderRadius: 1,
-    //   }}
-    //   elevation={0}
-    //   disableGutters
-    //   variant="outlined"
-    //   expanded={!isCollapsed}
-    //   onChange={() => {
-    //     setIsCollapsed(!isCollapsed);
-    //   }}
-    // >
-    //   <AccordionSummary expandIcon={<ArrowDropDown />}>
-    //     <Typography>{title}</Typography>
-    //   </AccordionSummary>
-    //   <AccordionDetails>{children}</AccordionDetails>
-    // </Accordion>
   );
 };

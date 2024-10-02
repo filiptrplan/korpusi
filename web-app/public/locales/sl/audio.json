@@ -25,6 +25,8 @@
         "loudnessTotal": "RMS glasnosti celotne pesmi",
         "loudnessVocals": "RMS glasnosti vokalov",
         "loudnessInstrumental": "RMS glasnosti spremljave",
-        "RMSlabel": "Glasnost"
+        "RMSlabel": "Glasnost",
+        "useMidiAxis": "Uporabi MIDI note namesto Hz",
+        "midiLabel": "MIDI oznaka"
     }
 }
