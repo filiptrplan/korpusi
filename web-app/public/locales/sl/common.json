@@ -1,3 +1,7 @@
 {
-    "search": "Isci"
+    "search": "Isci",
+    "navigation": {
+        "search": "Iskanje",
+        "home": "Mladinska glasba"
+    }
 }

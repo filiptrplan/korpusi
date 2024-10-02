@@ -106,14 +106,19 @@ const Document = withEmotionCache(
   },
 );
 
+export const localeCookieContext = React.createContext<string>("en");
+
 // https://remix.run/docs/en/main/route/component
 // https://remix.run/docs/en/main/file-conventions/routes
 export default function App() {
+  const loaderData = useLoaderData<typeof loader>();
   return (
     <Document>
+      <localeCookieContext.Provider value={loaderData.locale}>
       <Layout>
         <Outlet />
       </Layout>
+      </localeCookieContext.Provider>
     </Document>
   );
 }

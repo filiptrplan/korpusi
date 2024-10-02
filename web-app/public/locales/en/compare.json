@@ -1,0 +1,20 @@
+{
+    "tooFewSongs": "Too few songs",
+    "tooFewSongsDescription": "Please add at least two songs to compare.",
+    "addSongsTitle": "Add songs",
+    "addSongsButton": "ADd",
+    "addSongsLabel": "Add songs to comparison",
+    "measureFromTo": "Excerpt (measures)",
+    "songTitle": "Title",
+    "tempo": "Tempo",
+    "key": "Key",
+    "timeSignature": "Time signature",
+    "ambitus": "Ambitus in semitones",
+    "sheetMusic": "Sheet music excerpt",
+    "measureWidth": "Measure width",
+    "contour": "Pitch contour",
+    "beat": "Note sequence number",
+    "contourRange": "Contour range",
+    "duration": "Duration",
+    "graphs": "Analysis"
+}

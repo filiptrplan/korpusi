@@ -1,0 +1,23 @@
+{
+    "composer": "Composer",
+    "lyricist": "Lyricist",
+    "titleSong": "Title of the work",
+    "outsideLinks": "External links",
+    "metadataCardTitle": "Metadata",
+    "basicData": {
+        "title": "Basic data",
+        "key": "Key",
+        "metrum": "Meter",
+        "tempo": "Tempo (BPM)",
+        "ambitus": "Range (ambitus in semitones)",
+        "durationMeasures": "Length (in measures)"
+    },
+    "sheetMusic": {
+        "title": "Sheet music",
+        "measureRange": "Range in measures",
+        "lyrics": "Show lyrics"
+    },
+    "contourGraph": {
+        "title": "Contour"
+    }
+}

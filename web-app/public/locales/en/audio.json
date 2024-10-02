@@ -1,0 +1,32 @@
+{
+    "metadataCard": {
+        "title": "Metadata",
+        "titleSong": "Title",
+        "URL": "URL"
+    },
+    "basicDataCard": {
+        "title": "Basic data",
+        "duration": "Song duration",
+        "tempo": "Tempo (beats/min)",
+        "key": "Key"
+    },
+    "graphAudio": {
+        "title": "Audio analysis",
+        "displayBeatTicks": "Show detected downbeats",
+        "displayChords": "Show estimated chords",
+        "spanInSeconds": "Graph range (seconds)",
+        "unknownChord": "Unknown",
+        "voiceContour": "Melodic contour of vocals",
+        "instrumentalContour": "Melodic contour of accompaniment",
+        "timeLabel": "Time (min:sec)",
+        "hzLabel": "Tone pitch (Hz)",
+        "selectedSongs": "Displayed songs:",
+        "smoothing": "Moving average:",
+        "loudnessTotal": "Loudness RMS - song",
+        "loudnessVocals": "Loudness RMS - vocals",
+        "loudnessInstrumental": "Loudness RMS - accompaniment",
+        "RMSlabel": "Loudness",
+        "useMidiAxis": "Use MIDI note names instead of Hz",
+        "midiLabel": "MIDI label"
+    }
+}

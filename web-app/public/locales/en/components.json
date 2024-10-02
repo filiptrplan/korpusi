@@ -1,0 +1,7 @@
+{
+    "ContourGraph": {
+        "beat": "Beat number",
+        "contourRange": "Contour range",
+        "measure": "Measure"
+    }
+}
