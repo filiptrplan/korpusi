@@ -29,7 +29,7 @@ export const ResultList: React.FC<ResultListProps> = ({
 }) => {
   const { t } = useTranslation("search");
   const navigation = useNavigation();
-  const searching = navigation.state !== "idle";
+  const searching = typeof navigation.state == 'undefined' || navigation.state !== "idle";
   const navigate = useNavigate();
 
   const [params] = useSearchParams();
