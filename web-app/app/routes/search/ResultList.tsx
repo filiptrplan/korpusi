@@ -54,9 +54,6 @@ export const ResultList: React.FC<ResultListProps> = ({
           {t("results", { count: pagination.totalHits })}
         </Typography>
         <Divider sx={{ mx: 1, flexGrow: 1 }} />
-        <Button variant="text" size="small">
-          Izberi dela
-        </Button>
       </Stack>
       <Box
         sx={{

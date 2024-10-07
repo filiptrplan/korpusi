@@ -1,4 +1,6 @@
 {
+    "addToComparison": "Dodaj primerjavi",
+    "downloadFile": "Prenesi datoteko",
     "searchByMetadata": "Išči po metapodatkih",
     "results_one": "{{count}} rezultat",
     "results_two": "{{count}} rezultata",

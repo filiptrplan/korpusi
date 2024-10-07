@@ -1,4 +1,6 @@
 {
+    "addToComparison": "Add to comparison",
+    "downloadFile": "Download file",
     "searchByMetadata": "Search by metadata",
     "results_one": "{{count}} result",
     "results_two": "{{count}} results",

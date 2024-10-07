@@ -82,9 +82,11 @@ export const ResultRow: React.FC<ResultRowProps> = ({
             paddingRight: 1,
           }}
         >
-          <Typography display="block" variant="caption">
-            {searchHit._score?.toFixed(2)}
-          </Typography>
+          <Tooltip title={t("relevanceScore")}>
+            <Typography display="block" variant="caption">
+              {searchHit._score?.toFixed(2)}
+            </Typography>
+          </Tooltip>
         </Box>
       </Tooltip>
       <CardActionArea
@@ -153,7 +155,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Tooltip title="Dodaj primerjavi">
+        <Tooltip title={t("addToComparison")}>
           <IconButton
             sx={{
               zIndex: 2,
@@ -167,7 +169,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
             />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Prenesi datoteko">
+        <Tooltip title={t("downloadFile")}>
           <IconButton
             component="a"
             href={createDownloadLink()}
