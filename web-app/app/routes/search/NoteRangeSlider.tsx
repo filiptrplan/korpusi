@@ -8,6 +8,7 @@ import {
 import { useControlledState } from "../../utils/useControlledState";
 import { useTranslation } from "react-i18next";
 import { allNotes, midiToNote, noteToMidi } from "~/utils/notes";
+import { useMemo } from "react";
 
 interface NoteRangeSliderProps {
   noteFrom?: string;
@@ -25,12 +26,15 @@ export const NoteRangeSlider: React.FC<NoteRangeSliderProps> = ({
   nameTo,
 }) => {
   const [noteFromState, setNoteFromState] = useControlledState(
-    noteFrom ? parseInt(noteFrom) : 23,
+    noteFrom ? parseInt(noteFrom) : 23
   );
   const [noteToState, setNoteToState] = useControlledState(
-    noteTo ? parseInt(noteTo) : 132,
+    noteTo ? parseInt(noteTo) : 132
   );
   const { t } = useTranslation("search");
+  const options = useMemo(() => {
+    return [...new Set(Object.values(allNotes))];
+  }, []);
   return (
     <>
       <Stack direction={"row"} spacing={2} alignItems={"center"}>
@@ -41,11 +45,12 @@ export const NoteRangeSlider: React.FC<NoteRangeSliderProps> = ({
             width: "6rem",
           }}
           onChange={(e, newValue) => {
+            console.log(newValue)
             setNoteFromState(newValue as number);
           }}
           disableClearable
           renderInput={(params) => <TextField {...params} label={t("from")} />}
-          options={Object.keys(allNotes).map((note) => noteToMidi(note))}
+          options={options}
           getOptionLabel={(option) => midiToNote(option)}
         />
         <TextField
@@ -66,8 +71,10 @@ export const NoteRangeSlider: React.FC<NoteRangeSliderProps> = ({
           value={[noteFromState, noteToState]}
           onChange={(e, value) => {
             value = value as number[];
+            console.log(value)
             setNoteFromState(value[0] as number);
             setNoteToState(value[1] as number);
+            console.log(value[1])
           }}
           disableSwap
           min={23}
@@ -83,7 +90,7 @@ export const NoteRangeSlider: React.FC<NoteRangeSliderProps> = ({
           }}
           disableClearable
           renderInput={(params) => <TextField {...params} label={t("to")} />}
-          options={Object.keys(allNotes).map((note) => noteToMidi(note))}
+          options={options}
           getOptionLabel={(option) => midiToNote(option)}
         />
         <TextField

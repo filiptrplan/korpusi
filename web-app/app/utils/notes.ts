@@ -2,11 +2,17 @@ import { useTranslation } from "react-i18next";
 import notes from "./notes.json";
 
 export const midiToNote = (midi: number): string => {
-  return (
-    Object.keys(notes).find(
-      (key) => notes[key as keyof typeof notes] === midi,
-    ) || ""
-  );
+  const indexes: string[] = [];
+  Object.values(notes).forEach((value, i) => {
+    if (value === midi) {
+      indexes.push(Object.keys(notes)[i]);
+    }
+  });
+  if (indexes.length === 1) {
+    return indexes[0];
+  } else {
+    return indexes.join("/");
+  }
 };
 
 export const noteToMidi = (note: string): number => {
