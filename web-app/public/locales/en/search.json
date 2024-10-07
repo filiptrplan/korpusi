@@ -45,5 +45,6 @@
     "durationSliderLabel": "Duration (seconds)",
     "useDuration": "Consider duration",
     "duration": "Duration",
-    "relevanceScore": "Relevance to query"
+    "relevanceScore": "Relevance to query",
+    "numPerPage": "Num. per page"
 }

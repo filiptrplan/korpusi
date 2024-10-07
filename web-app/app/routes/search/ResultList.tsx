@@ -97,7 +97,7 @@ export const ResultList: React.FC<ResultListProps> = ({
         }}
       >
         <FormControl size="small">
-          <InputLabel id="page-size-label">Št. na stran</InputLabel>
+          <InputLabel id="page-size-label">{t("numPerPage")}</InputLabel>
           <Select
             labelId="page-size-label"
             defaultValue={10}
@@ -105,7 +105,7 @@ export const ResultList: React.FC<ResultListProps> = ({
               minWidth: "7rem",
             }}
             size="small"
-            label="Št. na stran"
+            label={t("numPerPage")}
             value={pagination.pageSize}
             onChange={(e) => {
               const link = new URLSearchParams(params);

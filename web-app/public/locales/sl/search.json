@@ -45,5 +45,6 @@
     "durationSliderLabel": "Dolžina (sekunde)",
     "useDuration": "Upoštevaj dolžino",
     "duration": "Dolžina",
-    "relevanceScore": "Relevantnost poizvedbi"
+    "relevanceScore": "Relevantnost poizvedbi",
+    "numPerPage": "Št. na stran"
 }
