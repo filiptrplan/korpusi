@@ -66,6 +66,20 @@ export interface SongResult extends Record<string, unknown> {
     measure_starts: number[];
   };
   /**
+   * The number of occurences of each rhythmic ngram in the song. Keys are the
+   * ngrams and values are the number of occurences.
+   */
+  ngram_rhythm: {
+    frequency_histogram: Record<string, number>;
+  };
+  /**
+   * The number of occurences of each rhythmic ngram in the song. Keys are the
+   * melodic intervals and values are the number of occurences.
+   */
+  ngram_pitch: {
+    frequency_histogram: Record<string, number>;
+  };
+  /**
    * Tempo in BPM
    */
   tempo: number;

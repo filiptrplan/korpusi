@@ -16,5 +16,7 @@
     "beat": "Zaporedna št. note",
     "contourRange": "Razpon grafa",
     "duration": "Dolžina",
-    "graphs": "Analiza"
+    "graphs": "Analiza",
+    "ngramsPitch": "N-grami tonskih intervalov",
+    "ngramsRhythm": "N-grami ritmičnih vzorcev"
 }

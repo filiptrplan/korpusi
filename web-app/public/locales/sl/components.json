@@ -3,5 +3,12 @@
         "beat": "Zaporedna št. note",
         "contourRange": "Razpon konture",
         "measure": "Takt"
+    },
+    "ngrams": {
+        "topN": "Prikaz prvih N n-gramov",
+        "numberOfOccurrences": "Št. pojavitev",
+        "pitchAxis": "Tonski intervali",
+        "rhythmAxis": "Ritmični vzorci",
+        "pitchNgramExplanation": "Kako brati intervale: <tip intervala> <smer intervala> <velikost intervala>.\n Tipi intervalov: M - major, m - minor, P - perfect"
     }
 }

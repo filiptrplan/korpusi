@@ -1,7 +1,12 @@
 import os
 
 import music21
-from processors.contour_processor import ContourProcessor, RhythmProcessor
+from processors.contour_processor import (
+    ContourProcessor,
+    RhythmProcessor,
+    NGramRhythmProcessor,
+    NGramPitchProcessor,
+)
 
 
 def song():
@@ -25,4 +30,14 @@ class TestAdvancedProcessors:
     def test_rhythm_processor(self, snapshot):
         rhythm_processor = RhythmProcessor(song())
         result = rhythm_processor.process()
+        assert result == snapshot
+
+    def test_rhythm_ngram_processor(self, snapshot):
+        rhythm_ngram_processor = NGramRhythmProcessor(song())
+        result = rhythm_ngram_processor.process()
+        assert result == snapshot
+
+    def test_pitch_ngram_processor(self, snapshot):
+        pitch_ngram_processor = NGramPitchProcessor(song())
+        result = pitch_ngram_processor.process()
         assert result == snapshot

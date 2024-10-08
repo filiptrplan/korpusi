@@ -19,5 +19,9 @@
     },
     "contourGraph": {
         "title": "Contour"
+    },
+    "ngrams": {
+        "titlePitch": "Pitch n-grams",
+        "titleRhythm": "Rhythm n-grams"
     }
 }

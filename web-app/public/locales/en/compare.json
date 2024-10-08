@@ -16,5 +16,7 @@
     "beat": "Note sequence number",
     "contourRange": "Contour range",
     "duration": "Duration",
-    "graphs": "Analysis"
+    "graphs": "Analysis",
+    "ngramsPitch": "Pitch n-grams",
+    "ngramsRhythm": "Rhythm n-grams"
 }

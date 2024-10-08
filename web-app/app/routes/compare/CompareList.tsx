@@ -20,8 +20,15 @@ import {
 import { CompareSheetMusic } from "./CompareSheetMusic";
 import { CompareContour } from "./CompareContour";
 import { CompareContext, SearchType, SearchTypeContext } from "~/routes/search";
-import { CompareDurationAudio, CompareKeyAudio, CompareTempoAudio, CompareTitleAudio } from "~/routes/compare/BasicCompareRowsAudio";
+import {
+  CompareDurationAudio,
+  CompareKeyAudio,
+  CompareTempoAudio,
+  CompareTitleAudio,
+} from "~/routes/compare/BasicCompareRowsAudio";
 import { CompareAudioGraph } from "~/routes/compare/CompareAudioGraph";
+import { NGramHistogram } from "~/components/NGramHistogram";
+import { CompareNGramHistogram } from "~/routes/compare/CompareNGramHistorgram";
 
 const CompareRowXML: React.FC<{
   title: string;
@@ -169,26 +176,34 @@ const CompareRowListXML: React.FC = () => {
       <CompareRowCustom title={t("sheetMusic")}>
         <CompareSheetMusic />
       </CompareRowCustom>
+      <CompareRowCustom title={t("ngramsPitch")}>
+        <CompareNGramHistogram type="pitch" />
+      </CompareRowCustom>
+      <CompareRowCustom title={t("ngramsRhythm")}>
+        <CompareNGramHistogram type="rhythm" />
+      </CompareRowCustom>
     </>
   );
 };
 
 const CompareRowListAudio: React.FC = () => {
-  const {t } = useTranslation("compare");
-  return <>
-    <CompareRowAudio title={t("songTitle")} Component={CompareTitleAudio}/>
-    <GridDivider/>
-    <CompareRowAudio title={t("tempo")} Component={CompareTempoAudio}/>
-    <GridDivider/>
-    <CompareRowAudio title={t("duration")} Component={CompareDurationAudio}/>
-    <GridDivider/>
-    <CompareRowAudio title={t("key")} Component={CompareKeyAudio}/>
-    <GridDivider/>
-    <CompareRowCustom title={t("graphs")}>
-      <CompareAudioGraph />
-    </CompareRowCustom>
-  </>;
-}
+  const { t } = useTranslation("compare");
+  return (
+    <>
+      <CompareRowAudio title={t("songTitle")} Component={CompareTitleAudio} />
+      <GridDivider />
+      <CompareRowAudio title={t("tempo")} Component={CompareTempoAudio} />
+      <GridDivider />
+      <CompareRowAudio title={t("duration")} Component={CompareDurationAudio} />
+      <GridDivider />
+      <CompareRowAudio title={t("key")} Component={CompareKeyAudio} />
+      <GridDivider />
+      <CompareRowCustom title={t("graphs")}>
+        <CompareAudioGraph />
+      </CompareRowCustom>
+    </>
+  );
+};
 
 export const CompareList: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -231,7 +246,11 @@ export const CompareList: React.FC = () => {
             container
             alignItems={"center"}
           >
-            {searchType == SearchType.Audio ? <CompareRowListAudio /> : <CompareRowListXML />}
+            {searchType == SearchType.Audio ? (
+              <CompareRowListAudio />
+            ) : (
+              <CompareRowListXML />
+            )}
           </Grid>
         </Box>
       </scrollWidthContext.Provider>

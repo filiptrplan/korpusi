@@ -43,9 +43,16 @@ def generate_mapping(
                 mapping["properties"][processor_instance.get_feature_name()] = {
                     "properties": {}
                 }
-            mapping["properties"][processor_instance.get_feature_name()]["properties"][
-                processor_instance.get_algorithm_name()
-            ] = processor_instance.get_mapping()
+            if processor_type == "audio":
+                mapping["properties"][processor_instance.get_feature_name()][
+                    "properties"
+                ][
+                    processor_instance.get_algorithm_name()
+                ] = processor_instance.get_mapping()
+            else:
+                mapping["properties"][processor_instance.get_feature_name()] = (
+                    processor_instance.get_mapping()
+                )
         f.write(json.dumps(mapping, indent=4))
 
     print(f"Mapping file generated at {out_file}")

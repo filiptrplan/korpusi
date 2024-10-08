@@ -133,3 +133,95 @@ class RhythmProcessor(MusicXMLProcessor):
                 if measure_numbers[i] != measure_numbers[i - 1]
             ],
         }
+
+
+class NGramRhythmProcessor(MusicXMLProcessor):
+    """Analyzes the frequency of rhythmic n-grams in the song."""
+
+    song: music21.stream.Stream
+    r_proccessor: RhythmProcessor
+
+    def __init__(self, song: music21.stream.Stream, feature_name="ngram_rhythm"):
+        super().__init__(song, feature_name)
+        self.r_proccessor = RhythmProcessor(song)
+        self.mapping = {
+            "properties": {
+                "frequency_histogram": {"type": "object", "enabled": False},
+            }
+        }
+
+    def process(self):
+        from nltk import ngrams
+
+        data = self.r_proccessor.process()
+        rhythm = data["rhythm_string"]
+
+        rhythm = rhythm.split(" ")
+        n_gram_dict = {}
+
+        for n_gram_length in range(3, 10):
+            n_grams = ngrams(rhythm, n_gram_length)
+            for grams in n_grams:
+                grams_string = " ".join(grams)
+                if grams_string not in n_gram_dict:
+                    n_gram_dict[grams_string] = 1
+                else:
+                    n_gram_dict[grams_string] += 1
+
+        for gram in list(n_gram_dict):
+            if n_gram_dict[gram] < 2:
+                n_gram_dict.pop(gram)
+
+        sorted_n_grams = dict(
+            sorted(n_gram_dict.items(), key=lambda x: x[1], reverse=True)
+        )
+
+        return {"frequency_histogram": sorted_n_grams}
+
+
+class NGramPitchProcessor(MusicXMLProcessor):
+    """Analyzes the frequency of melodic interval n-grams in the song."""
+
+    song: music21.stream.Stream
+
+    def __init__(self, song: music21.stream.Stream, feature_name="ngram_pitch"):
+        super().__init__(song, feature_name)
+        self.mapping = {
+            "properties": {
+                "frequency_histogram": {"type": "object", "enabled": False},
+            }
+        }
+
+    def process(self):
+        from nltk import ngrams
+
+        notes = self.song.parts[0].flatten().notes.stream()
+        interval_list = list(notes.melodicIntervals(skipRests=True))
+
+        processed_intervals = []
+        for i in interval_list:
+            if len(str(i.directedName)) == 2:
+                nov_i = f"{i.directedName[0]}+{i.directedName[1]}"
+            else:
+                nov_i = i.directedName
+            processed_intervals.append(nov_i)
+
+        n_gram_dict = {}
+        for n_gram_length in range(3, 10):
+            n_grams = ngrams(processed_intervals, n_gram_length)
+            for grams in n_grams:
+                grams_string = " ".join(grams)
+                if grams_string not in n_gram_dict:
+                    n_gram_dict[grams_string] = 1
+                else:
+                    n_gram_dict[grams_string] += 1
+
+        for gram in list(n_gram_dict):
+            if n_gram_dict[gram] < 2:
+                n_gram_dict.pop(gram)
+
+        sorted_n_grams = dict(
+            sorted(n_gram_dict.items(), key=lambda x: x[1], reverse=True)
+        )
+
+        return {"frequency_histogram": sorted_n_grams}

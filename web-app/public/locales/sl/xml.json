@@ -19,5 +19,9 @@
     },
     "contourGraph": {
         "title": "Kontura"
+    },
+    "ngrams": {
+        "titlePitch": "N-grami tonskih intervalov",
+        "titleRhythm": "N-grami ritmičnih vzorcev"
     }
 }

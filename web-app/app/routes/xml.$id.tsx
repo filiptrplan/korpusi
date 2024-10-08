@@ -12,6 +12,7 @@ import { createContext } from "react";
 import { useTranslation } from "react-i18next";
 import { SheetMusic } from "./xml/SheetMusic";
 import { ContourGraph } from "~/components/ContourGraph";
+import { NGramHistogram } from "~/components/NGramHistogram";
 
 export const handle = {
   i18n: ["xml"],
@@ -65,6 +66,12 @@ export default function Song() {
               </MAccordion>
               <MAccordion title={t("contourGraph.title")}>
                 <ContourGraph songs={data} maxHeight={"500px"} useMeasures />
+              </MAccordion>
+              <MAccordion title={t("ngrams.titleRhythm")}>
+                <NGramHistogram songs={data} type="rhythm" />
+              </MAccordion>
+              <MAccordion title={t("ngrams.titlePitch")}>
+                <NGramHistogram songs={data} type="pitch" />
               </MAccordion>
             </Stack>
           </Grid>

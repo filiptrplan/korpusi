@@ -3,5 +3,12 @@
         "beat": "Beat number",
         "contourRange": "Contour range",
         "measure": "Measure"
+    },
+    "ngrams": {
+        "topN": "Show top N n-grams",
+        "numberOfOccurrences": "Number of occurrences",
+        "pitchAxis": "Pitch intervals",
+        "rhythmAxis": "Rhythmic patterns",
+        "pitchNgramExplanation": "How to read intervals: <interval type> <interval direction> <interval size>.\n Interval types: M - major, m - minor, P - perfect"
     }
 }

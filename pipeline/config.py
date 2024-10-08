@@ -14,6 +14,8 @@ music_xml_processors = [
     basic_processors.DurationProcessor,
     contour_processor.ContourProcessor,
     contour_processor.RhythmProcessor,
+    contour_processor.NGramRhythmProcessor,
+    contour_processor.NGramPitchProcessor,
 ]
 
 audio_processors = [

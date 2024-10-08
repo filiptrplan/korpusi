@@ -49,8 +49,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     throw new Error("Not all ids found");
   }
 
-  console.log(params);
-
   return {
     xmlHits:
       searchType == SearchType.XML
