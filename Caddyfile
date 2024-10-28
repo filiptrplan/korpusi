@@ -1,4 +1,4 @@
-korpusi.musiclab.si {
+localhost {
     reverse_proxy /kibana* kibana:5601
     reverse_proxy remix:3000
 }

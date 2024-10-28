@@ -7,6 +7,7 @@ import { elastic } from "~/services/Elastic";
 import { CorpusAccordionXML } from "./index/CorpusAccordionXML";
 import { MAccordion } from "~/components/MAccordion";
 import {
+  Corpus,
   CorpusAggregateAudio,
   CorpusAggregateXML,
   aggregateCorpusAudio,
@@ -14,6 +15,7 @@ import {
   getCorpusIdsFromIndex,
 } from "~/services/IndexService";
 import { CorpusAccordionAudio } from "~/routes/index/CorpusAccordionAudio";
+import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 
 export const handle = {
   i18n: "index",
@@ -44,11 +46,35 @@ export const loader: LoaderFunction = async () => {
     ReturnType<typeof aggregateCorpusAudio>
   >(audioCorpusIds.map((corpusId) => aggregateCorpusAudio(corpusId)));
 
+  const corpusesXML = elastic.search<Corpus>({
+    index: 'corpuses',
+    body: {
+      query: {
+        ids: {
+          values: songCorpusIds
+        }
+      }
+    }
+  });
+
+  const corpusesAudio = elastic.search<Corpus>({
+    index: 'corpuses',
+    body: {
+      query: {
+        ids: {
+          values: audioCorpusIds
+        }
+      }
+    }
+  });
+
   return {
     allSongsCount: allDocumentsCount,
     allCorpusesCount: allCorpusesCount.count,
     corpusAggregatesXML,
     corpusAggregatesAudio,
+    corpusesXML: (await corpusesXML).hits.hits,
+    corpusesAudio: (await corpusesAudio).hits.hits,
   };
 };
 
@@ -58,12 +84,14 @@ export default function Index() {
     allCorpusesCount,
     corpusAggregatesXML,
     corpusAggregatesAudio,
+    corpusesXML,
+    corpusesAudio
   } = useLoaderData<typeof loader>();
   const { t } = useTranslation("index");
 
   const xmlAggregates = corpusAggregatesXML.map(
     (corpus: CorpusAggregateXML) => (
-      <CorpusAccordionXML key={corpus.corpusId} corpus={corpus} />
+      <CorpusAccordionXML key={corpus.corpusId} corpusAgg={corpus} corpusInfo={corpusesXML.find((x: SearchHit<Corpus>) => x._id == corpus.corpusId)} />
     )
   );
 

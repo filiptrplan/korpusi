@@ -17,7 +17,8 @@ import { Bar } from "react-chartjs-2";
 import { MAccordion } from "~/components/MAccordion";
 import { useKeyTranslate } from "~/utils/notes";
 import { getColorHex } from "~/utils/helpers";
-import { CorpusAggregateXML } from "~/services/IndexService";
+import { Corpus, CorpusAggregateXML } from "~/services/IndexService";
+import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 
 ChartJS.register(
   CategoryScale,
@@ -30,22 +31,24 @@ ChartJS.register(
 );
 
 interface CorpusAccordionXMLProps {
-  corpus: CorpusAggregateXML;
+  corpusAgg: CorpusAggregateXML;
+  corpusInfo: SearchHit<Corpus>;
 }
 
 export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
-  corpus,
+  corpusAgg,
+  corpusInfo
 }) => {
   const { t } = useTranslation("index");
 
   const metrumDatasets: ChartData<"bar"> = {
     datasets: [
       {
-        data: corpus.metrumBuckets.map((bucket) => bucket.doc_count),
-        backgroundColor: corpus.metrumBuckets.map((_, i) => getColorHex(i)),
+        data: corpusAgg.metrumBuckets.map((bucket) => bucket.doc_count),
+        backgroundColor: corpusAgg.metrumBuckets.map((_, i) => getColorHex(i)),
       },
     ],
-    labels: corpus.metrumBuckets.map((bucket) => bucket.key),
+    labels: corpusAgg.metrumBuckets.map((bucket) => bucket.key),
   };
 
   const metrumOptions: ChartOptions<"bar"> = {
@@ -72,11 +75,11 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
   const keyDatasets: ChartData<"bar"> = {
     datasets: [
       {
-        data: corpus.keysBuckets.map((bucket) => bucket.doc_count),
-        backgroundColor: corpus.keysBuckets.map((_, i) => getColorHex(i)),
+        data: corpusAgg.keysBuckets.map((bucket) => bucket.doc_count),
+        backgroundColor: corpusAgg.keysBuckets.map((_, i) => getColorHex(i)),
       },
     ],
-    labels: corpus.keysBuckets.map((bucket) => tKeys(bucket.key)),
+    labels: corpusAgg.keysBuckets.map((bucket) => tKeys(bucket.key)),
   };
 
   const keyOptions: ChartOptions<"bar"> = {
@@ -100,18 +103,25 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
   };
 
   return (
-    <MAccordion title={corpus.corpusName ?? t("unknownName")}>
+    <MAccordion title={corpusInfo._source!.corpus_name ?? t("unknownName")}>
       <Grid container spacing={1}>
+        {corpusInfo._source!.license ? (
+          <>
+            <Grid item xs={12}>
+              <Typography variant="h6">{t("license")}</Typography>
+            </Grid>
+          </>
+        ) : null}
         <Grid item xs={12}>
           <Typography variant="h6">{t("corpusStatsTitle")}</Typography>
         </Grid>
         <Grid item xs="auto">
-          <InfoCard title={t("songsCountCorpus")} value={corpus.songCount} />
+          <InfoCard title={t("songsCountCorpus")} value={corpusAgg.songCount} />
         </Grid>
         <Grid item xs="auto">
           <InfoCard
             title={t("composersCountCorpus")}
-            value={corpus.composersCount}
+            value={corpusAgg.composersCount}
           />
         </Grid>
         <Grid item xs={12}>
@@ -144,15 +154,15 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
           <Typography variant="h6">{t("ambitusStatsTitle")}</Typography>
         </Grid>
         <Grid item xs={"auto"}>
-          <InfoCard title={t("ambitusMin")} value={corpus.ambitusStats.min} />
+          <InfoCard title={t("ambitusMin")} value={corpusAgg.ambitusStats.min} />
         </Grid>
         <Grid item xs={"auto"}>
-          <InfoCard title={t("ambitusMax")} value={corpus.ambitusStats.max} />
+          <InfoCard title={t("ambitusMax")} value={corpusAgg.ambitusStats.max} />
         </Grid>
         <Grid item xs={"auto"}>
           <InfoCard
             title={t("ambitusAvg")}
-            value={corpus.ambitusStats.avg?.toFixed(1)}
+            value={corpusAgg.ambitusStats.avg?.toFixed(1)}
           />
         </Grid>
       </Grid>

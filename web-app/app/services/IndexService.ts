@@ -141,3 +141,11 @@ export type CorpusAggregateXML = Awaited<ReturnType<typeof aggregateCorpusXML>>;
 export type CorpusAggregateAudio = Awaited<
   ReturnType<typeof aggregateCorpusAudio>
 >;
+export interface Corpus {
+  corpus_name: string,
+  license?: {
+    url: string;
+    description: string;
+  },
+  description?: string;
+}
