@@ -68,8 +68,10 @@ class TempoProcessor(MusicXMLProcessor):
 
         if len(tempo_marks) == 0:
             tempo_str = None
-        else:
+        elif tempo_marks[0].number is not None:
             tempo_str = str(tempo_marks[0].number)
+        else:
+            tempo_str = None
         return tempo_str
 
 
