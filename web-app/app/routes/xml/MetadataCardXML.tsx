@@ -9,12 +9,15 @@ export const MetadataCardXML: React.FC = () => {
   const { metadata } = song;
   const { t } = useTranslation("xml");
 
-  // The values are the translation keys
+  // The values are the translations
   const metadataLabels: Partial<Record<keyof SongResult["metadata"], string>> =
     {
       composer: t("composer"),
       lyricist: t("lyricist"),
       title: t("titleSong"),
+      year: t("year"),
+      collector: t("collector"),
+      piece_title: t("piece_title"), 
     };
 
   const metadataList = useMemo(() => {

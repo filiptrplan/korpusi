@@ -7,6 +7,10 @@ export interface SongResult extends Record<string, unknown> {
     composer: string;
     movementName: string;
     copyright: string;
+    collector: string;
+    singer: string;
+    piece_title: string;
+    year: string;
   };
   ambitus: {
     /**

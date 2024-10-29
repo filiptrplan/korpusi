@@ -164,12 +164,6 @@ def process_file(
     results = {}
     metadata = process_metadata(in_file, csv_path)
 
-    if "metadata" not in results:
-        results["metadata"] = {}
-
-    # add metadata to the metadata field because other processors might have a field with the same name
-    results["metadata"].update(metadata)
-
     results["corpus_id"] = corpus_id
     results["filename"] = os.path.basename(in_file)
 
@@ -217,6 +211,12 @@ def process_file(
         results.update(process_audio(in_file, filtered_audio_processors))
     else:
         raise typer.BadParameter(f"File type not supported: {in_file}")
+
+    if "metadata" not in results:
+        results["metadata"] = {}
+
+    # add metadata to the metadata field because other processors might have a field with the same name
+    results["metadata"].update(metadata)
 
     if include_original:
         # include original only if it's a musicXML file

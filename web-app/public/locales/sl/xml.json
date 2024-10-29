@@ -2,6 +2,9 @@
     "composer": "Skladatelj",
     "lyricist": "Pesnik",
     "titleSong": "Naslov dela",
+    "year": "Leto",
+    "collector": "Zbiratelj",
+    "piece_title": "Naslov",
     "outsideLinks": "Zunanje povezave",
     "metadataCardTitle": "Metapodatki",
     "basicData": {

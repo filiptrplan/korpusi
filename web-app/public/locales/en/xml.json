@@ -2,6 +2,9 @@
     "composer": "Composer",
     "lyricist": "Lyricist",
     "titleSong": "Title of the work",
+    "year": "Year",
+    "collector": "Collector",
+    "piece_title": "Piece title",
     "outsideLinks": "External links",
     "metadataCardTitle": "Metadata",
     "basicData": {
