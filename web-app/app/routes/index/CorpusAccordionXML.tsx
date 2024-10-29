@@ -40,6 +40,7 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
   corpusInfo
 }) => {
   const { t } = useTranslation("index");
+  const corpusInfoSource = corpusInfo._source!;
 
   const metrumDatasets: ChartData<"bar"> = {
     datasets: [
@@ -103,15 +104,27 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
   };
 
   return (
-    <MAccordion title={corpusInfo._source!.corpus_name ?? t("unknownName")}>
+    <MAccordion title={corpusInfoSource.corpus_name ?? t("unknownName")}>
       <Grid container spacing={1}>
-        {corpusInfo._source!.license ? (
+        {corpusInfoSource.license && (
           <>
             <Grid item xs={12}>
               <Typography variant="h6">{t("license")}</Typography>
+              <Typography variant="body1"><strong>{t("licenseURL")}: </strong>
+                <a href={corpusInfoSource.license.url}>{corpusInfoSource.license.url}</a>
+              </Typography>
+              <Typography variant="body1"><div dangerouslySetInnerHTML={{ __html: corpusInfoSource.license.description }} /></Typography>
             </Grid>
           </>
-        ) : null}
+        )}
+        {corpusInfoSource.description && (
+          <>
+            <Grid item xs={12}>
+              <Typography variant="h6">{t("description")}</Typography>
+              <Typography variant="body1"><div dangerouslySetInnerHTML={{ __html: corpusInfoSource.description}} /></Typography>
+            </Grid>
+          </>
+        )}
         <Grid item xs={12}>
           <Typography variant="h6">{t("corpusStatsTitle")}</Typography>
         </Grid>

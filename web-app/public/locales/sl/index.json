@@ -21,5 +21,8 @@
     "unknownName": "Neznano ime",
     "tempoXLabel": "Tempo (dobe/min)",
     "numberOfWorks": "Število del",
-    "histogramTempoTitle": "Porazdelitev tempov"
+    "histogramTempoTitle": "Porazdelitev tempov",
+    "license": "Licenca",
+    "licenseURL": "Povezava do licence",
+    "description": "Opis korpusa"
 }

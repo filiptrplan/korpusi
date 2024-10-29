@@ -1,4 +1,6 @@
+import json
 import os
+from typing import Annotated, Optional
 
 import urllib3
 from elasticsearch import Elasticsearch
@@ -28,12 +30,31 @@ else:
 
 
 @app.command()
-def create_corpus(index: str, corpus_name: str):
+def create_corpus(
+    index: str,
+    corpus_name: str,
+    details_file: Annotated[
+        Optional[str],
+        typer.Option(
+            help="A file containing details about the corpus. The file should be in JSON format. For the schema, see the README.",
+        ),
+    ],
+):
     """Creates a corpus in the ElasticSearch database."""
     client.options(ignore_status=400).indices.create(
         index=index
     )  # create the index if it doesn't exist
-    api_response = client.index(index=index, document={"corpus_name": corpus_name})
+    data = {
+        "corpus_name": corpus_name,
+    }
+    if details_file:
+        if not os.path.exists(details_file):
+            raise FileNotFoundError(f"File {details_file} not found")
+        file = open(details_file, "r")
+        dictionairy = json.load(file)
+        data = {**data, **dictionairy}
+
+    api_response = client.index(index=index, document=data)
     print(f'Created corpus {corpus_name} with id {api_response["_id"]}')
 
 

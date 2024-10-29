@@ -1,13 +1,19 @@
 <!-- TOC -->
-* [Installation](#installation)
-  * [Default installation](#default-installation)
-  * [In case of CUDA errors](#in-case-of-cuda-errors)
-* [Usage](#usage)
-* [Pipeline](#pipeline)
-  * [MusicXML processing](#musicxml-processing)
-  * [Audio processing](#audio-processing)
-* [Development](#development)
-  * [Setup](#setup)
+- [Installation](#installation)
+  - [Default installation](#default-installation)
+  - [In case of CUDA errors](#in-case-of-cuda-errors)
+- [Usage](#usage)
+  - [Preprocessing](#preprocessing)
+  - [Ingesting](#ingesting)
+  - [Errors](#errors)
+    - [`SSLError([Errno 13] Permission denied))`](#sslerrorerrno-13-permission-denied)
+- [Pipeline](#pipeline)
+  - [MusicXML processing](#musicxml-processing)
+  - [Audio processing](#audio-processing)
+  - [Corpus schema](#corpus-schema)
+- [Development](#development)
+  - [Setup](#setup)
+  - [Testing](#testing)
 <!-- TOC -->
 
 # Installation
@@ -92,7 +98,9 @@ If you want to list all the available corpuses, you can run
 ```bash
 python ingest.py list-corpuses
 ```
-If you want to create a new one, you can run 
+If you want to create a new one, you can run. The convention is that the `index` is always `corpuses`. 
+To add licensing and descriptions to the corpus you can use the `--details-file` option and refer to the
+[corpus schema chapter](#corpus-schema).
 ```bash
 python ingest.py create-corpus <index> <corpus_name>
 ```
@@ -160,6 +168,19 @@ By default, the `ingest` command will use the `audio_processors` list to process
 
 To add a new audio processor, you can follow the same steps as for the musicXML processors. The only difference is that you should inherit from `AudioProcessor` instead of `MusicXMLProcessor`.
 The `song` parameter in the constructor now gets a path to the audio file.
+
+## Corpus schema
+The following is an example JSON file you can use with the `create-corpus` command. Descriptions can contain HTML.
+
+```json
+{
+  "license": {
+    "url": "http://example.com/license",
+    "description": "This is licensed under the MIT license."
+  },
+  "description": "This is additional information about the corpus."
+}
+```
 
 # Development
 

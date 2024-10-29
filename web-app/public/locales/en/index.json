@@ -21,5 +21,8 @@
     "unknownName": "Unknown name",
     "tempoXLabel": "Tempo (beats/min)",
     "numberOfWorks": "Number of works",
-    "histogramTempoTitle": "Tempo distribution"
+    "histogramTempoTitle": "Tempo distribution",
+    "license": "License",
+    "licenseURL": "Link to the license",
+    "description": "Description of the corpus"
 }
