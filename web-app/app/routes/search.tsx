@@ -7,13 +7,10 @@ import {
   Paper,
   Slide,
   Stack,
+  Switch,
+  Typography,
 } from "@mui/material";
-import {
-  Form,
-  useLoaderData,
-  useNavigate,
-  useSubmit,
-} from "@remix-run/react";
+import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
 import {
   FormEvent,
@@ -101,7 +98,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const getTotalPages = (data: SearchResponse<unknown>) =>
     Math.ceil(getTotalHits(data) / pageSize) ?? 0;
   const totalPages = getTotalPages(
-    searchType == SearchType.XML ? xmlHits : audioHits
+    searchType == SearchType.XML ? xmlHits : audioHits,
   );
   const totalHits =
     getTotalHits(searchType == SearchType.XML ? xmlHits : audioHits) ?? 0;
@@ -234,15 +231,6 @@ export const CompareCollapseAndList: React.FC<{
   );
 };
 
-const searchTypeToString = (type: SearchType) => {
-  switch (type) {
-    case SearchType.Audio:
-      return "switchToXML";
-    case SearchType.XML:
-      return "switchToAudio";
-  }
-};
-
 const stringToSearchType = (str: string): SearchType => {
   return isNaN(parseInt(str)) ? SearchType.XML : parseInt(str);
 };
@@ -313,11 +301,11 @@ export default function Search() {
   };
 
   const [showCompareList, setShowCompareList] = useState(
-    params.showCompareList === "1"
+    params.showCompareList === "1",
   );
   useUpdateQueryStringValueWithoutNavigation(
     "showCompareList",
-    showCompareList ? "1" : "0"
+    showCompareList ? "1" : "0",
   );
 
   const compareRef = useRef<HTMLDivElement>(null);
@@ -429,23 +417,28 @@ export default function Search() {
               >
                 {t("reset")}
               </Button>
-              <Button
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={0}
                 sx={{
-                  py: 1,
-                  px: 3,
-                  boxShadow: "none",
-                }}
-                variant="outlined"
-                onClick={() => {
-                  if (searchType == SearchType.Audio) {
-                    resetFields(SearchType.XML);
-                  } else {
-                    resetFields(SearchType.Audio);
-                  }
+                  px: 1,
                 }}
               >
-                {t(searchTypeToString(searchType))}
-              </Button>
+                <Typography>{t("switchToXML")}</Typography>
+                <Switch
+                  checked={searchType == SearchType.Audio}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    console.log(searchType);
+                    if (event.target.checked) {
+                      resetFields(SearchType.Audio);
+                    } else {
+                      resetFields(SearchType.XML);
+                    }
+                  }}
+                />
+                <Typography>{t("switchToAudio")}</Typography>
+              </Stack>
             </Stack>
           </Stack>
         </Form>
