@@ -14,7 +14,7 @@ if [ ! -d "$2" ]; then
 fi
 
 # Import songs index
-docker run --rm --net=host -v "$2":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
+docker run --rm --net=host -v "$(realpath "$2")":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
   --input=/tmp/songs_mapping.json \
   --output=https://elastic:$1@localhost:9200/songs \
   --type=mapping
