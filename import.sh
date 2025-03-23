@@ -19,31 +19,33 @@ docker run --rm --net=host -v "$(realpath "$2")":/tmp -e NODE_TLS_REJECT_UNAUTHO
   --output=https://elastic:$1@localhost:9200/songs \
   --type=mapping
 
-docker run --rm --net=host -v "$2":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
+docker run --rm --net=host -v "$(realpath "$2")":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
   --input=/tmp/songs_data.json \
   --output=https://elastic:$1@localhost:9200/songs \
   --type=data
 
 # Import corpuses index
-docker run --rm --net=host -v "$2":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
+docker run --rm --net=host -v "$(realpath "$2")":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
   --input=/tmp/corpuses_mapping.json \
   --output=https://elastic:$1@localhost:9200/corpuses \
   --type=mapping
 
-docker run --rm --net=host -v "$2":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
+docker run --rm --net=host -v "$(realpath "$2")":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
   --input=/tmp/corpuses_data.json \
   --output=https://elastic:$1@localhost:9200/corpuses \
   --type=data
 
 # Import audio index
-docker run --rm --net=host -v "$2":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
+docker run --rm --net=host -v "$(realpath "$2")":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
   --input=/tmp/audio_mapping.json \
   --output=https://elastic:$1@localhost:9200/audio \
   --type=mapping
 
-docker run --rm --net=host -v "$2":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
+# we need to set a lower limit for batch operations to not overloard the elasticsearch server
+docker run --rm --net=host -v "$(realpath "$2")":/tmp -e NODE_TLS_REJECT_UNAUTHORIZED=0 -ti elasticdump/elasticsearch-dump \
   --input=/tmp/audio_data.json \
   --output=https://elastic:$1@localhost:9200/audio \
-  --type=data
+  --limit=20 \ 
+  --type=data 
 
 echo "Import complete. Check your Elasticsearch instance for the imported data."
