@@ -10,6 +10,8 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
+import MusicNote from "@mui/icons-material/MusicNote";
+import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/server-runtime";
 import {
@@ -420,12 +422,15 @@ export default function Search() {
               <Stack
                 direction="row"
                 alignItems="center"
-                spacing={0}
+                spacing={1}
                 sx={{
                   px: 1,
                 }}
               >
-                <Typography>{t("switchToXML")}</Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <MusicNote fontSize="small" />
+                  <Typography>{t("switchToXML")}</Typography>
+                </Stack>
                 <Switch
                   checked={searchType == SearchType.Audio}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -437,7 +442,10 @@ export default function Search() {
                     }
                   }}
                 />
-                <Typography>{t("switchToAudio")}</Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <GraphicEqIcon fontSize="small" />
+                  <Typography>{t("switchToAudio")}</Typography>
+                </Stack>
               </Stack>
             </Stack>
           </Stack>
