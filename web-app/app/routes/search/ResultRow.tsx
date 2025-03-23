@@ -9,7 +9,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import Waves from "@mui/icons-material/Waves";
+import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import Difference from "@mui/icons-material/Difference";
@@ -122,7 +122,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
                   {type === SearchType.XML ? (
                     <MusicNote fontSize="small" />
                   ) : (
-                    <Waves fontSize="small" />
+                    <GraphicEqIcon fontSize="small" />
                   )}
                   <Tooltip title={title ?? titleMissingMessage}>
                     <Typography
