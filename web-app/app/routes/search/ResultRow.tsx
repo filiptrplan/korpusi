@@ -18,6 +18,7 @@ import { InfoCard } from "~/components/InfoCard";
 import { useTranslation } from "react-i18next";
 import { SearchType } from "~/routes/search";
 import { ReactNode } from "react";
+import { SongResult } from "~/src/DataTypes";
 
 export interface ResultRowProps {
   searchHit: SearchHit<{ corpus_id: string } & unknown>;
@@ -48,6 +49,13 @@ export const ResultRow: React.FC<ResultRowProps> = ({
   const createDownloadLink = () => {
     const blob = new Blob([JSON.stringify(searchHit._source)], {
       type: "application/json",
+    });
+    return URL.createObjectURL(blob);
+  };
+
+  const createDownloadLinkXML = () => {
+    const blob = new Blob([(searchHit._source as SongResult).original_file], {
+      type: "application/xml",
     });
     return URL.createObjectURL(blob);
   };
@@ -93,7 +101,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
       <CardActionArea
         onClick={() => {
           navigate(
-            `/${type == SearchType.Audio ? "audio" : "xml"}/${searchHit._id}`
+            `/${type == SearchType.Audio ? "audio" : "xml"}/${searchHit._id}`,
           );
         }}
       >
@@ -146,7 +154,7 @@ export const ResultRow: React.FC<ResultRowProps> = ({
                 title={t("corpus")}
                 value={
                   corpusOptions?.find(
-                    (x) => x.value === searchHit._source?.corpus_id
+                    (x) => x.value === searchHit._source?.corpus_id,
                   )?.label
                 }
               />
@@ -184,9 +192,10 @@ export const ResultRow: React.FC<ResultRowProps> = ({
           <Tooltip title={t("downloadMusicXML")}>
             <IconButton
               component="a"
-              href={(searchHit._source as SongResult).original_file}
+              href={createDownloadLinkXML()}
               download={`${title}.musicxml`}
               target="_blank"
+              style={{ marginLeft: 0 }}
             >
               <MusicNote sx={{ color: "text.primary" }} />
             </IconButton>
