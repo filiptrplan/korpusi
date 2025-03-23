@@ -13,6 +13,7 @@ import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import Difference from "@mui/icons-material/Difference";
 import FileDownload from "@mui/icons-material/FileDownload";
+import MusicNote from "@mui/icons-material/MusicNote";
 import { InfoCard } from "~/components/InfoCard";
 import { useTranslation } from "react-i18next";
 import { SearchType } from "~/routes/search";
@@ -179,6 +180,18 @@ export const ResultRow: React.FC<ResultRowProps> = ({
             <FileDownload sx={{ color: "text.primary" }} />
           </IconButton>
         </Tooltip>
+        {type === SearchType.XML && (
+          <Tooltip title={t("downloadMusicXML")}>
+            <IconButton
+              component="a"
+              href={(searchHit._source as SongResult).original_file}
+              download={`${title}.musicxml`}
+              target="_blank"
+            >
+              <MusicNote sx={{ color: "text.primary" }} />
+            </IconButton>
+          </Tooltip>
+        )}
       </CardActions>
     </Card>
   );
