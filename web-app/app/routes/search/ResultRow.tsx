@@ -9,6 +9,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import Waves from "@mui/icons-material/Waves";
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import Difference from "@mui/icons-material/Difference";
@@ -117,23 +118,30 @@ export const ResultRow: React.FC<ResultRowProps> = ({
                   paddingRight: 3,
                 }}
               >
-                <Tooltip title={title ?? titleMissingMessage}>
-                  <Typography
-                    variant="h6"
-                    fontSize={"1.15rem"}
-                    sx={{
-                      maxWidth: {
-                        lg: 400,
-                        xs: 200,
-                      },
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {title ?? titleMissingMessage}
-                  </Typography>
-                </Tooltip>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  {type === SearchType.XML ? (
+                    <MusicNote fontSize="small" />
+                  ) : (
+                    <Waves fontSize="small" />
+                  )}
+                  <Tooltip title={title ?? titleMissingMessage}>
+                    <Typography
+                      variant="h6"
+                      fontSize={"1.15rem"}
+                      sx={{
+                        maxWidth: {
+                          lg: 400,
+                          xs: 200,
+                        },
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {title ?? titleMissingMessage}
+                    </Typography>
+                  </Tooltip>
+                </Stack>
                 <Typography
                   variant="body2"
                   fontSize={"0.8rem"}
