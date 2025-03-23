@@ -46,5 +46,6 @@
     "useDuration": "Consider duration",
     "duration": "Duration",
     "relevanceScore": "Relevance to query",
-    "numPerPage": "Num. per page"
+    "numPerPage": "Num. per page",
+    "downloadMusicXML": "Download MusicXML"
 }
