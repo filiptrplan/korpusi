@@ -5,3 +5,4 @@ certs/
 .vscode/
 *.mp3
 backup.sh
+.aider*
