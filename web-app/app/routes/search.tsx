@@ -422,12 +422,12 @@ export default function Search() {
               <Stack
                 direction="row"
                 alignItems="center"
-                spacing={1}
+                spacing={0.5}
                 sx={{
                   px: 1,
                 }}
               >
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" alignItems="center" spacing={0.6}>
                   <MusicNote fontSize="small" />
                   <Typography>{t("switchToXML")}</Typography>
                 </Stack>
@@ -442,7 +442,7 @@ export default function Search() {
                     }
                   }}
                 />
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" alignItems="center" spacing={0.6}>
                   <GraphicEqIcon fontSize="small" />
                   <Typography>{t("switchToAudio")}</Typography>
                 </Stack>
