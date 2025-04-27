@@ -399,12 +399,8 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                   script: {
                     lang: "painless",
                     // Access _source directly to avoid fielddata issues on text fields
-                    source: """
-                      // Check if the path to the field exists in _source
-                      if (params._source?.rhythm?.rhythm_string == null) {
-                        return false;
-                      }
-                      String rhythmString = params._source.rhythm.rhythm_string;
+                    source: `
+                      String rhythmString = doc['rhythm.rhythm_string.keyword'].value;
                       if (rhythmString.isEmpty()) {
                           return false; // Empty string doesn't meet criteria
                       }
@@ -426,7 +422,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
 
                       // Calculate percentage and compare
                       return (double)targetNoteCount / totalCount >= 0.7;
-                    """,
+                    `,
                   },
                 },
               },
