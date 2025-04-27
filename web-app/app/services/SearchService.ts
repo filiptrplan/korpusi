@@ -261,7 +261,30 @@ const constructEducationalQuery = (params: Record<string, string>) => {
           },
         });
         break;
-      // TODO: Add cases for other educational filters (VR1, VR2, IF2, RF1-4) here
+      case "IF2":
+        filterQueries.push({
+          bool: {
+            must_not: [
+              // Disallow intervals with absolute value 6 (tritone) or > 7
+              {
+                regexp: {
+                  // Matches numbers like 6, -6, 8, -8, 10, -12, etc. as whole terms
+                  "contour.melodic_contour_string_relative": {
+                    // Regex breakdown:
+                    // (^| ): Start of string or space before number
+                    // -?: Optional minus sign
+                    // (6|([8-9]|\\d{2,})): Matches 6 OR (8 or 9 OR any number with 2+ digits)
+                    // ( |$): Space after number or end of string
+                    value: "(^| )(-?(6|([8-9]|\\d{2,})))( |$)",
+                    flags: "ALL", // Enable all optional operators
+                  },
+                },
+              },
+            ],
+          },
+        });
+        break;
+      // TODO: Add cases for other educational filters (VR1, VR2, RF1-4) here
       default:
         // Optionally log or handle unknown filters
         console.warn(`Unknown educational filter requested: ${filter}`);
