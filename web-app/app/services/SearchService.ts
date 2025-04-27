@@ -265,11 +265,30 @@ const constructEducationalQuery = (params: Record<string, string>) => {
             // If all checks pass
             return true;
           `,
-        },
+            },
+          },
+        });
+        break;
+      // TODO: Add cases for other educational filters (VR1, VR2, IF2, RF1-4) here
+      // case "VR1":
+      //   filterQueries.push({ script: { script: { lang: "painless", source: `... VR1 logic ...` } } });
+      //   break;
+      default:
+        // Optionally log or handle unknown filters
+        console.warn(`Unknown educational filter requested: ${filter}`);
+        break;
+    }
+  }
+
+  if (filterQueries.length > 0) {
+    // Combine all filter scripts under a single 'must' clause
+    return {
+      bool: {
+        must: filterQueries,
       },
     };
   }
-  // TODO: Add other educational filters (VR1, VR2, IF2, RF1-4) as script queries here if needed.
+
   return null;
 };
 
