@@ -131,8 +131,60 @@ export const constructQueryXML = (
     });
   }
 
+  // EDUCATIONAL FILTERS
+  // TODO: Handle multiple comma-separated filters if necessary
+  if ("edu" in params && params.edu === "IF1") {
+    queries.push({
+      script: {
+        script: {
+          lang: "painless",
+          source: `
+            // Check if the field exists and is not empty
+            if (doc['contour.melodic_contour_string_relative'].size() == 0 || doc['contour.melodic_contour_string_relative'].value.isEmpty()) {
+              return false; // Cannot apply filter if data is missing
+            }
+
+            String[] intervalsStr = doc['contour.melodic_contour_string_relative'].value.splitOnToken(' ');
+            List intervals = new ArrayList();
+            try {
+              for (String s : intervalsStr) {
+                intervals.add(Integer.parseInt(s));
+              }
+            } catch (NumberFormatException e) {
+              // Handle potential parsing errors - fail the document if unparseable
+              return false;
+            }
+
+            // Check allowed intervals (abs value <= 4)
+            Set allowedAbsIntervals = [0, 1, 2, 3, 4];
+            for (int interval : intervals) {
+              if (!allowedAbsIntervals.contains(Math.abs(interval))) {
+                return false; // Disallowed interval found
+              }
+            }
+
+            // Check for consecutive m2 (abs value 1)
+            Integer previousIntervalAbs = null;
+            for (int interval : intervals) {
+              int intervalAbs = Math.abs(interval);
+              if (intervalAbs == 1 && previousIntervalAbs != null && previousIntervalAbs == 1) {
+                return false; // Consecutive m2 found
+              }
+              previousIntervalAbs = intervalAbs;
+            }
+
+            // If all checks pass
+            return true;
+          `,
+        },
+      },
+    });
+  }
+  // TODO: Add other educational filters (VR1, VR2, IF2, RF1-4) as script queries here if needed.
+
+
   // RHYTHM NGRAM QUERY
-  if ("rhythmNgram" in params) {
+  if ("rhythmNgram" in params && params.rhythmNgram.trim() !== "") {
     queries.push({
       match_phrase: {
         "rhythm.rhythm_string": params.rhythmNgram,
