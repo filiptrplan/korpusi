@@ -346,13 +346,14 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                 script: {
                   script: {
                     lang: "painless",
-                    source: `
-                      // Check if the field exists and is not empty
-                      if (doc['rhythm.rhythm_string'] == null || doc['rhythm.rhythm_string'].empty) {
+                    // Access _source directly to avoid fielddata issues on text fields
+                    source: """
+                      // Check if the path to the field exists in _source
+                      if (params._source?.rhythm?.rhythm_string == null) {
                         return false;
                       }
-                      String rhythmString = doc['rhythm.rhythm_string'].value;
-                      if (rhythmString.length() == 0) {
+                      String rhythmString = params._source.rhythm.rhythm_string;
+                      if (rhythmString.isEmpty()) {
                           return false;
                       }
 
