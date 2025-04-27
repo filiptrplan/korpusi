@@ -1,0 +1,8 @@
+[
+    {
+        "name": "prod cluster",
+        "uri": "http://es01:9200",
+        "username": "elastic",
+        "password": "elastic"
+    }
+]
