@@ -47,5 +47,6 @@
     "duration": "Duration",
     "relevanceScore": "Relevance to query",
     "numPerPage": "Num. per page",
-    "downloadMusicXML": "Download MusicXML"
+    "downloadMusicXML": "Download MusicXML",
+    "educational": "Educational filters"
 }

@@ -47,5 +47,6 @@
     "duration": "Dolžina",
     "relevanceScore": "Relevantnost poizvedbi",
     "numPerPage": "Št. na stran",
-    "downloadMusicXML": "Prenesi MusicXML"
+    "downloadMusicXML": "Prenesi MusicXML",
+    "educational": "Izobraževalni filtri"
 }
