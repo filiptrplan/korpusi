@@ -491,7 +491,66 @@ const constructEducationalQuery = (params: Record<string, string>) => {
           },
         });
         break;
-      // TODO: Add cases for other educational filters (RF4) here
+      case "RF4":
+        // RF4: Complex Rhythm Filter with More Rests Allowed
+        filterQueries.push({
+          bool: {
+            must: [
+              // 1. Must have a single time signature (any type)
+              // We check for existence, assuming the field stores a single value if present.
+              {
+                exists: {
+                  field: "time_signature",
+                },
+              },
+              // 2. At least 70% eighth ("1/2"), quarter ("1/1"), or half ("2/1") notes
+              {
+                script: {
+                  script: {
+                    lang: "painless",
+                    source: `
+                      String rhythmString = doc['rhythm.rhythm_string.keyword'].value;
+                      if (rhythmString.isEmpty()) {
+                          return false; // Empty string doesn't meet criteria
+                      }
+
+                      String[] values = rhythmString.splitOnToken(' ');
+                      int totalCount = values.length;
+                      int targetNoteCount = 0;
+
+                      if (totalCount == 0) {
+                        return false; // No notes means it doesn't meet the criteria
+                      }
+
+                      for (String val : values) {
+                        // Check for eighth ("1/2"), quarter ("1/1"), or half ("2/1") notes
+                        if (val.equals("1/2") || val.equals("1/1") || val.equals("2/1")) {
+                          targetNoteCount++;
+                        }
+                      }
+
+                      // Calculate percentage and compare
+                      return (double)targetNoteCount / totalCount >= 0.7;
+                    `,
+                  },
+                },
+              },
+              // 3. Maximum 4 Rests - Cannot be implemented currently as rests are not indexed.
+              // TODO: Add rest information to the index to enable this filter.
+              /*
+              {
+                script: {
+                  script: {
+                    lang: "painless",
+                    source: " // Logic to count rests (up to 4) would go here if rest data was available "
+                  }
+                }
+              }
+              */
+            ],
+          },
+        });
+        break;
       default:
         // Optionally log or handle unknown filters
         console.warn(`Unknown educational filter requested: ${filter}`);
