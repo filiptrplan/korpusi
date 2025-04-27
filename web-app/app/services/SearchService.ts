@@ -331,9 +331,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
         });
         break;
       case "RF1":
-        // RF1: Simple Rhythm Filter (Adapted for current mapping)
-        // NOTE: Rule 2 (>= 80% eighth/quarter notes) cannot be implemented
-        //       with the current mapping without script queries or pipeline changes.
+        // RF1: Simple Rhythm Filter
         filterQueries.push({
           bool: {
             must: [
@@ -343,6 +341,42 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                   time_signature: ["2/4", "4/4", "2/2"],
                 },
               },
+              // 2. At least 80% eighth (0.5) or quarter (1.0) notes
+              {
+                script: {
+                  script: {
+                    lang: "painless",
+                    source: """
+                      // Check if the field exists and is not empty
+                      if (doc['rhythm.rhythm_string'] == null || doc['rhythm.rhythm_string'].empty) {
+                        return false;
+                      }
+                      String rhythmString = doc['rhythm.rhythm_string'].value;
+                      if (rhythmString.length() == 0) {
+                          return false;
+                      }
+
+                      String[] values = rhythmString.splitOnToken(' ');
+                      int totalCount = values.length;
+                      int eighthQuarterCount = 0;
+
+                      if (totalCount == 0) {
+                        return false; // No notes means it doesn't meet the criteria
+                      }
+
+                      for (String val : values) {
+                        String trimmedVal = val.trim();
+                        if (trimmedVal.equals("0.5") || trimmedVal.equals("1.0")) {
+                          eighthQuarterCount++;
+                        }
+                      }
+
+                      // Calculate percentage and compare
+                      return (double)eighthQuarterCount / totalCount >= 0.8;
+                    """,
+                  },
+                },
+              },
             ],
             must_not: [
               // 3. No rests (assuming '0' represents rests in rhythm_string)
@@ -350,7 +384,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                 match: {
                   // This assumes rests are coded as '0' in the string.
                   // Adjust if rests are represented differently.
-                  "rhythm.rhythm_string": "0",
+                  "rhythm.rhythm_string": "0", // Using match query to check for the term '0'
                 },
               },
             ],
