@@ -347,10 +347,14 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                   script: {
                     lang: "painless",
                     // Access _source directly to avoid fielddata issues on text fields
-                    source: `
-                      String rhythmString = doc['rhythm.rhythm_string'].value
+                    source: """
+                      // Check if the path to the field exists in _source
+                      if (params._source?.rhythm?.rhythm_string == null) {
+                        return false;
+                      }
+                      String rhythmString = params._source.rhythm.rhythm_string;
                       if (rhythmString.isEmpty()) {
-                          return true;
+                          return false; // Empty string doesn't meet criteria
                       }
 
                       String[] values = rhythmString.splitOnToken(' ');
@@ -362,8 +366,8 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                       }
 
                       for (String val : values) {
-                        String trimmedVal = val.trim();
-                        if (trimmedVal.equals("0.5") || trimmedVal.equals("1.0")) {
+                        // Check for quarter notes ("1/1") and eighth notes ("1/2")
+                        if (val.equals("1/1") || val.equals("1/2")) {
                           eighthQuarterCount++;
                         }
                       }
@@ -375,17 +379,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                 },
               },
             ],
-            must_not: [
-              // 3. No rests (assuming '0' represents rests in rhythm_string)
-              // TODO: Rests are not currently represented in the rhythm_string field.
-              {
-                match: {
-                  // This assumes rests are coded as '0' in the string.
-                  // Adjust if rests are represented differently.
-                  "rhythm.rhythm_string": "0", // Using match query to check for the term '0'
-                },
-              },
-            ],
+            // Removed must_not clause for rests as they are not in rhythm_string
           },
         });
         break;
