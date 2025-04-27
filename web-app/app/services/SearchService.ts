@@ -246,7 +246,8 @@ const constructEducationalQuery = (params: Record<string, string>) => {
 
             // Check allowed intervals (abs value <= 4)
             Set allowedAbsIntervals = [0, 1, 2, 3, 4];
-            for (int interval : intervals) {
+            for (Object o : intervals) {
+              int interval = (int)o; // Explicit cast
               if (!allowedAbsIntervals.contains(Math.abs(interval))) {
                 return false; // Disallowed interval found
               }
@@ -254,7 +255,8 @@ const constructEducationalQuery = (params: Record<string, string>) => {
 
             // Check for consecutive m2 (abs value 1)
             Integer previousIntervalAbs = null;
-            for (int interval : intervals) {
+            for (Object o : intervals) {
+              int interval = (int)o; // Explicit cast
               int intervalAbs = Math.abs(interval);
               if (intervalAbs == 1 && previousIntervalAbs != null && previousIntervalAbs == 1) {
                 return false; // Consecutive m2 found
