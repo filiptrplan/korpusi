@@ -11,6 +11,7 @@ import { AmbitusSlider } from "~/routes/search/AmbitusSlider";
 import { RhythmNgramSearch } from "~/routes/search/RhythmNgramSearch";
 import { MelodicNgramSearch } from "~/routes/search/MelodicNgramSearch";
 import { useMemo } from "react";
+import { EducationalSelect } from "./EducationalSelect";
 
 interface SearchFiltersXMLProps {
   params: Record<string, string>;
@@ -80,6 +81,9 @@ export const SearchFiltersXML: React.FC<SearchFiltersXMLProps> = ({
               tempoTo={params.tempoTo}
               useTempo={params.useTempo}
             />
+          </Grid>
+          <Grid item xs="auto" md={12}>
+            <EducationalSelect eduFilters={params.edu} />
           </Grid>
         </Grid>
       </FilterGroupCollapse>

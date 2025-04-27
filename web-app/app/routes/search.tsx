@@ -37,6 +37,7 @@ import {
   constructQueryXML,
   getAvailableCorpuses,
   getAvailableTimeSignatures,
+  searchAudio,
 } from "../services/SearchService";
 import { CompareList } from "./compare/CompareList";
 import { useUpdateQueryStringValueWithoutNavigation } from "~/utils/misc";
@@ -81,12 +82,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const searchType = stringToSearchType(params.searchType);
 
   // Search data fetching
-  const xmlHits = await elastic.search<SongResult>({
-    index: "songs",
-    from: (page - 1) * pageSize,
-    size: pageSize,
-    query: constructQueryXML(params),
-  });
+  const xmlHits = await searchAudio(params, page, pageSize);
 
   const audioHits = await elastic.search<AudioResult>({
     index: "audio",
