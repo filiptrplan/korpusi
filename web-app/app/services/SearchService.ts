@@ -376,9 +376,13 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                   },
                 },
               },
+              // 3. No Rests
+              {
+                term: {
+                  "rhythm.num_rests": 0,
+                },
+              },
             ],
-            // Removed must_not clause for rests as they are not in rhythm_string
-            // TODO: Add rests to rhythm_string field or as a separate field
           },
         });
         break;
@@ -426,7 +430,12 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                   },
                 },
               },
-              // 3. No Rests - Cannot be implemented currently as rests are not in rhythm_string
+              // 3. No Rests
+              {
+                term: {
+                  "rhythm.num_rests": 0,
+                },
+              },
             ],
           },
         });
@@ -473,20 +482,18 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                       return (double)targetNoteCount / totalCount >= 0.7;
                     `,
                   },
+                    `,
+                  },
                 },
               },
-              // 3. Maximum 2 Rests - Cannot be implemented currently as rests are not indexed.
-              // TODO: Add rest information to the index to enable this filter.
-              /*
+              // 3. Maximum 2 Rests
               {
-                script: {
-                  script: {
-                    lang: "painless",
-                    source: " // Logic to count rests would go here if rest data was available "
-                  }
-                }
-              }
-              */
+                range: {
+                  "rhythm.num_rests": {
+                    lte: 2,
+                  },
+                },
+              },
             ],
           },
         });
@@ -533,20 +540,18 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                       return (double)targetNoteCount / totalCount >= 0.7;
                     `,
                   },
+                    `,
+                  },
                 },
               },
-              // 3. Maximum 4 Rests - Cannot be implemented currently as rests are not indexed.
-              // TODO: Add rest information to the index to enable this filter.
-              /*
+              // 3. Maximum 4 Rests
               {
-                script: {
-                  script: {
-                    lang: "painless",
-                    source: " // Logic to count rests (up to 4) would go here if rest data was available "
-                  }
-                }
-              }
-              */
+                range: {
+                  "rhythm.num_rests": {
+                    lte: 4,
+                  },
+                },
+              },
             ],
           },
         });

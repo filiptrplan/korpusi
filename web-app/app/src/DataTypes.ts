@@ -69,7 +69,7 @@ export interface SongResult extends Record<string, unknown> {
      */
     measure_starts: number[];
     /**
-     * Number of rests
+     * Number of rests in the song
      */
     num_rests: number;
   };
