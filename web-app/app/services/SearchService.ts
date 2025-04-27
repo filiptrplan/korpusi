@@ -224,53 +224,44 @@ const constructEducationalQuery = (params: Record<string, string>) => {
     switch (filter) {
       case "IF1":
         filterQueries.push({
-          script: {
-            script: {
-              lang: "painless",
-              source: `
-            // Check if the field exists and is not empty
-            if (doc['contour.melodic_contour_string_relative'].size() == 0 || doc['contour.melodic_contour_string_relative'].value.isEmpty()) {
-              return false; // Cannot apply filter if data is missing
-            }
-
-            String[] intervalsStr = doc['contour.melodic_contour_string_relative'].value.splitOnToken(' ');
-            List intervals = new ArrayList();
-            try {
-              for (String s : intervalsStr) {
-                intervals.add(Integer.parseInt(s));
-              }
-            } catch (NumberFormatException e) {
-              // Handle potential parsing errors - fail the document if unparseable
-              return false;
-            }
-
-            // Check allowed intervals (abs value <= 4)
-            Set allowedAbsIntervals = [0, 1, 2, 3, 4];
-            for (Object o : intervals) {
-              int interval = (int)o; // Explicit cast
-              if (!allowedAbsIntervals.contains(Math.abs(interval))) {
-                return false; // Disallowed interval found
-              }
-            }
-
-            // Check for consecutive m2 (abs value 1)
-            Integer previousIntervalAbs = null;
-            for (Object o : intervals) {
-              int interval = (int)o; // Explicit cast
-              int intervalAbs = Math.abs(interval);
-              if (intervalAbs == 1 && previousIntervalAbs != null && previousIntervalAbs == 1) {
-                return false; // Consecutive m2 found
-              }
-              previousIntervalAbs = intervalAbs;
-            }
-
-            // If all checks pass
-            return true;
-          `,
-            },
+          bool: {
+            must_not: [
+              // Condition 1: Disallow intervals with absolute value >= 5
+              {
+                regexp: {
+                  // Matches numbers like 5, -5, 10, -12, etc. as whole terms
+                  "contour.melodic_contour_string_relative": {
+                    value: "(^| )(-?([5-9]|\\d{2,}))( |$)",
+                    flags: "ALL", // Enable all optional operators
+                  },
+                },
+              },
+              // Condition 2: Disallow consecutive m2 (abs value 1)
+              {
+                match_phrase: {
+                  "contour.melodic_contour_string_relative": "1 1",
+                },
+              },
+              {
+                match_phrase: {
+                  "contour.melodic_contour_string_relative": "-1 1",
+                },
+              },
+              {
+                match_phrase: {
+                  "contour.melodic_contour_string_relative": "1 -1",
+                },
+              },
+              {
+                match_phrase: {
+                  "contour.melodic_contour_string_relative": "-1 -1",
+                },
+              },
+            ],
           },
         });
         break;
+      // TODO: Add cases for other educational filters (VR1, VR2, IF2, RF1-4) here
       default:
         // Optionally log or handle unknown filters
         console.warn(`Unknown educational filter requested: ${filter}`);
