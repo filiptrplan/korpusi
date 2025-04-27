@@ -105,6 +105,7 @@ class RhythmProcessor(MusicXMLProcessor):
         # this is done because you can't set a measure number to a note and a note in a chord doesn't have one
         measure_numbers = []
         beats = []
+        num_rests = 0
         for x in self.song.parts[0].flatten():
             if len(measure_numbers) != 0:
                 if (
