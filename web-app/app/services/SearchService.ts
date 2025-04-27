@@ -346,7 +346,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                 script: {
                   script: {
                     lang: "painless",
-                    source: """
+                    source: `
                       // Check if the field exists and is not empty
                       if (doc['rhythm.rhythm_string'] == null || doc['rhythm.rhythm_string'].empty) {
                         return false;
@@ -373,13 +373,14 @@ const constructEducationalQuery = (params: Record<string, string>) => {
 
                       // Calculate percentage and compare
                       return (double)eighthQuarterCount / totalCount >= 0.8;
-                    """,
+                    `,
                   },
                 },
               },
             ],
             must_not: [
               // 3. No rests (assuming '0' represents rests in rhythm_string)
+              // TODO: Rests are not currently represented in the rhythm_string field.
               {
                 match: {
                   // This assumes rests are coded as '0' in the string.
