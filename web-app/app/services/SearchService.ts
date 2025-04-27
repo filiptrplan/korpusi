@@ -330,7 +330,34 @@ const constructEducationalQuery = (params: Record<string, string>) => {
           },
         });
         break;
-      // TODO: Add cases for other educational filters (RF1-4) here
+      case "RF1":
+        // RF1: Simple Rhythm Filter (Adapted for current mapping)
+        // NOTE: Rule 2 (>= 80% eighth/quarter notes) cannot be implemented
+        //       with the current mapping without script queries or pipeline changes.
+        filterQueries.push({
+          bool: {
+            must: [
+              // 1. Time Signature must be 2/4, 4/4, or 2/2
+              {
+                terms: {
+                  time_signature: ["2/4", "4/4", "2/2"],
+                },
+              },
+            ],
+            must_not: [
+              // 3. No rests (assuming '0' represents rests in rhythm_string)
+              {
+                match: {
+                  // This assumes rests are coded as '0' in the string.
+                  // Adjust if rests are represented differently.
+                  "rhythm.rhythm_string": "0",
+                },
+              },
+            ],
+          },
+        });
+        break;
+      // TODO: Add cases for other educational filters (RF2-4) here
       default:
         // Optionally log or handle unknown filters
         console.warn(`Unknown educational filter requested: ${filter}`);
