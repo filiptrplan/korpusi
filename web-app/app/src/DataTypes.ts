@@ -68,6 +68,10 @@ export interface SongResult extends Record<string, unknown> {
      * Indexes of the start of each measure
      */
     measure_starts: number[];
+    /**
+     * Number of rests
+     */
+    num_rests: number;
   };
   /**
    * The number of occurences of each rhythmic ngram in the song. Keys are the
@@ -156,41 +160,47 @@ export interface AudioResult extends Record<string, unknown> {
       chord_name: string[];
     }
   >;
-  loudness: AudioFeature<"rms", {
-    /**
-     * Loudness of the original file
-     */
-    loudness_total: number[];
-    /**
-     * Loudness of the extracted vocals 
-     */
-    loudness_vocals: number[];
-    /**
-     * Loudness of the extracted instrumental
-     */
-    loudness_instrumental: number[];
-    /**
-     * Time step between data points in seconds 
-     */
-    timestep_seconds: number;
-  }>;
-  key: AudioFeature<"essentia_key_extractor", {
-    /**
-     * The extracted key
-     */
-    key: string;
-    /**
-     * Scale: major or minor of the key
-     */
-    scale: "major" | "minor";
-    /**
-     * Confidence of the algorithm in the result
-     */
-    confidence: number;
-  }>;
+  loudness: AudioFeature<
+    "rms",
+    {
+      /**
+       * Loudness of the original file
+       */
+      loudness_total: number[];
+      /**
+       * Loudness of the extracted vocals
+       */
+      loudness_vocals: number[];
+      /**
+       * Loudness of the extracted instrumental
+       */
+      loudness_instrumental: number[];
+      /**
+       * Time step between data points in seconds
+       */
+      timestep_seconds: number;
+    }
+  >;
+  key: AudioFeature<
+    "essentia_key_extractor",
+    {
+      /**
+       * The extracted key
+       */
+      key: string;
+      /**
+       * Scale: major or minor of the key
+       */
+      scale: "major" | "minor";
+      /**
+       * Confidence of the algorithm in the result
+       */
+      confidence: number;
+    }
+  >;
   metadata: {
     title: string;
     filename: string;
     URL: string;
-  }
+  };
 }
