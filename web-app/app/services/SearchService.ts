@@ -17,6 +17,8 @@ export const searchAudio = async (
 ): Promise<
   SearchResponse<SongResult, Record<string, AggregationsAggregate>>
 > => {
+  const query = constructQueryXML(params);
+  console.log(JSON.stringify(query));
   return elastic.search<SongResult>({
     index: "songs",
     from: (page - 1) * pageSize,
@@ -347,12 +349,8 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                   script: {
                     lang: "painless",
                     // Access _source directly to avoid fielddata issues on text fields
-                    source: """
-                      // Check if the path to the field exists in _source
-                      if (params._source?.rhythm?.rhythm_string == null) {
-                        return false;
-                      }
-                      String rhythmString = params._source.rhythm.rhythm_string;
+                    source: `
+                      String rhythmString = doc['rhythm.rhythm_string.keyword'].value;
                       if (rhythmString.isEmpty()) {
                           return false; // Empty string doesn't meet criteria
                       }
@@ -380,6 +378,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
               },
             ],
             // Removed must_not clause for rests as they are not in rhythm_string
+            // TODO: Add rests to rhythm_string field or as a separate field
           },
         });
         break;

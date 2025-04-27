@@ -91,7 +91,10 @@ class RhythmProcessor(MusicXMLProcessor):
         self.mapping = {
             "properties": {
                 "measure_starts": {"type": "long"},
-                "rhythm_string": {"type": "text"},
+                "rhythm_string": {
+                    "type": "text",
+                    "fields": {"keyword": {"type": "keyword", "ignore_above": 8192}},
+                },
             }
         }
 
