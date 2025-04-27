@@ -284,7 +284,30 @@ const constructEducationalQuery = (params: Record<string, string>) => {
           },
         });
         break;
-      // TODO: Add cases for other educational filters (VR1, VR2, RF1-4) here
+      case "VR1":
+        // VR1: Vocal Range D4 (MIDI 62) to A4 (MIDI 69)
+        filterQueries.push({
+          bool: {
+            must: [
+              {
+                range: {
+                  "ambitus.min_note": {
+                    gte: 62, // D4
+                  },
+                },
+              },
+              {
+                range: {
+                  "ambitus.max_note": {
+                    lte: 69, // A4
+                  },
+                },
+              },
+            ],
+          },
+        });
+        break;
+      // TODO: Add cases for other educational filters (VR2, RF1-4) here
       default:
         // Optionally log or handle unknown filters
         console.warn(`Unknown educational filter requested: ${filter}`);
