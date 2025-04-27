@@ -24,6 +24,7 @@ class ContourProcessor(MusicXMLProcessor):
         # this is done because you can't set a measure number to a note and a note in a chord doesn't have one
         measure_numbers = []
         beats = []
+        num_rests = 0
         for x in self.song.parts[0].flatten():
             if len(measure_numbers) != 0:
                 if (
@@ -95,6 +96,7 @@ class RhythmProcessor(MusicXMLProcessor):
                     "type": "text",
                     "fields": {"keyword": {"type": "keyword", "ignore_above": 8192}},
                 },
+                "num_rests": {"type": "long"},
             }
         }
 
@@ -112,9 +114,9 @@ class RhythmProcessor(MusicXMLProcessor):
                     continue  # prevents adding two notes that are played at the same time
 
             note = x
-            if not isinstance(
-                x, (music21.note.Note, music21.note.Rest, music21.chord.Chord)
-            ):
+            if isinstance(x, music21.note.Rest):
+                num_rests += 1
+            elif not isinstance(x, (music21.note.Note, music21.chord.Chord)):
                 continue
 
             # notes in chords lose their measure number so we save it here
@@ -135,6 +137,7 @@ class RhythmProcessor(MusicXMLProcessor):
                 for i in range(len(rhythm_numeric))
                 if measure_numbers[i] != measure_numbers[i - 1]
             ],
+            "num_rests": num_rests,
         }
 
 
