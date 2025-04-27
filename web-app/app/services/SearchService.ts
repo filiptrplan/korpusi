@@ -226,8 +226,8 @@ const constructEducationalQuery = (params: Record<string, string>) => {
         filterQueries.push({
           script: {
             script: {
-          lang: "painless",
-          source: `
+              lang: "painless",
+              source: `
             // Check if the field exists and is not empty
             if (doc['contour.melodic_contour_string_relative'].size() == 0 || doc['contour.melodic_contour_string_relative'].value.isEmpty()) {
               return false; // Cannot apply filter if data is missing
@@ -269,10 +269,6 @@ const constructEducationalQuery = (params: Record<string, string>) => {
           },
         });
         break;
-      // TODO: Add cases for other educational filters (VR1, VR2, IF2, RF1-4) here
-      // case "VR1":
-      //   filterQueries.push({ script: { script: { lang: "painless", source: `... VR1 logic ...` } } });
-      //   break;
       default:
         // Optionally log or handle unknown filters
         console.warn(`Unknown educational filter requested: ${filter}`);
@@ -291,7 +287,6 @@ const constructEducationalQuery = (params: Record<string, string>) => {
 
   return null;
 };
-
 
 export const constructQueryAudio = (
   params: Record<string, string>,
