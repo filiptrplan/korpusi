@@ -17,82 +17,12 @@ export const searchAudio = async (
 ): Promise<
   SearchResponse<SongResult, Record<string, AggregationsAggregate>>
 > => {
-  const xmlHits = await elastic.search<SongResult>({
+  return elastic.search<SongResult>({
     index: "songs",
     from: (page - 1) * pageSize,
     size: pageSize,
     query: constructQueryXML(params),
   });
-  xmlHits.hits.hits = filterWithEducationalQuery(params, xmlHits.hits.hits);
-  return xmlHits;
-};
-
-export const filterEducationalHit = (
-  eduFilter: string,
-  xmlHit: SearchHit<SongResult>,
-): boolean => {
-  switch (eduFilter) {
-    case "IF1": {
-      // IF1: Intervals allowed: m2, M2, m3, M3, P1 (abs values: 0, 1, 2, 3, 4)
-      // Excludes consecutive m2 (abs value 1)
-      if (!xmlHit._source?.contour?.melodic_contour_string_relative) {
-        console.log(
-          "Cannot apply filter IF1 because contour.melodic_contour_string_relative is missing",
-        );
-        return false; // Cannot apply filter if data is missing
-      }
-      const intervals = xmlHit._source.contour.melodic_contour_string_relative
-        .split(" ")
-        .map(Number);
-
-      const allowedIntervalsAbs = new Set([0, 1, 2, 3, 4]);
-      let previousIntervalAbs: number | null = null;
-
-      for (const interval of intervals) {
-        const intervalAbs = Math.abs(interval);
-
-        // Check if interval is allowed
-        if (!allowedIntervalsAbs.has(intervalAbs)) {
-          return false; // Found a disallowed interval
-        }
-
-        // Check for consecutive minor seconds (m2)
-        if (intervalAbs === 1 && previousIntervalAbs === 1) {
-          return false; // Found consecutive m2
-        }
-
-        previousIntervalAbs = intervalAbs;
-      }
-
-      return true; // Passed all checks
-    }
-    case "VR1":
-    case "VR2":
-    case "IF2":
-    case "RF1":
-    case "RF2":
-    case "RF3":
-    case "RF4":
-      // Placeholder for other filters - currently defaults to passing
-      return true;
-    default:
-      return true; // If filter type is unknown or not applicable, pass the hit
-  }
-};
-
-export const filterWithEducationalQuery = (
-  params: Record<string, string>,
-  xmlHits: SearchHit<SongResult>[],
-): SearchHit<SongResult>[] => {
-  if (params.edu === "none" || !params.edu) return xmlHits;
-  const eduFilters = params.edu.split(",");
-  for (const eduFilter of eduFilters) {
-    console.log("Filtering hits with educational filter:", eduFilter);
-    console.log("Hits before filtering:", xmlHits.length);
-    xmlHits = xmlHits.filter((x) => filterEducationalHit(eduFilter, x));
-    console.log("Hits after filtering:", xmlHits.length);
-  }
-  return xmlHits;
 };
 
 export const constructQueryXML = (
@@ -211,7 +141,7 @@ export const constructQueryXML = (
   }
 
   // MELODIC NGRAM QUERY
-  if ("melodicNgram" in params) {
+  if ("melodicNgram" in params && params.melodicNgram.trim() !== "") {
     // convert text to midi numbers
     const stringArr = params.melodicNgram.split(" ");
     const midiNumbers = stringArr.map((x) => {
@@ -268,7 +198,7 @@ const constructMetadataQuery = (params: Record<string, string>) => {
 };
 
 const constructCorpusQuery = (params: Record<string, string>) => {
-  if ("corpus" in params) {
+  if ("corpus" in params && params.corpus !== "none") {
     return {
       terms: {
         corpus_id: params.corpus.split(","),
