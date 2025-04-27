@@ -213,11 +213,19 @@ const constructCorpusQuery = (params: Record<string, string>) => {
 };
 
 const constructEducationalQuery = (params: Record<string, string>) => {
-  // TODO: Handle multiple comma-separated filters if necessary
-  if ("edu" in params && params.edu === "IF1") {
-    return {
-      script: {
-        script: {
+  if (!("edu" in params) || params.edu === "none") {
+    return null;
+  }
+
+  const eduFilters = params.edu.split(",");
+  const filterQueries: QueryDslQueryContainer[] = [];
+
+  for (const filter of eduFilters) {
+    switch (filter) {
+      case "IF1":
+        filterQueries.push({
+          script: {
+            script: {
           lang: "painless",
           source: `
             // Check if the field exists and is not empty
