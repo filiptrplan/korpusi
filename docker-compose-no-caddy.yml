@@ -156,6 +156,8 @@ services:
     build: 
       context: ./web-app
       dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
