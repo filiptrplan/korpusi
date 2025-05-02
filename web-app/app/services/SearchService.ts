@@ -482,8 +482,6 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                       return (double)targetNoteCount / totalCount >= 0.7;
                     `,
                   },
-                    `,
-                  },
                 },
               },
               // 3. Maximum 2 Rests
@@ -538,8 +536,6 @@ const constructEducationalQuery = (params: Record<string, string>) => {
 
                       // Calculate percentage and compare
                       return (double)targetNoteCount / totalCount >= 0.7;
-                    `,
-                  },
                     `,
                   },
                 },
