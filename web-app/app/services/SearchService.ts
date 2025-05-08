@@ -228,17 +228,16 @@ const constructEducationalQuery = (params: Record<string, string>) => {
         filterQueries.push({
           bool: {
             must_not: [
-              // Condition 1: Disallow intervals with absolute value >= 5
+              // Disallow intervals with absolute value > 4 (larger than a major third)
               {
                 regexp: {
-                  // Matches numbers like 5, -5, 10, -12, etc. as whole terms
                   "contour.melodic_contour_string_relative": {
                     value: "(^| )(-?([5-9]|\\d{2,}))( |$)",
-                    flags: "ALL", // Enable all optional operators
+                    flags: "ALL",
                   },
                 },
               },
-              // Condition 2: Disallow consecutive m2 (abs value 1)
+              // Disallow consecutive minor seconds (chromatic patterns)
               {
                 match_phrase: {
                   "contour.melodic_contour_string_relative": "1 1",
@@ -246,12 +245,40 @@ const constructEducationalQuery = (params: Record<string, string>) => {
               },
               {
                 match_phrase: {
-                  "contour.melodic_contour_string_relative": "-1 1",
+                  "contour.melodic_contour_string_relative": "-1 -1",
                 },
               },
               {
                 match_phrase: {
-                  "contour.melodic_contour_string_relative": "1 -1",
+                  "contour.melodic_contour_string_relative": "1 -1 1",
+                },
+              },
+              {
+                match_phrase: {
+                  "contour.melodic_contour_string_relative": "-1 1 -1",
+                },
+              },
+            ],
+          },
+        });
+        break;
+      case "IF2":
+        filterQueries.push({
+          bool: {
+            must_not: [
+              // Disallow intervals greater than a perfect fifth (>7 semitones)
+              {
+                regexp: {
+                  "contour.melodic_contour_string_relative": {
+                    value: "(^| )(-?([8-9]|\\d{2,}))( |$)",
+                    flags: "ALL",
+                  },
+                },
+              },
+              // Disallow chromatic sequences (consecutive minor seconds)
+              {
+                match_phrase: {
+                  "contour.melodic_contour_string_relative": "1 1",
                 },
               },
               {
@@ -263,38 +290,15 @@ const constructEducationalQuery = (params: Record<string, string>) => {
           },
         });
         break;
-      case "IF2":
-        filterQueries.push({
-          bool: {
-            must_not: [
-              // Disallow intervals with absolute value 6 (tritone) or > 7
-              {
-                regexp: {
-                  // Matches numbers like 6, -6, 8, -8, 10, -12, etc. as whole terms
-                  "contour.melodic_contour_string_relative": {
-                    // Regex breakdown:
-                    // (^| ): Start of string or space before number
-                    // -?: Optional minus sign
-                    // (6|([8-9]|\\d{2,})): Matches 6 OR (8 or 9 OR any number with 2+ digits)
-                    // ( |$): Space after number or end of string
-                    value: "(^| )(-?(6|([8-9]|\\d{2,})))( |$)",
-                    flags: "ALL", // Enable all optional operators
-                  },
-                },
-              },
-            ],
-          },
-        });
-        break;
       case "VR1":
-        // VR1: Vocal Range D4 (MIDI 62) to A4 (MIDI 69)
+        // VRF1: Vocal Range C4 (MIDI 60) to A4 (MIDI 69)
         filterQueries.push({
           bool: {
             must: [
               {
                 range: {
                   "ambitus.min_note": {
-                    gte: 62, // D4
+                    gte: 60, // C4 (changed from 62/D4)
                   },
                 },
               },
@@ -309,8 +313,9 @@ const constructEducationalQuery = (params: Record<string, string>) => {
           },
         });
         break;
-      case "VR2":
-        // VR2: Vocal Range A3 (MIDI 57) to C5 (MIDI 72)
+
+      case "VRF":
+        // VRF2: Vocal Range A3 (MIDI 57) to C5 (MIDI 72)
         filterQueries.push({
           bool: {
             must: [
