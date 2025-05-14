@@ -47,25 +47,25 @@ export const loader: LoaderFunction = async () => {
   >(audioCorpusIds.map((corpusId) => aggregateCorpusAudio(corpusId)));
 
   const corpusesXML = elastic.search<Corpus>({
-    index: 'corpuses',
+    index: "corpuses",
     body: {
       query: {
         ids: {
-          values: songCorpusIds
-        }
-      }
-    }
+          values: songCorpusIds,
+        },
+      },
+    },
   });
 
   const corpusesAudio = elastic.search<Corpus>({
-    index: 'corpuses',
+    index: "corpuses",
     body: {
       query: {
         ids: {
-          values: audioCorpusIds
-        }
-      }
-    }
+          values: audioCorpusIds,
+        },
+      },
+    },
   });
 
   return {
@@ -85,20 +85,32 @@ export default function Index() {
     corpusAggregatesXML,
     corpusAggregatesAudio,
     corpusesXML,
-    corpusesAudio
+    corpusesAudio,
   } = useLoaderData<typeof loader>();
   const { t } = useTranslation("index");
 
   const xmlAggregates = corpusAggregatesXML.map(
     (corpus: CorpusAggregateXML) => (
-      <CorpusAccordionXML key={corpus.corpusId} corpusAgg={corpus} corpusInfo={corpusesXML.find((x: SearchHit<Corpus>) => x._id == corpus.corpusId)} />
-    )
+      <CorpusAccordionXML
+        key={corpus.corpusId}
+        corpusAgg={corpus}
+        corpusInfo={corpusesXML.find(
+          (x: SearchHit<Corpus>) => x._id == corpus.corpusId,
+        )}
+      />
+    ),
   );
 
   const audioAggregates = corpusAggregatesAudio.map(
     (corpus: CorpusAggregateAudio) => (
-      <CorpusAccordionAudio key={corpus.corpusId} corpus={corpus} />
-    )
+      <CorpusAccordionAudio
+        key={corpus.corpusId}
+        corpus={corpus}
+        corpusInfo={corpusesAudio.find(
+          (x: SearchHit<Corpus>) => x._id == corpus.corpusId,
+        )}
+      />
+    ),
   );
 
   return (
