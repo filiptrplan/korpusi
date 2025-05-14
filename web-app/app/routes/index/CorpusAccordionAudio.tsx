@@ -1,4 +1,5 @@
 import { Grid, Typography } from "@mui/material";
+import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 import {
   BarElement,
   CategoryScale,
@@ -16,11 +17,12 @@ import { Bar } from "react-chartjs-2";
 import { useTranslation } from "react-i18next";
 import { InfoCard } from "~/components/InfoCard";
 import { MAccordion } from "~/components/MAccordion";
-import { CorpusAggregateAudio } from "~/services/IndexService";
+import { Corpus, CorpusAggregateAudio } from "~/services/IndexService";
 import { getColorHex } from "~/utils/helpers";
 
 interface CorpusAccordionAudioProps {
   corpus: CorpusAggregateAudio;
+  corpusInfo: SearchHit<Corpus>;
 }
 
 Chart.register(
@@ -43,7 +45,9 @@ const colorArrayFromLength = (n: number): string[] => {
 
 export const CorpusAccordionAudio: React.FC<CorpusAccordionAudioProps> = ({
   corpus,
+  corpusInfo,
 }) => {
+  const corpusInfoSource = corpusInfo._source!;
   const { t } = useTranslation("index");
 
   const tempoHistogramData: ChartData<"bar"> = useMemo(() => {
@@ -67,8 +71,27 @@ export const CorpusAccordionAudio: React.FC<CorpusAccordionAudioProps> = ({
   }, [corpus.tempoBuckets]);
 
   return (
-    <MAccordion title={corpus.corpusName}>
+    <MAccordion title={corpusInfoSource.corpus_name ?? t("unknownName")}>
       <Grid container spacing={1}>
+        {corpusInfoSource.license && (
+          <>
+            <Grid item xs={12}>
+              <Typography variant="h6">{t("license")}</Typography>
+              <Typography variant="body1"><strong>{t("licenseURL")}: </strong>
+                <a href={corpusInfoSource.license.url}>{corpusInfoSource.license.url}</a>
+              </Typography>
+              <Typography variant="body1"><div dangerouslySetInnerHTML={{ __html: corpusInfoSource.license.description }} /></Typography>
+            </Grid>
+          </>
+        )}
+        {corpusInfoSource.description && (
+          <>
+            <Grid item xs={12}>
+              <Typography variant="h6">{t("description")}</Typography>
+              <Typography variant="body1"><div dangerouslySetInnerHTML={{ __html: corpusInfoSource.description}} /></Typography>
+            </Grid>
+          </>
+        )}
         <Grid item xs={12}>
           <Typography variant="h6">{t("corpusStatsTitle")}</Typography>
         </Grid>
