@@ -2,6 +2,7 @@
     "search": "Isci",
     "navigation": {
         "search": "Iskanje",
-        "home": "Domov"
+        "home": "Domov",
+        "about": "Opis analiz"
     }
 }

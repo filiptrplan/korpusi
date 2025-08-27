@@ -2,6 +2,7 @@
     "search": "Search",
     "navigation": {
         "search": "Search",
-        "home": "Home"
+        "home": "Home",
+        "about": "About the analysis"
     }
 }
