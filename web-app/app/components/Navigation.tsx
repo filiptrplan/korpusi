@@ -33,6 +33,11 @@ export default function Navigation() {
             <Button LinkComponent={Link} color="inherit" to="/search">
               {t("navigation.search")}
             </Button>
+            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+            {/* @ts-ignore */}
+            <Button LinkComponent={Link} color="inherit" to="/about">
+              {t("navigation.about")}
+            </Button>
           </Stack>
           <Button color="inherit" onClick={switchLocale}>
             {locale}
