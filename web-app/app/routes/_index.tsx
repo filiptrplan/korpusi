@@ -1,6 +1,7 @@
-import { Grid, Link, Stack, Typography } from "@mui/material";
-import { Trans, useTranslation } from "react-i18next";
+import { Grid, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { useLoaderData } from "@remix-run/react";
+import { MarkdownLinkRenderer } from "~/components/MarkdownLinkRenderer";
 import { InfoCard } from "~/components/InfoCard";
 import { LoaderFunction } from "@remix-run/server-runtime";
 import { elastic } from "~/services/Elastic";
@@ -130,10 +131,7 @@ export default function Index() {
           mb: 1,
         }}
       >
-        <Trans t={t} i18nKey="projectDescription">
-          Opis
-          <Link href="http://muzikologijaff.si/gmgm/"></Link>
-        </Trans>
+        <MarkdownLinkRenderer text={t("projectDescription")} />
       </Typography>
       <MAccordion title={t("allStatsTitle")}>
         <Grid container spacing={1}>
