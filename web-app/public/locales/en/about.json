@@ -4,19 +4,19 @@
   "sections": {
     "musicxml": {
       "heading": "MusicXML analysis",
-      "text": "MusicXML files are analyzed using the music21 library. We extract basic information such as key, time signature, tempo, and metadata. Other analyses include ambitus (the note range of a piece), duration in measures and beats, and melodic contour (up, down, same)."
+      "text": "MusicXML files are systematically analyzed using the music21 computational musicology toolkit, which enables a highly detailed and theoretically informed extraction of symbolic features. Core descriptive attributes include tonality (key detection through probabilistic and theoretical models), metrical organization (time signatures), and tempo indications. In addition, higher-order structural and registral aspects are examined, such as the ambitus (i.e., the full pitch range of the work), totalized duration measured both in notated measures and metric time, and the melodic contour—an abstraction characterizing directional movements of the melody (ascending, descending, static sequences). This symbolic analysis aims to capture both surface features and deeper generative structures of the score."
     },
     "rhythm": {
       "heading": "Rhythm and pitch n-grams",
-      "text": "We compute rhythmic n-grams (durational patterns) and pitch interval n-grams (sequences of melodic intervals). Only the most frequent patterns are retained, which allows comparison of characteristic motifs across corpuses."
+      "text": "For rhythm and melodic intervallic analysis, we employ n-gram models of sequential events, drawing on methodologies from computational linguistics adapted to music. Rhythmic n-grams capture durational successions, while pitch n-grams model the recurrence of directed interval sequences. Frequencies of these event n-grams are aggregated into distributional profiles, from which recurrent and statistically salient patterns can be identified. By preserving only the most frequent n-grams, the analysis isolates characteristic rhythmic and melodic motifs, thus facilitating comparative corpus-level studies of stylistic idioms, compositional fingerprints, and cultural norms of repetition and variation."
     },
     "audio": {
       "heading": "Audio analysis",
-      "text": "Audio files are analyzed with signal processing algorithms. Features include tempo (BPM estimation), pitch contour (tracking pitch over time separately for vocals and accompaniment), chord progression, RMS loudness (volume over time), and key estimation."
+      "text": "Audio recordings are subjected to a multi-faceted computational analysis involving state-of-the-art digital signal processing and machine learning algorithms. Core features include tempo estimation (beats per minute derived through onset detection and autocorrelation models), continuous pitch contour tracking (differentiated for vocal and instrumental layers through source separation techniques), chordal segmentation and harmonic labeling (providing progressional syntax), and root mean square (RMS) energy profiles (capturing dynamical fluctuations and loudness curves across time). Additionally, automatic key estimation is performed using spectral representations and tonal centroid models. Collectively, these features enable a rigorous empirical description of audio material beyond notated representations, bridging symbolic and performed domains of music."
     },
     "metadata": {
       "heading": "Metadata",
-      "text": "Metadata is extracted both from MusicXML content and from additional CSV files supplied with some corpuses (e.g. descriptive tags, licensing information)."
+      "text": "Metadata is derived from multiple complementary sources, including embedded MusicXML annotations as well as externally curated CSV data supplied with particular corpuses. These metadata records encompass bibliographic and contextual information such as titles, composers, dates, edition details, and licensing conditions, alongside additional descriptive tags provided by editors or corpus compilers. Such metadata not only support accurate identification and provenance tracing of individual works, but also enable robust filtering, stratified analysis, and the contextualization of quantitative features in relation to formal, stylistic, and historical categories."
     }
   }
 }
