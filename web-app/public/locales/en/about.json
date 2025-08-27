@@ -1,4 +1,22 @@
 {
   "title": "About the analysis",
-  "description": "This page provides general information about the types of analyses performed on the audio and musical corpuses."
+  "description": "This page provides general information about the types of analyses performed on the audio and musical corpuses.",
+  "sections": {
+    "musicxml": {
+      "heading": "MusicXML analysis",
+      "text": "MusicXML files are analyzed using the music21 library. We extract basic information such as key, time signature, tempo, and metadata. Other analyses include ambitus (the note range of a piece), duration in measures and beats, and melodic contour (up, down, same)."
+    },
+    "rhythm": {
+      "heading": "Rhythm and pitch n-grams",
+      "text": "We compute rhythmic n-grams (durational patterns) and pitch interval n-grams (sequences of melodic intervals). Only the most frequent patterns are retained, which allows comparison of characteristic motifs across corpuses."
+    },
+    "audio": {
+      "heading": "Audio analysis",
+      "text": "Audio files are analyzed with signal processing algorithms. Features include tempo (BPM estimation), pitch contour (tracking pitch over time separately for vocals and accompaniment), chord progression, RMS loudness (volume over time), and key estimation."
+    },
+    "metadata": {
+      "heading": "Metadata",
+      "text": "Metadata is extracted both from MusicXML content and from additional CSV files supplied with some corpuses (e.g. descriptive tags, licensing information)."
+    }
+  }
 }
