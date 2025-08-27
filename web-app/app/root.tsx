@@ -35,7 +35,7 @@ export const handle = {
 };
 
 export const meta: MetaFunction = () => {
-  return [{ title: "Mladinska glasba" }];
+  return [{ title: "MUSCO" }];
 };
 
 interface DocumentProps {
@@ -115,9 +115,9 @@ export default function App() {
   return (
     <Document>
       <localeCookieContext.Provider value={loaderData.locale}>
-      <Layout>
-        <Outlet />
-      </Layout>
+        <Layout>
+          <Outlet />
+        </Layout>
       </localeCookieContext.Provider>
     </Document>
   );
