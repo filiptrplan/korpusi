@@ -3,20 +3,20 @@
   "description": "Ta stran prikazuje splošne informacije o vrstah analiz, izvedenih na avdio in glasbenih korpusih.",
   "sections": {
     "musicxml": {
-      "heading": "Analiza MusicXML",
-      "text": "Datoteke MusicXML so analizirane z orodjem music21 za računalniško muzikologijo. Izlučene značilnosti vključujejo tonaliteto (prepoznano s tonalno analizo), taktovski način in oznake tempa. Dodatne rezultate predstavljajo ambitus (tonsko območje skladbe), trajanje izraženo v taktih in dobi ter konture melodije, ki opisujejo relativno smerno gibanje zaporednih tonov (naraščajoče, padajoče ali ponovljeno)."
+      "heading": "Analiza MusicXML zapisov",
+      "text": "Datoteke MusicXML so analizirane z orodjem music21 za računalniško muzikologijo. Pridobljene značilnosti vključujejo tonaliteto (prepoznano s tonsko analizo), taktovski način in oznake tempa. Dodatni rezultati so še ambitus (tonsko območje skladbe), trajanje izraženo v taktih in dobah ter konture melodije, ki opisujejo relativno smer gibanja zaporednih tonov (naraščajoče, padajoče ali ponovljajoče)."
     },
     "rhythm": {
       "heading": "Ritmični in tonski n-grami",
-      "text": "Analize ritma in tonskih intervalov so izvedene z modeli n-gramov, kjer so zaporedne dolžine not ali intervalni koraki kodirani kot zaporedja. Frekvence teh zaporedij so združene v histograme, ki prikazujejo porazdelitve opaženih ritmičnih in melodičnih intervalnih vzorcev. Ohranijo se samo tisti n-grami, ki se pojavijo več kot enkrat, rezultati pa so ločeno prikazani za ritem in tone."
+      "text": "Analize ritma in tonskih intervalov so izvedene z modelom n-gramov, kjer so zaporedne dolžine not ali intervalni koraki kodirani kot zaporedja. Frekvence teh zaporedij so združene v histograme, ki prikazujejo porazdelitve opaženih ritmičnih in melodičnih intervalnih vzorcev. Ohranijo se samo tisti n-grami, ki se pojavijo več kot enkrat, rezultati pa so ločeno prikazani za ritem in melodijo."
     },
     "audio": {
-      "heading": "Analiza avdia",
-      "text": "Avdio posnetki so obdelani z metodami digitalne obdelave signalov. Izlučene značilnosti vključujejo oceno tempa v udarcih na minuto, konture višine tona iz ločenih vokalnih in instrumentalnih posnetkov, akordne progresije z določitvijo časovnih meja ter krivulje glasnosti RMS (za celotno mešanico, vokale in spremljavo) z ustrezno časovno ločljivostjo. Poleg tega ocena tonalitete vključuje toniko, način (dur/mol) in vrednost zaupanja na podlagi spektralnih in tonalnih značilnosti."
+      "heading": "Analiza zvočnih posnetkov",
+      "text": "Zvočne posnetke analiziramo z metodami digitalne obdelave signalov. Pridobljene značilnosti vključujejo oceno tempa v udarcih na minuto, konture višine tona iz ločenih vokalnih in inštrumentalnih posnetkov, akordne progresije z določitvijo časovnih meja ter krivulje glasnosti RMS (za celoten posnetek, vokale in spremljavo) z ustrezno časovno ločljivostjo. Poleg tega ocena tonalitete vključuje tonsko višinmo, način (dur/mol) in vrednost zaupanja na podlagi spektralnih in tonalnih značilnosti."
     },
     "metadata": {
       "heading": "Metapodatki",
-      "text": "Metapodatki so pridobljeni iz več virov, vključno z glavo datotek MusicXML in dopolnilnimi CSV datotekami, ki so specifične za posamezne korpuse. Izlučena polja vključujejo bibliografske informacije (naslov, skladatelj, datumi, podatki o izdaji), informacije o licenci in opisne oznake, prisotne v podatkih. Vsak zapis metapodatkov je povezan z ustreznim imenom datoteke, kar omogoča dosledno indeksiranje skupaj z analitičnimi značilnostmi."
+      "text": "Metapodatki so pridobljeni iz več virov, vključno z glavo datotek MusicXML in dopolnilnimi CSV datotekami, ki so specifične za posamezne korpuse. Pridobljena polja vključujejo bibliografske informacije (naslov, skladatelj, datumi, podatki o izdaji), informacije o licenciranju in opisne oznake prisotne v podatkih. Vsak zapis metapodatkov je povezan z ustreznim imenom datoteke, kar omogoča dosledno indeksiranje skupaj z analitičnimi značilnostmi."
     }
   }
 }
