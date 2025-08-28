@@ -232,7 +232,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
               {
                 regexp: {
                   "contour.melodic_contour_string_relative": {
-                    value: "(^| )(-?([5-9]|\\d{2,}))( |$)",
+                    value: ".*(-?([5-9]|\\d{2,})).*",
                     flags: "ALL",
                   },
                 },
@@ -270,7 +270,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
               {
                 regexp: {
                   "contour.melodic_contour_string_relative": {
-                    value: "(^| )(-?([8-9]|\\d{2,}))( |$)",
+                    value: ".*(-?([8-9]|\\d{2,})).*",
                     flags: "ALL",
                   },
                 },
