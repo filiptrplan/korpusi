@@ -314,7 +314,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
         });
         break;
 
-      case "VRF":
+      case "VR2":
         // VRF2: Vocal Range A3 (MIDI 57) to C5 (MIDI 72)
         filterQueries.push({
           bool: {
