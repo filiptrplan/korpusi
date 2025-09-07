@@ -12,10 +12,19 @@ class ContourProcessor(MusicXMLProcessor):
         super().__init__(song, feature_name)
         self.mapping = {
             "properties": {
-                "melodic_contour_string_relative": {"type": "text"},
-                "melodic_contour_string": {"type": "text"},
+                "melodic_contour_string_relative": {
+                    "type": "text",
+                    "fields": {"keyword": {"type": "keyword", "ignore_above": 8192}},
+                },
+                "melodic_contour_string": {
+                    "type": "text",
+                    "fields": {"keyword": {"type": "keyword", "ignore_above": 8192}},
+                },
                 "measure_starts": {"type": "long"},
-                "melodic_contour_string_absolute": {"type": "text"},
+                "melodic_contour_string_absolute": {
+                    "type": "text",
+                    "fields": {"keyword": {"type": "keyword", "ignore_above": 8192}},
+                },
             }
         }
 
