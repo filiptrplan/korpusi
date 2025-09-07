@@ -38,9 +38,17 @@ def index_document(json_str: str, index: str):
     except json.JSONDecodeError as e:
         raise e
     json_obj = json.loads(json_str)
+    if "_source" in json_obj:  # if from dump, extract only source
+        json_obj = json_obj["_source"]
+        # clean all the _ keys
+        for key in json_obj.keys():
+            if key.startswith("_"):
+                del json_obj[key]
     if "file_hash_sha256" not in json_obj:
         raise ValueError("file_hash_sha256 field is missing")
-    client.index(index=index, document=json_str, id=json_obj["file_hash_sha256"])
+    client.index(
+        index=index, document=json.dumps(json_obj), id=json_obj["file_hash_sha256"]
+    )
 
 
 def merge(source, destination):
