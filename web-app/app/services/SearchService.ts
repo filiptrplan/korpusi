@@ -227,35 +227,24 @@ const constructEducationalQuery = (params: Record<string, string>) => {
       case "IF1":
         filterQueries.push({
           bool: {
-            must_not: [
-              // Disallow intervals with absolute value > 4 (larger than a major third)
+            must: [
               {
                 regexp: {
-                  "contour.melodic_contour_string_relative": {
-                    value: ".*(-?([5-9]|\\d{2,})).*",
-                    flags: "ALL",
-                  },
+                  "contour.melodic_contour_string_relative.keyword":
+                    "(-?(0|1|2|3|4))( +-?(0|1|2|3|4))*",
                 },
               },
-              // Disallow consecutive minor seconds (chromatic patterns)
+            ],
+            must_not: [
               {
-                match_phrase: {
-                  "contour.melodic_contour_string_relative": "1 1",
-                },
-              },
-              {
-                match_phrase: {
-                  "contour.melodic_contour_string_relative": "-1 -1",
+                regexp: {
+                  "contour.melodic_contour_string_relative.keyword": ".*1 1.*",
                 },
               },
               {
-                match_phrase: {
-                  "contour.melodic_contour_string_relative": "1 -1 1",
-                },
-              },
-              {
-                match_phrase: {
-                  "contour.melodic_contour_string_relative": "-1 1 -1",
+                regexp: {
+                  "contour.melodic_contour_string_relative.keyword":
+                    ".*-1 -1.*",
                 },
               },
             ],
@@ -265,25 +254,24 @@ const constructEducationalQuery = (params: Record<string, string>) => {
       case "IF2":
         filterQueries.push({
           bool: {
-            must_not: [
-              // Disallow intervals greater than a perfect fifth (>7 semitones)
+            must: [
               {
                 regexp: {
-                  "contour.melodic_contour_string_relative": {
-                    value: ".*(-?([8-9]|\\d{2,})).*",
-                    flags: "ALL",
-                  },
+                  "contour.melodic_contour_string_relative.keyword":
+                    "(-?(0|1|2|3|4|5|7))( +-?(0|1|2|3|4|5|7))*",
                 },
               },
-              // Disallow chromatic sequences (consecutive minor seconds)
+            ],
+            must_not: [
               {
-                match_phrase: {
-                  "contour.melodic_contour_string_relative": "1 1",
+                regexp: {
+                  "contour.melodic_contour_string_relative.keyword": ".*1 1.*",
                 },
               },
               {
-                match_phrase: {
-                  "contour.melodic_contour_string_relative": "-1 -1",
+                regexp: {
+                  "contour.melodic_contour_string_relative.keyword":
+                    ".*-1 -1.*",
                 },
               },
             ],
