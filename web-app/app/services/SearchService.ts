@@ -297,6 +297,13 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                   },
                 },
               },
+              {
+                script: {
+                  script: {
+                    source: `doc['ambitus.max_note'].value - doc['ambitus.min_note'].value <= 12`,
+                  },
+                },
+              },
             ],
           },
         });
@@ -318,6 +325,13 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                 range: {
                   "ambitus.max_note": {
                     lte: 72, // C5
+                  },
+                },
+              },
+              {
+                script: {
+                  script: {
+                    source: `doc['ambitus.max_note'].value - doc['ambitus.min_note'].value <= 12`,
                   },
                 },
               },
