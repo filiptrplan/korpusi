@@ -1,5 +1,11 @@
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 export interface OSMDMeasureProps {
   xml?: string;
@@ -21,26 +27,25 @@ export const OSMDMeasures: React.FC<OSMDMeasureProps> = ({
   divProps,
 }) => {
   const ref = useRef(null);
-  const osmd = useMemo(() => {
-    if (ref.current === null) return null;
-    const osmd = new OpenSheetMusicDisplay(ref.current, {
+  const [osmd, setOsmd] = useState<null | OpenSheetMusicDisplay>(null);
+
+  const handleRef = useCallback((node: HTMLDivElement | null) => {
+    if (node === null) return;
+    const temp_osmd = new OpenSheetMusicDisplay(node as HTMLElement, {
       autoResize: false,
       drawingParameters: "compacttight",
       drawCredits: false,
       disableCursor: true,
       drawLyrics: displayLyrics,
     });
-    return osmd;
-  }, [ref.current]);
+    setOsmd(temp_osmd);
+  }, []);
 
   const resetOSMD = async () => {
     if (osmd === null) return;
     if (xml === "" || !xml) return;
     await osmd.load(xml);
     osmd.render();
-    if (ref.current) {
-      (ref.current as HTMLElement).innerHTML = "";
-    }
   };
 
   // These are done as functions and not in useEffect because we have to reset the OSMD object
@@ -77,5 +82,5 @@ export const OSMDMeasures: React.FC<OSMDMeasureProps> = ({
     osmd?.render();
   }, []);
 
-  return <div ref={ref} {...divProps}></div>;
+  return <div ref={handleRef} {...divProps}></div>;
 };
