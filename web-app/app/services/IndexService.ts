@@ -35,23 +35,52 @@ const getCorpusName = async (corpusId: string): Promise<string> => {
   return corpusName ?? "";
 };
 
+export const getEnabledCorpusIds = async () => {
+  const enabledCorpuses = await elastic.search({
+    index: "corpuses",
+    size: 10000,
+    query: {
+      bool: {
+        must_not: [
+          {
+            term: {
+              enabled: false,
+            },
+          },
+        ],
+      },
+    },
+    _source: false,
+  });
+
+  const enabledCorpusIds = enabledCorpuses.hits.hits.map(
+    (hit) => hit._id as string,
+  );
+
+  return enabledCorpusIds;
+};
+
 export const getCorpusIdsFromIndex = async (index: "audio" | "songs") => {
-  const corpuses = await elastic.search({
+  const corpusesInIndex = await elastic.search({
     index: index,
+    size: 0,
     aggs: {
       per_corpus: {
         terms: {
           field: "corpus_id",
+          size: 10000,
         },
       },
     },
   });
 
   const aggregates = (
-    corpuses.aggregations?.per_corpus as AggregationsStringTermsAggregate
+    corpusesInIndex.aggregations?.per_corpus as AggregationsStringTermsAggregate
   ).buckets as AggregationsStringTermsBucket[];
 
-  return aggregates.map((x) => x.key);
+  const allCorpusIds = aggregates.map((x) => x.key as string);
+  const enabledIds = await getEnabledCorpusIds();
+  return allCorpusIds.filter((x) => enabledIds.contains(x));
 };
 
 export const aggregateCorpusXML = async (corpusId: string) => {
@@ -133,7 +162,7 @@ export const aggregateCorpusAudio = async (corpusId: string) => {
     songCount: (await getCorpusCount(corpusId, "audio")).count,
     tempoBuckets: (
       corpus.aggregations?.tempo_buckets as AggregationsHistogramAggregate
-    ).buckets as AggregationsHistogramBucket[]
+    ).buckets as AggregationsHistogramBucket[],
   };
 };
 
@@ -142,10 +171,11 @@ export type CorpusAggregateAudio = Awaited<
   ReturnType<typeof aggregateCorpusAudio>
 >;
 export interface Corpus {
-  corpus_name: string,
+  corpus_name: string;
+  enabled?: boolean;
   license?: {
     url: string;
     description: string;
-  },
+  };
   description?: string;
 }

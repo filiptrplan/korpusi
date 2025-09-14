@@ -9,27 +9,26 @@ import {
 import { elastic } from "~/services/Elastic";
 import { SongResult } from "~/src/DataTypes";
 import { noteToMidi } from "~/utils/notes";
+import { getEnabledCorpusIds } from "./IndexService";
 
-export const searchAudio = async (
+export const searchXML = async (
   params: Record<string, string>,
   page: number,
   pageSize: number,
 ): Promise<
   SearchResponse<SongResult, Record<string, AggregationsAggregate>>
 > => {
-  const query = constructQueryXML(params);
-  console.log(JSON.stringify(query));
   return elastic.search<SongResult>({
     index: "songs",
     from: (page - 1) * pageSize,
     size: pageSize,
-    query: constructQueryXML(params),
+    query: await constructQueryXML(params),
   });
 };
 
-export const constructQueryXML = (
+export const constructQueryXML = async (
   params: Record<string, string>,
-): QueryDslQueryContainer => {
+): Promise<QueryDslQueryContainer> => {
   const queries: QueryDslQueryContainer[] = [];
 
   const metadataQuery = constructMetadataQuery(params);
@@ -177,9 +176,18 @@ export const constructQueryXML = (
     }
   }
 
+  queries.push(await constructEnabledQuery());
   return {
     bool: {
       must: queries,
+    },
+  };
+};
+
+const constructEnabledQuery = async (): Promise<QueryDslQueryContainer> => {
+  return {
+    terms: {
+      corpus_id: await getEnabledCorpusIds(),
     },
   };
 };
@@ -578,9 +586,9 @@ const constructEducationalQuery = (params: Record<string, string>) => {
   return null;
 };
 
-export const constructQueryAudio = (
+export const constructQueryAudio = async (
   params: Record<string, string>,
-): QueryDslQueryContainer => {
+): Promise<QueryDslQueryContainer> => {
   const queries: QueryDslQueryContainer[] = [];
 
   // METADATA
@@ -621,6 +629,7 @@ export const constructQueryAudio = (
     }
   }
 
+  queries.push(await constructEnabledQuery());
   return {
     bool: {
       must: queries,
@@ -654,6 +663,15 @@ export const getAvailableTimeSignatures = async () => {
 export const getAvailableCorpuses = async () => {
   const data = await elastic.search<{ corpus_name: string }>({
     index: "corpuses",
+    query: {
+      bool: {
+        must_not: {
+          term: {
+            enabled: false,
+          },
+        },
+      },
+    },
   });
 
   return data.hits.hits.map((x) => {
