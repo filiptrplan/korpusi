@@ -50,7 +50,7 @@ export const OSMDMeasures: React.FC<OSMDMeasureProps> = ({
     resetOSMD().then(() => {
       osmd.setOptions({
         drawFromMeasureNumber: startMeasure,
-        drawUpToMeasureNumber: endMeasure,
+        drawUpToMeasureNumber: endMeasure + 1,
         drawLyrics: displayLyrics,
       });
       osmd.zoom = zoom;
