@@ -6,6 +6,7 @@
     "collector": "Collector",
     "piece_title": "Piece title",
     "outsideLinks": "External links",
+    "noExternalLinks": "No external links.",
     "metadataCardTitle": "Metadata",
     "basicData": {
         "title": "Basic data",

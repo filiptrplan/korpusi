@@ -10,7 +10,7 @@ export const OutsideLinksCardXML: React.FC = () => {
       }}
     >
       <CardHeader title={t("outsideLinks")} />
-      <CardContent>Ni zunanjih povezav.</CardContent>
+      <CardContent>{t("noExternalLinks")}</CardContent>
     </Card>
   );
 };

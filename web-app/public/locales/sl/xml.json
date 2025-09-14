@@ -6,6 +6,7 @@
     "collector": "Zbiratelj",
     "piece_title": "Naslov",
     "outsideLinks": "Zunanje povezave",
+    "noExternalLinks": "Ni zunanjih povezav.",
     "metadataCardTitle": "Metapodatki",
     "basicData": {
         "title": "Osnovni podatki",
