@@ -386,7 +386,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                       }
 
                       // Calculate percentage and compare
-                      return (double)eighthQuarterCount / totalCount >= 0.8;
+                      return (double)eighthQuarterCount / totalCount >= 0.9;
                     `,
                   },
                 },
@@ -550,7 +550,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                       }
 
                       // Calculate percentage and compare
-                      return (double)targetNoteCount / totalCount >= 0.7;
+                      return (double)targetNoteCount / totalCount >= 0.8;
                     `,
                   },
                 },
