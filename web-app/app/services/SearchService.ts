@@ -266,7 +266,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
               {
                 regexp: {
                   "contour.melodic_contour_string_relative.keyword":
-                    "(-?(0|1|2|3|4|5|7))( +-?(0|1|2|3|4|5|7))*",
+                    "(-?(0|1|2|3|4|5|7))(\\s+-?(0|1|2|3|4|5|7))*",
                 },
               },
             ],
