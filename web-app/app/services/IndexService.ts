@@ -1,3 +1,4 @@
+import License from "@elastic/elasticsearch/lib/api/api/license";
 import {
   AggregationsCardinalityAggregate,
   AggregationsHistogramAggregate,
@@ -175,7 +176,30 @@ export interface Corpus {
   enabled?: boolean;
   license?: {
     url: string;
-    description: string;
+    description?: string;
+    description_translations?: Record<string, string>;
   };
   description?: string;
+  description_translations?: Record<string, string>;
 }
+
+export const getLicenseDescriptionFromCorpus = (
+  corpus: Corpus,
+  language: string,
+): string | undefined => {
+  if (!corpus.license) return undefined;
+  if (!corpus.license.description_translations)
+    return corpus.license.description;
+  return (
+    corpus.license.description_translations[language] ??
+    corpus.license.description
+  );
+};
+
+export const getDescriptionFromCorpus = (
+  corpus: Corpus,
+  language: string,
+): string | undefined => {
+  if (!corpus.description_translations) return corpus.description;
+  return corpus.description_translations[language] ?? corpus.description;
+};

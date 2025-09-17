@@ -26,7 +26,6 @@ export const OSMDMeasures: React.FC<OSMDMeasureProps> = ({
   fixedMeasureWidth,
   divProps,
 }) => {
-  const ref = useRef(null);
   const [osmd, setOsmd] = useState<null | OpenSheetMusicDisplay>(null);
 
   const handleRef = useCallback((node: HTMLDivElement | null) => {

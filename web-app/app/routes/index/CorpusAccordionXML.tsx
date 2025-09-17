@@ -17,7 +17,12 @@ import { Bar } from "react-chartjs-2";
 import { MAccordion } from "~/components/MAccordion";
 import { useKeyTranslate } from "~/utils/notes";
 import { getColorHex } from "~/utils/helpers";
-import { Corpus, CorpusAggregateXML } from "~/services/IndexService";
+import {
+  Corpus,
+  CorpusAggregateXML,
+  getDescriptionFromCorpus,
+  getLicenseDescriptionFromCorpus,
+} from "~/services/IndexService";
 import { SearchHit } from "@elastic/elasticsearch/lib/api/types";
 
 ChartJS.register(
@@ -37,9 +42,9 @@ interface CorpusAccordionXMLProps {
 
 export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
   corpusAgg,
-  corpusInfo
+  corpusInfo,
 }) => {
-  const { t } = useTranslation("index");
+  const { t, i18n } = useTranslation("index");
   const corpusInfoSource = corpusInfo._source!;
 
   const metrumDatasets: ChartData<"bar"> = {
@@ -110,10 +115,23 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
           <>
             <Grid item xs={12}>
               <Typography variant="h6">{t("license")}</Typography>
-              <Typography variant="body1"><strong>{t("licenseURL")}: </strong>
-                <a href={corpusInfoSource.license.url}>{corpusInfoSource.license.url}</a>
+              <Typography variant="body1">
+                <strong>{t("licenseURL")}: </strong>
+                <a href={corpusInfoSource.license.url}>
+                  {corpusInfoSource.license.url}
+                </a>
               </Typography>
-              <Typography variant="body1"><div dangerouslySetInnerHTML={{ __html: corpusInfoSource.license.description }} /></Typography>
+              <Typography variant="body1">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      getLicenseDescriptionFromCorpus(
+                        corpusInfoSource,
+                        i18n.language as string,
+                      ) ?? "",
+                  }}
+                />
+              </Typography>
             </Grid>
           </>
         )}
@@ -121,7 +139,17 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
           <>
             <Grid item xs={12}>
               <Typography variant="h6">{t("description")}</Typography>
-              <Typography variant="body1"><div dangerouslySetInnerHTML={{ __html: corpusInfoSource.description}} /></Typography>
+              <Typography variant="body1">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      getDescriptionFromCorpus(
+                        corpusInfoSource,
+                        i18n.language as string,
+                      ) ?? "",
+                  }}
+                />
+              </Typography>
             </Grid>
           </>
         )}
@@ -167,10 +195,16 @@ export const CorpusAccordionXML: React.FC<CorpusAccordionXMLProps> = ({
           <Typography variant="h6">{t("ambitusStatsTitle")}</Typography>
         </Grid>
         <Grid item xs={"auto"}>
-          <InfoCard title={t("ambitusMin")} value={corpusAgg.ambitusStats.min} />
+          <InfoCard
+            title={t("ambitusMin")}
+            value={corpusAgg.ambitusStats.min}
+          />
         </Grid>
         <Grid item xs={"auto"}>
-          <InfoCard title={t("ambitusMax")} value={corpusAgg.ambitusStats.max} />
+          <InfoCard
+            title={t("ambitusMax")}
+            value={corpusAgg.ambitusStats.max}
+          />
         </Grid>
         <Grid item xs={"auto"}>
           <InfoCard

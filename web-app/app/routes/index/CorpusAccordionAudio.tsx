@@ -17,7 +17,12 @@ import { Bar } from "react-chartjs-2";
 import { useTranslation } from "react-i18next";
 import { InfoCard } from "~/components/InfoCard";
 import { MAccordion } from "~/components/MAccordion";
-import { Corpus, CorpusAggregateAudio } from "~/services/IndexService";
+import {
+  Corpus,
+  CorpusAggregateAudio,
+  getDescriptionFromCorpus,
+  getLicenseDescriptionFromCorpus,
+} from "~/services/IndexService";
 import { getColorHex } from "~/utils/helpers";
 
 interface CorpusAccordionAudioProps {
@@ -32,7 +37,7 @@ Chart.register(
   Title,
   Tooltip,
   Legend,
-  Colors
+  Colors,
 );
 
 const colorArrayFromLength = (n: number): string[] => {
@@ -48,14 +53,14 @@ export const CorpusAccordionAudio: React.FC<CorpusAccordionAudioProps> = ({
   corpusInfo,
 }) => {
   const corpusInfoSource = corpusInfo._source!;
-  const { t } = useTranslation("index");
+  const { t, i18n } = useTranslation("index");
 
   const tempoHistogramData: ChartData<"bar"> = useMemo(() => {
     const tempoHistogramLabels = corpus.tempoBuckets.map((x) =>
-      x.key.toString()
+      x.key.toString(),
     );
     const tempoHistogramDatapoints = corpus.tempoBuckets.map(
-      (x) => x.doc_count
+      (x) => x.doc_count,
     );
     return {
       labels: tempoHistogramLabels,
@@ -63,7 +68,7 @@ export const CorpusAccordionAudio: React.FC<CorpusAccordionAudioProps> = ({
         {
           data: tempoHistogramDatapoints,
           backgroundColor: colorArrayFromLength(
-            tempoHistogramDatapoints.length
+            tempoHistogramDatapoints.length,
           ),
         },
       ],
@@ -77,10 +82,23 @@ export const CorpusAccordionAudio: React.FC<CorpusAccordionAudioProps> = ({
           <>
             <Grid item xs={12}>
               <Typography variant="h6">{t("license")}</Typography>
-              <Typography variant="body1"><strong>{t("licenseURL")}: </strong>
-                <a href={corpusInfoSource.license.url}>{corpusInfoSource.license.url}</a>
+              <Typography variant="body1">
+                <strong>{t("licenseURL")}: </strong>
+                <a href={corpusInfoSource.license.url}>
+                  {corpusInfoSource.license.url}
+                </a>
               </Typography>
-              <Typography variant="body1"><div dangerouslySetInnerHTML={{ __html: corpusInfoSource.license.description }} /></Typography>
+              <Typography variant="body1">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      getLicenseDescriptionFromCorpus(
+                        corpusInfoSource,
+                        i18n.language as string,
+                      ) ?? "",
+                  }}
+                />
+              </Typography>
             </Grid>
           </>
         )}
@@ -88,7 +106,17 @@ export const CorpusAccordionAudio: React.FC<CorpusAccordionAudioProps> = ({
           <>
             <Grid item xs={12}>
               <Typography variant="h6">{t("description")}</Typography>
-              <Typography variant="body1"><div dangerouslySetInnerHTML={{ __html: corpusInfoSource.description}} /></Typography>
+              <Typography variant="body1">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      getDescriptionFromCorpus(
+                        corpusInfoSource,
+                        i18n.language as string,
+                      ) ?? "",
+                  }}
+                />
+              </Typography>
             </Grid>
           </>
         )}
@@ -114,15 +142,15 @@ export const CorpusAccordionAudio: React.FC<CorpusAccordionAudioProps> = ({
                 y: {
                   title: {
                     text: t("numberOfWorks"),
-                    display: true
+                    display: true,
                   },
                 },
                 x: {
                   title: {
                     text: t("tempoXLabel"),
-                    display: true
-                  }
-                }
+                    display: true,
+                  },
+                },
               },
             }}
           />
