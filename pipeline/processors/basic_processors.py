@@ -34,7 +34,7 @@ class KeyProcessor(MusicXMLProcessor):
 
 
 class TimeSignatureProcessor(MusicXMLProcessor):
-    """Get the time signature of the song."""
+    """Get all time signatures in the song."""
 
     song: stream.Stream
 
@@ -42,12 +42,18 @@ class TimeSignatureProcessor(MusicXMLProcessor):
         super().__init__(song, feature_name)
         self.mapping = {"type": "keyword", "fields": {"text": {"type": "text"}}}
 
-    def process(self) -> str:
-        first_measure: stream.Measure = self.song.parts[0].getElementsByClass(
-            stream.Measure
-        )[0]
-        time_signature = str(first_measure.timeSignature.ratioString)
-        return time_signature
+    def process(self) -> list[str]:
+        time_signatures = set()
+
+        # Iterate through all parts and measures to find time signatures
+        for part in self.song.parts:
+            measures = part.getElementsByClass(stream.Measure)
+            for measure in measures:
+                if measure.timeSignature is not None:
+                    time_signatures.add(str(measure.timeSignature.ratioString))
+
+        # Convert set to sorted list for consistent ordering
+        return sorted(list(time_signatures))
 
 
 class TempoProcessor(MusicXMLProcessor):
