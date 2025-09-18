@@ -104,12 +104,17 @@ class RhythmProcessor(MusicXMLProcessor):
                     "type": "text",
                     "fields": {"keyword": {"type": "keyword", "ignore_above": 8192}},
                 },
+                "rhythm_string_no_rests": {
+                    "type": "text",
+                    "fields": {"keyword": {"type": "keyword", "ignore_above": 8192}},
+                },
                 "num_rests": {"type": "long"},
             }
         }
 
     def process(self):
         rhythm_numeric = []
+        rhythm_numeric_no_rests = []
         # this is done because you can't set a measure number to a note and a note in a chord doesn't have one
         measure_numbers = []
         beats = []
@@ -123,7 +128,8 @@ class RhythmProcessor(MusicXMLProcessor):
                     continue  # prevents adding two notes that are played at the same time
 
             note = x
-            if isinstance(x, music21.note.Rest):
+            is_rest = isinstance(x, music21.note.Rest)
+            if is_rest:
                 num_rests += 1
             elif not isinstance(x, (music21.note.Note, music21.chord.Chord)):
                 continue
@@ -136,11 +142,18 @@ class RhythmProcessor(MusicXMLProcessor):
             beats.append(note.beat)
             measure_numbers.append(measure_number)
             fraction = note.duration.quarterLength.as_integer_ratio()
-            rhythm_numeric.append(f"{fraction[0]}/{fraction[1]}")
+            duration_string = f"{fraction[0]}/{fraction[1]}"
+            rhythm_numeric.append(duration_string)
+
+            # Only add to no_rests version if it's not a rest
+            if not is_rest:
+                rhythm_numeric_no_rests.append(duration_string)
 
         rhythm_string = " ".join([str(x) for x in rhythm_numeric])
+        rhythm_string_no_rests = " ".join([str(x) for x in rhythm_numeric_no_rests])
         return {
             "rhythm_string": rhythm_string,
+            "rhythm_string_no_rests": rhythm_string_no_rests,
             "measure_starts": [
                 i
                 for i in range(len(rhythm_numeric))
