@@ -17,7 +17,14 @@ export const MetadataCardXML: React.FC = () => {
       title: t("titleSong"),
       year: t("year"),
       collector: t("collector"),
-      piece_title: t("piece_title"), 
+      piece_title: t("piece_title"),
+      title_en: t("title_en"),
+      publication: t("publication"),
+      publication_year: t("publication_year"),
+      publication_number: t("publication_number"),
+      page: t("page"),
+      year_issued: t("year_issued"),
+
     };
 
   const metadataList = useMemo(() => {

@@ -11,6 +11,12 @@ export interface SongResult extends Record<string, unknown> {
     singer: string;
     piece_title: string;
     year: string;
+    title_en: string;
+    publication: string;
+    publication_year: string;
+    publication_number: string;
+    page: string;
+    year_issued: string;
   };
   ambitus: {
     /**
