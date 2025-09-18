@@ -5,6 +5,7 @@ This file is the main entry point for the program.
 import hashlib
 import json
 import os
+import tempfile
 from typing import Type, List
 
 from tqdm import tqdm
@@ -51,6 +52,9 @@ def process(
     in_dir: Annotated[
         str, typer.Option(help="Path to the directory to process")
     ] = None,
+    dump: Annotated[
+        str, typer.Option(help="Path to the elasticsearch dump file to process")
+    ] = None,
     include_original: Annotated[
         bool,
         typer.Option(
@@ -72,8 +76,19 @@ def process(
     ] = None,
 ):
     """Processes MusicXMLs and outputs the results in JSON."""
-    if in_dir is None:
-        raise typer.BadParameter("Must specify in_dir")
+    if in_dir is None and dump is None:
+        raise typer.BadParameter("Must specify either in_dir or dump")
+    if in_dir is not None and dump is not None:
+        raise typer.BadParameter("Cannot specify both in_dir and dump")
+    
+    if dump is not None:
+        if out_dir is None:
+            out_dir = os.path.dirname(dump)
+        if out_file is None:
+            out_file = os.path.join(out_dir, "results.json")
+        process_dump(dump, out_file, corpus_id, include_original, print_output, csv_path, overwrite_features)
+        return
+    
     if out_dir is None:
         out_dir = in_dir
     if out_file is None:
@@ -277,6 +292,161 @@ def process_metadata(path: str, csv_path):
         metadata = csv_processor.process(path)
 
     return metadata
+
+
+def process_dump(
+    dump_file: str,
+    out_file: str,
+    corpus_id: str,
+    include_original: bool,
+    print_output: bool,
+    csv_path: str = None,
+    overwrite_features: list = None,
+):
+    """Processes records from an elasticsearch dump file."""
+    if overwrite_features is None:
+        overwrite_features = []
+
+    # remove old results.json
+    existing_out_file = out_file
+    if os.path.exists(out_file):
+        # if we overwrite all, just delete the file
+        if "all" in overwrite_features:
+            os.remove(out_file)
+        else:
+            existing_out_file = out_file + ".backup.json"
+            with open(out_file, "r") as file1, open(existing_out_file, "w") as file2:
+                file2.write(file1.read())
+            os.remove(out_file)
+
+    # read and process dump file
+    dump_records = read_dump_file(dump_file)
+    
+    with tqdm(total=len(dump_records)) as pbar:
+        existing_json = read_existing_output_file(existing_out_file)
+        
+        for record in dump_records:
+            results = process_dump_record(
+                record,
+                print_output,
+                include_original,
+                corpus_id,
+                existing_json,
+                csv_path,
+                overwrite_features,
+            )
+
+            pbar.update(1)
+            if print_output is True:
+                print(results)
+            else:
+                with open(out_file, "a", encoding="utf-8") as f:
+                    f.write(results + "\n")
+
+
+def read_dump_file(dump_file: str) -> list:
+    """Reads an elasticsearch dump file and returns a list of records."""
+    if not os.path.exists(dump_file):
+        raise typer.BadParameter(f"Dump file does not exist: {dump_file}")
+    
+    records = []
+    with open(dump_file, "r", encoding="utf-8") as f:
+        for line in f:
+            try:
+                record = json.loads(line.strip())
+                if "_source" in record and "original_file" in record["_source"]:
+                    records.append(record)
+            except json.JSONDecodeError as e:
+                print(f"Skipping invalid JSON line: {e}")
+                continue
+    
+    return records
+
+
+def process_dump_record(
+    record: dict,
+    pretty: bool,
+    include_original: bool,
+    corpus_id: str,
+    existing_json: dict,
+    csv_path: str = None,
+    overwrite_features: list = None,
+) -> str:
+    """Processes a single record from the dump file."""
+    if overwrite_features is None:
+        overwrite_features = []
+
+    source_data = record["_source"]
+    original_file_content = source_data.get("original_file", "")
+    filename = source_data.get("filename", "unknown.xml")
+    
+    if not original_file_content:
+        print(f"No original_file content found for {filename}, skipping...")
+        return json.dumps({})
+
+    # Create temporary file with the original content
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False, encoding='utf-8') as temp_file:
+        temp_file.write(original_file_content)
+        temp_file_path = temp_file.name
+
+    try:
+        # Use existing source data as baseline
+        results = dict(source_data)
+        
+        # Always update corpus_id and filename
+        results["corpus_id"] = corpus_id
+        results["filename"] = filename
+        
+        should_merge_existing = (
+            existing_json is not None and "all" not in overwrite_features
+        )
+
+        filtered_musicxml_processors = music_xml_processors
+        filtered_audio_processors = audio_processors
+
+        # don't process features that won't be overwritten
+        if should_merge_existing:
+            # merge results
+            file_hash = results.get("file_hash_sha256", "")
+            if file_hash and file_hash in existing_json:
+                existing = existing_json[file_hash]
+                results.update(existing)
+                # always overwrite the corpus_id
+                results["corpus_id"] = corpus_id
+                
+            # filter processors based on overwrite_features
+            filtered_musicxml_processors = [
+                proc
+                for proc in music_xml_processors
+                if (proc(temp_file_path).get_feature_name()) in overwrite_features
+            ]
+
+        # Process the temporary file if it's XML
+        if check_xml_extension_allowed(temp_file_path):
+            new_features = process_musicxml(temp_file_path, filtered_musicxml_processors)
+            results.update(new_features)
+
+        # Handle metadata
+        if "metadata" not in results:
+            results["metadata"] = {}
+        
+        if "metadata" in overwrite_features or not should_merge_existing:
+            metadata = process_metadata(temp_file_path, csv_path)
+            results["metadata"].update(metadata)
+
+        # Handle original file inclusion
+        if include_original:
+            results["original_file"] = original_file_content
+
+    finally:
+        # Clean up temporary file
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+
+    if pretty:
+        return json.dumps(results, indent=4)
+    else:
+        return json.dumps(results)
 
 
 if __name__ == "__main__":
