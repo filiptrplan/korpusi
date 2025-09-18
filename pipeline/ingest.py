@@ -320,7 +320,7 @@ def process_dump(
             os.remove(out_file)
 
     # read and process dump file
-    dump_records = read_dump_file(dump_file)
+    dump_records = read_dump_file(dump_file, corpus_id)
     
     with tqdm(total=len(dump_records)) as pbar:
         existing_json = read_existing_output_file(existing_out_file)
@@ -344,8 +344,8 @@ def process_dump(
                     f.write(results + "\n")
 
 
-def read_dump_file(dump_file: str) -> list:
-    """Reads an elasticsearch dump file and returns a list of records."""
+def read_dump_file(dump_file: str, corpus_id: str = None) -> list:
+    """Reads an elasticsearch dump file and returns a list of records, optionally filtered by corpus_id."""
     if not os.path.exists(dump_file):
         raise typer.BadParameter(f"Dump file does not exist: {dump_file}")
     
@@ -355,6 +355,11 @@ def read_dump_file(dump_file: str) -> list:
             try:
                 record = json.loads(line.strip())
                 if "_source" in record and "original_file" in record["_source"]:
+                    # Filter by corpus_id if provided
+                    if corpus_id is not None:
+                        record_corpus_id = record["_source"].get("corpus_id")
+                        if record_corpus_id != corpus_id:
+                            continue
                     records.append(record)
             except json.JSONDecodeError as e:
                 print(f"Skipping invalid JSON line: {e}")
