@@ -354,8 +354,18 @@ const constructEducationalQuery = (params: Record<string, string>) => {
             must: [
               // 1. Time Signature must be 2/4, 4/4, or 2/2
               {
-                terms: {
-                  time_signature: ["2/4", "4/4", "2/2"],
+                script: {
+                  script: {
+                    source: `
+                 def allowed = ['2/4', '4/4', '2/2'];
+                for (value in doc['time_signature']) {
+                  if (!allowed.contains(value)) {
+                    return false;
+                  }
+                }
+                return true;
+                    `,
+                  },
                 },
               },
               // 2. At least 80% eighth (0.5) or quarter (1.0) notes
@@ -365,7 +375,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                     lang: "painless",
                     // Access _source directly to avoid fielddata issues on text fields
                     source: `
-                      String rhythmString = doc['rhythm.rhythm_string.keyword'].value;
+                      String rhythmString = doc['rhythm.rhythm_string_no_rests.keyword'].value;
                       if (rhythmString.isEmpty()) {
                           return false; // Empty string doesn't meet criteria
                       }
@@ -408,8 +418,18 @@ const constructEducationalQuery = (params: Record<string, string>) => {
             must: [
               // 1. Time Signature must be 2/4, 4/4, or 2/2
               {
-                terms: {
-                  time_signature: ["2/4", "4/4", "2/2"],
+                script: {
+                  script: {
+                    source: `
+                 def allowed = ['2/4', '4/4', '2/2'];
+                for (value in doc['time_signature']) {
+                  if (!allowed.contains(value)) {
+                    return false;
+                  }
+                }
+                return true;
+                    `,
+                  },
                 },
               },
               // 2. At least 70% eighth ("1/2"), quarter ("1/1"), or half ("2/1") notes
@@ -419,7 +439,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                     lang: "painless",
                     // Access _source directly to avoid fielddata issues on text fields
                     source: `
-                      String rhythmString = doc['rhythm.rhythm_string.keyword'].value;
+                      String rhythmString = doc['rhythm.rhythm_string_no_rests.keyword'].value;
                       if (rhythmString.isEmpty()) {
                           return false; // Empty string doesn't meet criteria
                       }
@@ -462,8 +482,18 @@ const constructEducationalQuery = (params: Record<string, string>) => {
             must: [
               // 1. Time Signature must be 2/4, 4/4, or 2/2
               {
-                terms: {
-                  time_signature: ["2/4", "4/4", "2/2"],
+                script: {
+                  script: {
+                    source: `
+                 def allowed = ['2/4', '4/4', '2/2'];
+                for (value in doc['time_signature']) {
+                  if (!allowed.contains(value)) {
+                    return false;
+                  }
+                }
+                return true;
+                    `,
+                  },
                 },
               },
               // 2. At least 70% eighth ("1/2"), quarter ("1/1"), or half ("2/1") notes
@@ -473,7 +503,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                     lang: "painless",
                     // Access _source directly to avoid fielddata issues on text fields
                     source: `
-                      String rhythmString = doc['rhythm.rhythm_string.keyword'].value;
+                      String rhythmString = doc['rhythm.rhythm_string_no_rests.keyword'].value;
                       if (rhythmString.isEmpty()) {
                           return false; // Empty string doesn't meet criteria
                       }
@@ -519,8 +549,10 @@ const constructEducationalQuery = (params: Record<string, string>) => {
               // 1. Must have a single time signature (any type)
               // We check for existence, assuming the field stores a single value if present.
               {
-                exists: {
-                  field: "time_signature",
+                script: {
+                  script: {
+                    source: "doc['time_signature'].length == 1",
+                  },
                 },
               },
               // 2. At least 70% eighth ("1/2"), quarter ("1/1"), or half ("2/1") notes
@@ -529,7 +561,7 @@ const constructEducationalQuery = (params: Record<string, string>) => {
                   script: {
                     lang: "painless",
                     source: `
-                      String rhythmString = doc['rhythm.rhythm_string.keyword'].value;
+                      String rhythmString = doc['rhythm.rhythm_string_no_rests.keyword'].value;
                       if (rhythmString.isEmpty()) {
                           return false; // Empty string doesn't meet criteria
                       }
