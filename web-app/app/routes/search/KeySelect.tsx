@@ -50,6 +50,7 @@ export const KeySelect: React.FC<KeySelectProps> = ({
           }}
         >
           <MenuItem value="none">{tKeys("none")}</MenuItem>
+          <MenuItem value="C">{tKeys("C")}</MenuItem>
           <MenuItem value="G">{tKeys("G")}</MenuItem>
           <MenuItem value="D">{tKeys("D")}</MenuItem>
           <MenuItem value="A">{tKeys("A")}</MenuItem>
