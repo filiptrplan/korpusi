@@ -133,16 +133,16 @@ export default function Index() {
       >
         <MarkdownLinkRenderer text={t("projectDescription")} />
       </Typography>
-      <MAccordion title={t("allStatsTitle")}>
-        <Grid container spacing={1}>
-          <Grid item xs="auto">
-            <InfoCard title={t("totalSongs")} value={allSongsCount} />
-          </Grid>
-          <Grid item xs="auto">
-            <InfoCard title={t("totalCorpuses")} value={allCorpusesCount} />
-          </Grid>
-        </Grid>
-      </MAccordion>
+      {/* <MAccordion title={t("allStatsTitle")}> */}
+      {/*   <Grid container spacing={1}> */}
+      {/*     <Grid item xs="auto"> */}
+      {/*       <InfoCard title={t("totalSongs")} value={allSongsCount} /> */}
+      {/*     </Grid> */}
+      {/*     <Grid item xs="auto"> */}
+      {/*       <InfoCard title={t("totalCorpuses")} value={allCorpusesCount} /> */}
+      {/*     </Grid> */}
+      {/*   </Grid> */}
+      {/* </MAccordion> */}
       <Stack>
         {xmlAggregates}
         {audioAggregates}
@@ -150,3 +150,4 @@ export default function Index() {
     </>
   );
 }
+

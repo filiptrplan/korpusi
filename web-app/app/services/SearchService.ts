@@ -547,7 +547,6 @@ const constructEducationalQuery = (params: Record<string, string>) => {
           bool: {
             must: [
               // 1. Must have a single time signature (any type)
-              // We check for existence, assuming the field stores a single value if present.
               {
                 script: {
                   script: {
